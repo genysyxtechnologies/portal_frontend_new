@@ -1,8 +1,8 @@
 <template>
   <div
-    class="mx-auto w-full  bg-white shadow-lg rounded-lg overflow-hidden transition-all duration-300 hover:shadow-xl">
+    class="mx-auto w-full  rounded-lg overflow-hidden transition-all duration-300 hover:shadow-xl flex flex-col gap-4">
     <!-- Header Section with Animation -->
-    <div class="bg-[#0D47A1] text-white p-4" v-motion="{
+    <div class="bg-[#0D47A1] text-white rounded-xl p-4" v-motion="{
       initial: { opacity: 0, y: -20 },
       enter: { opacity: 1, y: 0, transition: { duration: 500 } }
     }">
@@ -25,11 +25,10 @@
           <p class="text-green-300">✓ Paid: 2025/2026</p>
         </div>
       </div>
-
     </div>
 
     <!-- Student Information Section -->
-    <div class="p-4">
+    <div class="p-4 bg-[#fff] h-full rounded-xl shadow-lg ">
       <h2 class="text-xl font-bold mb-4 sub-title" v-motion="{
         initial: { opacity: 0, x: -20 },
         enter: { opacity: 1, x: 0, transition: { duration: 500, delay: 100 } }
@@ -50,7 +49,7 @@
           }
         }">
           <label class="block text-[#BFBFBF] mb-1 text-sm">{{ formatLabel(key) }}</label>
-          <InputText style="border: 1px solid #90CAF9;" v-model="studentInfo[key]" class="w-full" readonly :pt="{
+          <InputText size="large" style="border: 1px solid #90CAF9;" v-model="studentInfo[key]" class="w-full" readonly :pt="{
             root: {
               class: 'border-[#90CAF9] hover:border-[#0D47A1] focus:border-[#0D47A1] focus:ring-2 focus:ring-[#90CAF9]/50 transition-all duration-300'
             }

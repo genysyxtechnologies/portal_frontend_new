@@ -1,32 +1,35 @@
 <template>
   <div class="dashboard-layout">
-    <!-- Fixed Sidebar -->
+    <!-- fixedss Sidebar -->
     <SidebarView />
 
-    <!-- Main Content Area -->
+    <!-- main Content Area -->
     <div class="main-content">
-      <!-- Navbar that moves with content -->
       <NavbarView />
-
-      <!-- Your page content will go here -->
       <div class="page-content">
-        <DashboardMenu  />
-     <!--    <DashboardMenu /> -->
+        <DashboardContent />
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import StudentBioData from './biodata/StudentBioData.vue';
-import DashboardMenu from './dashboard/DashboardContent.vue';
+import DashboardContent from './dashboard/DashboardContent.vue';
 import StudentFee from './fees/StudentFee.vue';
+import StudentBioData from './biodata/StudentBioData.vue';
+import StudentCourseRegistration from './course_registration/StudentCourseRegistration.vue';
+import StudentResult from './result/StudentResult.vue';
+import StudentAccomodation from './accomodation/StudentAccomodation.vue';
+import StudentProgramme from './programme/StudentProgramme.vue';
+import StudentDocuments from './documents/StudentDocuments.vue';
+import StudentSelfService from './self_service/StudentSelfService.vue';
+import StudentSettings from './settings/StudentSettings.vue';
 
 
+
+/* The Navbar and Sidebar */
 import NavbarView from './NavbarView.vue';
 import SidebarView from './SidebarView.vue';
-
-// Dashboard logic will be added here
 </script>
 
 
@@ -38,7 +41,6 @@ import SidebarView from './SidebarView.vue';
 }
 
 .sidebar {
-  /* Keep your existing sidebar styles */
   position: fixed;
   left: 4;
   top: 4;
@@ -51,7 +53,7 @@ import SidebarView from './SidebarView.vue';
   flex: 1;
   margin-left: 270px;
 
-  /* Same as sidebar width */
+  /* sidebar width */
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -74,7 +76,7 @@ import SidebarView from './SidebarView.vue';
   padding: 0.8rem;
 }
 
-/* Responsive adjustments */
+/* responsive adjustments */
 @media (max-width: 768px) {
   .sidebar {
     width: 240px;

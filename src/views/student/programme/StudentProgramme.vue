@@ -1,13 +1,12 @@
 <template>
-  <div class="flex flex-col gap-6">
-    <div class="flex items-center justify-between">
-      <h1 class="head-title">Dashboard</h1>
+  <div class=" flex flex-col gap-6">
+    <div class=" flex items-center justify-between">
+      <h1 class="head-title">Change Programme</h1>
       <div class="flex items-center gap-4">
-        <ReUsableSelect />
-        <ReUsableSelect />
+        <ReUsableSelect class="flex-1" />
+        <ReUsableSelect class="flex-1" />
       </div>
     </div>
-    <!-- page content -->
 
     <div class="grid grid-cols-12 h-[calc(100vh-180px)] gap-4">
 
@@ -17,23 +16,18 @@
       </div>
       <!-- Bio Data -->
 
-      <div class="col-span-7 w-full  rounded-xl flex justify-center">
-        <StudentInformation />
+      <div class="col-span-7 bg-[#fff] w-full  rounded-xl flex justify-center">
+        <StudentPayment />
       </div>
 
     </div>
-
   </div>
 </template>
 
 <script setup lang="ts">
 import ReUsableSelect from '@/views/select/ReUsableSelect.vue';
-import UserInformation from './UserInformation.vue';
-import StudentInformation from './StudentInformation.vue';
-
-
+import UserInformation from '../dashboard/UserInformation.vue';
+import BioData from '../dashboard/StudentInformation.vue';
+import StudentPayment from './StudentPayment.vue';
 
 </script>
-
-
-<style scoped></style>

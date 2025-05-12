@@ -17,59 +17,9 @@
       </div>
 
       <!-- Right hand side -->
-      <div
-        class="flex flex-col p-6 sm:p-12 bg-white gap-8 rounded-xl justify-center shadow-2xl transform transition-all duration-700 hover:shadow-3xl hover:-translate-y-1">
-        <div class="p-4 sm:p-8 flex flex-col gap-8">
-          <div class="flex flex-col items-center space-y-2">
-            <h1 class="welcome animate-fade-in">Welcome back</h1>
-            <h3 class="sub-welcome animate-fade-in delay-100">Login to your account below</h3>
-          </div>
+      <LoginPage v-if="isLoginPage" @on-switch="handlePageChange"/>
+      <RegistrationPage v-else @on-switch="handlePageChange"/>
 
-          <div class="flex flex-col gap-6 animate-fade-in delay-200">
-            <div class="flex flex-col gap-6">
-              <div class="flex flex-col space-y-2">
-                <small class="text-[#0D47A1] font-medium">Username</small>
-                <div class="relative">
-                  <InputText class="input-field" placeholder="Enter your username" />
-                  <span class="absolute top-4 right-4">
-                    <i class="pi pi-user"></i>
-                  </span>
-                </div>
-              </div>
-              <div class="flex flex-col space-y-2">
-                <small class="text-[#0D47A1] font-medium">Password</small>
-                <div class="relative">
-                  <InputText type="password" class="input-field" placeholder="Enter your password" />
-                  <span class="absolute top-4 right-4"> <i class="pi pi-lock"></i></span>
-                </div>
-              </div>
-            </div>
-
-            <div class="flex flex-col gap-6">
-              <div class="flex flex-col space-y-4">
-                <ReUsableButtons :label="'Login'" @on-click="handleButtonClick" />
-                <span
-                  class="text-center text-[#0D47A1] hover:text-[#1565C0] cursor-pointer transition-colors duration-300">
-                  Forget password?
-                </span>
-              </div>
-
-              <div class="flex flex-col text-center space-y-1">
-                <span class="text-[#BFBFBF]">Start your application</span>
-                <div class="flex self-center items-center gap-2">
-                  <span
-                    class="text-[#0D47A1] font-medium hover:text-[#1565C0] cursor-pointer transition-colors duration-300">
-                    Apply here
-                  </span>
-                  <span class="flex">
-                    <i class="pi pi-arrow-right"></i>
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   </div>
 </template>
@@ -77,22 +27,21 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
 import image1 from '../../../assets/images/auth/image1.png'
-import ReUsableButtons from '@/views/buttons/ReUsableButtons.vue'
 import { useRouter } from 'vue-router'
+import LoginPage from './LoginPage.vue'
+import RegistrationPage from './RegistrationPage.vue'
+import { useAuth } from '@/services/student/useAuth'
+
+const { isLoginPage, handlePageChange } = useAuth();
+
+
 const $router = useRouter();
-
-
-
-
-
 
 const handleButtonClick = () => {
   $router.push('/student')
 }
 
-
 onMounted(() => {
-  // Add animation class to elements when mounted
   document.querySelectorAll('.animate-on-scroll').forEach(el => {
     el.classList.add('animate-fade-in-up')
   })
