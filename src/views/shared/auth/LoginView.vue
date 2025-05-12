@@ -17,8 +17,8 @@
       </div>
 
       <!-- Right hand side -->
-      <LoginPage v-if="isLoginPage" @on-switch="handlePageChange"/>
-      <RegistrationPage v-else @on-switch="handlePageChange"/>
+      <LoginPage v-if="isLoginPage" @on-switch="handlePageChange" @on-click="handleButtonClick"/>
+      <RegistrationPage v-else @on-switch="handlePageChange" @on-click="handleButtonClick"/>
 
     </div>
   </div>
