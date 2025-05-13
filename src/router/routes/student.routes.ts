@@ -12,36 +12,31 @@ const studentRoutes: RouteRecordRaw[] = [
     children: [
       {
         path: '',
-        redirect: '/student/dashboard',
-      },
-      {
-        path: 'dashboard',
-        name: 'StudentDashboard',
-        component: () => import('@/views/student/StudentDashboard.vue'),
+        name: 'DashboardContent',
+        component: () => import('@/views/student/dashboard/DashboardContent.vue'),
         meta: {
           title: 'Student Dashboard',
           icon: 'pi pi-home',
         },
       },
-
       {
         path: 'fees',
         name: 'StudentFee',
-        component: () => import('@/views/student/StudentDashboard.vue'),
+        component: () => import('@/views/student/fees/StudentFee.vue'),
         meta: {
-          title: 'Student Dashboard',
-          icon: 'pi pi-home',
+          title: 'Student Fees',
+          icon: 'pi pi-money-bill',
         },
       },
-      /*  {
-        path: 'calendar',
-        name: 'StudentCalendar',
-        component: () => import('@/views/student/dashboard/CalendarView.vue'),
+      {
+        path: 'bio-data',
+        name: 'StudentBioData',
+        component: () => import('@/views/student/biodata/StudentBioData.vue'),
         meta: {
-          title: 'Calendar',
-          icon: 'pi pi-calendar',
+          title: 'Student Bio Data',
+          icon: 'pi pi-user',
         },
-      }, */
+      },
     ],
   },
 ]

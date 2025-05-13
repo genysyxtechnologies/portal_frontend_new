@@ -82,10 +82,9 @@ const router = useRouter()
 
 const login = async () => {
   const d = await handleUserLogin()
-
   // route based on
-  if(anyContains(['student'], d.data.roles)){
-    await router.push("/student")
+  if (anyContains(['student'], d.data.roles)) {
+    await router.push('/student')
   }
 }
 </script>

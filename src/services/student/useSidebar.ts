@@ -26,22 +26,22 @@ export const useStudentSideBar = createSharedComposable(() => {
     {
       title: 'Bio Data',
       icon: image3,
-      path: '',
+      path: '/student/bio-data',
     },
     {
       title: 'Course Registration',
       icon: image4,
-      path: '',
+      path: '/student/course-registration',
     },
     {
       title: 'My Results',
       icon: image5,
-      path: '',
+      path: '/student/my-results',
     },
     {
       title: 'My Accomodation',
       icon: image6,
-      path: '',
+      path: '/student/my-accomodation',
     },
     {
       title: 'Dashboard',

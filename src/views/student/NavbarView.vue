@@ -1,10 +1,10 @@
 <template>
-  <div class="navbar rounded-2xl shadow-lg bg-white  flex items-center justify-between">
+  <header class="navbar">
     <button class="sidebar-toggle">
       <i class="pi pi-arrow-left"></i>
     </button>
-    <div>{{ currentDate }}</div>
-  </div>
+    <div class="current-date">{{ currentDate }}</div>
+  </header>
 </template>
 
 <script setup lang="ts">
@@ -21,14 +21,22 @@ const currentDate = computed(() => {
   });
 });
 </script>
-
 <style scoped>
+
+
 .navbar {
-  padding: 1rem;
-  margin-left: 8px;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 1rem 1.5rem;
   display: flex;
   align-items: center;
-  gap: 1rem;
+  justify-content: space-between;
+  border-radius: 0.5rem;
+  margin: 0.5rem;
+  margin-left: 38px;
 }
 
 .sidebar-toggle {
@@ -37,5 +45,18 @@ const currentDate = computed(() => {
   cursor: pointer;
   font-size: 1.2rem;
   color: #0D47A1;
+  padding: 0.5rem;
+}
+
+.current-date {
+  font-weight: 500;
+  color: #333;
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    margin: 0;
+    border-radius: 0;
+  }
 }
 </style>

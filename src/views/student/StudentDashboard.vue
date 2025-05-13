@@ -1,5 +1,5 @@
 <template>
-  <div class="dashboard-layout" >
+  <div class="dashboard-layout">
     <!-- fixedss Sidebar -->
     <SidebarView />
 
@@ -7,20 +7,20 @@
     <div class="main-content">
       <NavbarView />
       <div class="page-content">
-        <DashboardContent />
+        <router-view />
       </div>
     </div>
   </div>
-<!--  <skeleton></skeleton>-->
 </template>
 
 <script setup lang="ts">
-import DashboardContent from './dashboard/DashboardContent.vue';
-/* The Navbar and Sidebar */
-import NavbarView from './NavbarView.vue';
-import SidebarView from './SidebarView.vue';
-</script>
+{/* import DashboardContent from './dashboard/DashoardContent.vue'
+import StudentFee from './fees/StudentFee.vue' */}
 
+/* The Navbar and Sidebar */
+import NavbarView from './NavbarView.vue'
+import SidebarView from './SidebarView.vue'
+</script>
 
 <style scoped>
 .dashboard-layout {
@@ -53,7 +53,6 @@ import SidebarView from './SidebarView.vue';
   /* Modified navbar styles */
   position: sticky;
   top: 0;
-  width: 100%;
   z-index: 50;
   background: white;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -63,6 +62,7 @@ import SidebarView from './SidebarView.vue';
   margin-top: 1rem;
   flex: 1;
   padding: 0.8rem;
+  margin-left: 35px;
 }
 
 /* responsive adjustments */

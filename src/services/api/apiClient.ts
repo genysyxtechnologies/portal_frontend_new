@@ -1,8 +1,13 @@
-import axios, { type AxiosError, type AxiosInstance, type AxiosRequestConfig, type AxiosResponse } from 'axios'
+import axios, {
+  type AxiosError,
+  type AxiosInstance,
+  type AxiosRequestConfig,
+  type AxiosResponse,
+} from 'axios'
 import { processError } from '@/utils/apiErrorResolver'
 
 // Define response type structure
-export interface ApiResponse<T =unknown> {
+export interface ApiResponse<T = unknown> {
   data: T
   success: boolean
   message?: string
@@ -40,7 +45,7 @@ class ApiClient {
         // Get token from storage
         const token = sessionStorage.getItem('auth_token')
 
-        console.log("Auth", token)
+        console.log('Auth', token)
 
         // If token exists, add to headers
         if (token && !config.url?.includes('authenticate')) {
@@ -102,12 +107,13 @@ class ApiClient {
   public async request<T>(config: AxiosRequestConfig): Promise<ApiResponse<T>> {
     try {
       const response: AxiosResponse<ApiResponse<T>> = await this.instance.request(config)
+      console.log("THIS IS THE RESPONSE: ", response.data)
       return {
         success: true,
         data: (response as AxiosResponse).data,
         message: 'Success',
       }
-    } catch (error:unknown) {
+    } catch (error: unknown) {
       const errorMessage = await processError(error)
       return {
         success: false,
@@ -118,7 +124,7 @@ class ApiClient {
   }
 
   // GET method
-  public async get<T>(url: string, params?:unknown): Promise<ApiResponse<T>> {
+  public async get<T>(url: string, params?: unknown): Promise<ApiResponse<T>> {
     return this.request<T>({
       method: 'GET',
       url,
@@ -127,7 +133,7 @@ class ApiClient {
   }
 
   // POST method
-  public async post<T =unknown>(url: string, data?:unknown): Promise<ApiResponse<T>> {
+  public async post<T = unknown>(url: string, data?: unknown): Promise<ApiResponse<T>> {
     return this.request<T>({
       method: 'POST',
       url,
@@ -136,7 +142,7 @@ class ApiClient {
   }
 
   // PUT method
-  public async put<T =unknown>(url: string, data?:unknown): Promise<ApiResponse<T>> {
+  public async put<T = unknown>(url: string, data?: unknown): Promise<ApiResponse<T>> {
     return this.request<T>({
       method: 'PUT',
       url,
@@ -145,7 +151,7 @@ class ApiClient {
   }
 
   // PATCH method
-  public async patch<T =unknown>(url: string, data?:unknown): Promise<ApiResponse<T>> {
+  public async patch<T = unknown>(url: string, data?: unknown): Promise<ApiResponse<T>> {
     return this.request<T>({
       method: 'PATCH',
       url,
@@ -154,7 +160,7 @@ class ApiClient {
   }
 
   // DELETE method
-  public async delete<T =unknown>(url: string, params?:unknown): Promise<ApiResponse<T>> {
+  public async delete<T = unknown>(url: string, params?: unknown): Promise<ApiResponse<T>> {
     return this.request<T>({
       method: 'DELETE',
       url,
@@ -175,7 +181,7 @@ class ApiClient {
   }
 
   // Download file method
-  public async download(url: string, filename: string, params?:unknown): Promise<boolean> {
+  public async download(url: string, filename: string, params?: unknown): Promise<boolean> {
     try {
       const response = await this.instance.get(url, {
         params,
