@@ -110,6 +110,7 @@ const isSubmitting = ref(false);
 const showPassword = ref(false);
 const showConfirmPassword = ref(false);
 
+
 const formData = reactive({
   firstName: '',
   lastName: '',
@@ -216,6 +217,7 @@ const handleSubmit = async () => {
 
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 1000));
+  
 
     // Redirect to verify email page or login
     router.push('/auth/verify-email');

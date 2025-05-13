@@ -1,11 +1,7 @@
-<script setup lang="ts">
-import ReUsableButtons from '@/views/buttons/ReUsableButtons.vue';
-
-</script>
-
 <template>
   <div
-    class="flex flex-col p-6 sm:p-12 bg-white gap-8 rounded-xl justify-center shadow-2xl transform transition-all duration-700 hover:shadow-3xl hover:-translate-y-1">
+    class="flex flex-col p-6 sm:p-12 bg-white gap-8 rounded-xl justify-center shadow-2xl transform transition-all duration-700 hover:shadow-3xl hover:-translate-y-1"
+  >
     <div class="p-4 sm:p-8 flex flex-col gap-8">
       <div class="flex flex-col items-center space-y-2">
         <h1 class="welcome animate-fade-in">Welcome back</h1>
@@ -17,7 +13,11 @@ import ReUsableButtons from '@/views/buttons/ReUsableButtons.vue';
           <div class="flex flex-col space-y-2">
             <small class="text-[#0D47A1] font-medium">Username</small>
             <div class="relative">
-              <InputText class="input-field" placeholder="Enter your username" />
+              <InputText
+                v-model="credentials.email"
+                class="input-field"
+                placeholder="Enter your username"
+              />
               <span class="absolute top-4 right-4">
                 <i class="pi pi-user"></i>
               </span>
@@ -26,16 +26,26 @@ import ReUsableButtons from '@/views/buttons/ReUsableButtons.vue';
           <div class="flex flex-col space-y-2">
             <small class="text-[#0D47A1] font-medium">Password</small>
             <div class="relative">
-              <InputText type="password" class="input-field" placeholder="Enter your password" />
-              <span class="absolute top-4 right-4"> <i class="pi pi-lock"></i></span>
+              <InputText
+                v-model="credentials.password"
+                :type="isPassword ? 'password' : 'text'"
+                class="input-field"
+                placeholder="Enter your password"
+              />
+              <span @click="handlePasswordChange" class="absolute top-4 right-4">
+                <i v-if="isPassword" class="pi pi-lock"></i>
+                <i v-else class="pi pi-eye-slash"></i>
+              </span>
             </div>
           </div>
         </div>
 
         <div class="flex flex-col gap-6">
           <div class="flex flex-col space-y-4">
-            <ReUsableButtons :label="'Login'" @on-click="$emit('on-click')" />
-            <span class="text-center text-[#0D47A1] hover:text-[#1565C0] cursor-pointer transition-colors duration-300">
+            <ReUsableButtons :label="'Login'" @on-click="handleUserLogin" />
+            <span
+              class="text-center text-[#0D47A1] hover:text-[#1565C0] cursor-pointer transition-colors duration-300"
+            >
               Forget password?
             </span>
           </div>
@@ -44,8 +54,9 @@ import ReUsableButtons from '@/views/buttons/ReUsableButtons.vue';
             <span class="text-[#BFBFBF]">Start your application</span>
             <div class="flex self-center items-center gap-2">
               <span
-              @click="$emit('on-switch')"
-                class="text-[#0D47A1] font-medium hover:text-[#1565C0] cursor-pointer transition-colors duration-300">
+                @click="$emit('on-switch')"
+                class="text-[#0D47A1] font-medium hover:text-[#1565C0] cursor-pointer transition-colors duration-300"
+              >
                 Apply here
               </span>
               <span class="flex">
@@ -58,6 +69,12 @@ import ReUsableButtons from '@/views/buttons/ReUsableButtons.vue';
     </div>
   </div>
 </template>
+
+<script setup lang="ts">
+import { useAuth } from '@/services/student/useAuth'
+import ReUsableButtons from '@/views/buttons/ReUsableButtons.vue'
+const { handleUserLogin, credentials, isPassword, handlePasswordChange } = useAuth()
+</script>
 
 <style scoped>
 .welcome {
@@ -78,10 +95,9 @@ import ReUsableButtons from '@/views/buttons/ReUsableButtons.vue';
   color: #434343;
 }
 
-
 .input-field {
   padding: 12px 16px;
-  border: 1px solid #E0E0E0;
+  border: 1px solid #e0e0e0;
   border-radius: 8px;
   transition: all 0.3s ease;
   width: 100%;

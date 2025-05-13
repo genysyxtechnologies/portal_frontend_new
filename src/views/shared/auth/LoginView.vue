@@ -1,14 +1,20 @@
 <template>
   <div
-    class="h-screen bg-gradient-to-br from-[#90CAF9] to-[#64B5F6] w-full flex items-center justify-center p-5 overflow-hidden">
+    class="h-screen bg-gradient-to-br from-[#90CAF9] to-[#64B5F6] w-full flex items-center justify-center p-5 overflow-hidden"
+  >
     <div class="grid grid-cols-1 lg:grid-cols-2 w-full lg:w-3/4 h-full max-w-6xl">
       <!-- Left hand side -->
       <div
-        class="hidden lg:flex flex-col items-center justify-center gap-8 left-text transform transition-all duration-1000 ease-in-out">
+        class="hidden lg:flex flex-col items-center justify-center gap-8 left-text transform transition-all duration-1000 ease-in-out"
+      >
         <div
-          class="bg-white rounded-full flex items-center justify-center p-2 shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-105">
-          <img :src="image1" alt="Logo"
-            class="image1 rounded-t-full scale-75 transition-transform duration-700 hover:scale-90" />
+          class="bg-white rounded-full flex items-center justify-center p-2 shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-105"
+        >
+          <img
+            :src="image1"
+            alt="Logo"
+            class="image1 rounded-t-full scale-75 transition-transform duration-700 hover:scale-90"
+          />
         </div>
         <div class="text-center space-y-2">
           <div class="animate-fade-in-up delay-100">Integrity, Innovation</div>
@@ -17,32 +23,33 @@
       </div>
 
       <!-- Right hand side -->
-      <LoginPage v-if="isLoginPage" @on-switch="handlePageChange" @on-click="handleButtonClick"/>
-      <RegistrationPage v-else @on-switch="handlePageChange" @on-click="handleButtonClick"/>
-
+      <LoginPage v-if="isLoginPage" @on-switch="handlePageChange" @on-click="handleButtonClick" />
+      <RegistrationPage v-else @on-switch="handlePageChange" @on-click="handleButtonClick" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { onMounted } from 'vue'
-import image1 from '../../../assets/images/auth/image1.png'
 import { useRouter } from 'vue-router'
 import LoginPage from './LoginPage.vue'
 import RegistrationPage from './RegistrationPage.vue'
 import { useAuth } from '@/services/student/useAuth'
+import urlUtil from '@/utils/urlUtil'
 
-const { isLoginPage, handlePageChange } = useAuth();
+const { isLoginPage, handlePageChange } = useAuth()
 
-
-const $router = useRouter();
+const $router = useRouter()
 
 const handleButtonClick = () => {
   $router.push('/student')
 }
 
+const image1 = urlUtil.getBaseUrl() + '/api/global/logo'
+
+
 onMounted(() => {
-  document.querySelectorAll('.animate-on-scroll').forEach(el => {
+  document.querySelectorAll('.animate-on-scroll').forEach((el) => {
     el.classList.add('animate-fade-in-up')
   })
 })
@@ -78,10 +85,9 @@ onMounted(() => {
   color: #434343;
 }
 
-
 .input-field {
   padding: 12px 16px;
-  border: 1px solid #E0E0E0;
+  border: 1px solid #e0e0e0;
   border-radius: 8px;
   transition: all 0.3s ease;
   width: 100%;
