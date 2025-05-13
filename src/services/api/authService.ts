@@ -18,7 +18,6 @@ class AuthService {
       localStorage.setItem('auth_token', response.data.token)
       localStorage.setItem('isAuthenticated', 'true')
     }
-console.log('THIS IS THE RESPONSE FORM THE ROOT: ', response)
     return response
   }
 
