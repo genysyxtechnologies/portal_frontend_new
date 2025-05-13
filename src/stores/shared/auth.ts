@@ -30,13 +30,27 @@ export const useAuthStore = defineStore('auth', () => {
     loading.value = true
     error.value = null
 
+    // first load roles from session storage
+    const r = sessionStorage.getItem("roles")
+    if(r && authService.isAuthenticated()){
+      // pass
+      try {
+        setUserRole(JSON.parse(r))
+      } catch (e: unknown){
+        console.log(e)
+        setUserRole([])
+      }
+    }
+
     try {
       if (authService.isAuthenticated()) {
         const response = await authService.getCurrentUser()
+        console.log(response)
         if (response.success && response.data) {
           user.value = response.data
-          setUserRole(response.data.roles as Array<Role>)
+          setUserRole(response.data.user.roles as Array<Role>)
         } else {
+          console.log("Logount called")
           // Token is invalid, clear auth state
           logout()
         }
@@ -48,6 +62,10 @@ export const useAuthStore = defineStore('auth', () => {
       loading.value = false
       isInitialized.value = true
     }
+  }
+
+  async function storeRoles(roles: string[]){
+    sessionStorage.setItem("roles", JSON.stringify(roles))
   }
 
   async function login(credentials: LoginCredentials) {
@@ -132,7 +150,7 @@ export const useAuthStore = defineStore('auth', () => {
     error.value = null
 
     try {
-      const response = await authService.getCurrentUser() // Mock - replace with actual API call
+      const response = await authService.getCurrentUser()
 
       if (response.success) {
         user.value = {
@@ -184,5 +202,6 @@ export const useAuthStore = defineStore('auth', () => {
     register,
     logout,
     updateProfile,
+    storeRoles
   }
 })

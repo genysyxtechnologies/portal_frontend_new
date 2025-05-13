@@ -1,5 +1,5 @@
 <template>
-  <div class="dashboard-layout">
+  <div class="dashboard-layout" >
     <!-- fixedss Sidebar -->
     <SidebarView />
 
@@ -11,22 +11,11 @@
       </div>
     </div>
   </div>
+<!--  <skeleton></skeleton>-->
 </template>
 
 <script setup lang="ts">
 import DashboardContent from './dashboard/DashboardContent.vue';
-import StudentFee from './fees/StudentFee.vue';
-import StudentBioData from './biodata/StudentBioData.vue';
-import StudentCourseRegistration from './course_registration/StudentCourseRegistration.vue';
-import StudentResult from './result/StudentResult.vue';
-import StudentAccomodation from './accomodation/StudentAccomodation.vue';
-import StudentProgramme from './programme/StudentProgramme.vue';
-import StudentDocuments from './documents/StudentDocuments.vue';
-import StudentSelfService from './self_service/StudentSelfService.vue';
-import StudentSettings from './settings/StudentSettings.vue';
-
-
-
 /* The Navbar and Sidebar */
 import NavbarView from './NavbarView.vue';
 import SidebarView from './SidebarView.vue';

@@ -43,7 +43,7 @@
 
         <div class="flex flex-col gap-6">
           <div class="flex flex-col space-y-4">
-            <ReUsableButtons :label="'Login'" @on-click="handleUserLogin" />
+            <ReUsableButtons :label="'Login'" @on-click="login" />
             <span
               class="text-center text-[#0D47A1] hover:text-[#1565C0] cursor-pointer transition-colors duration-300"
             >
@@ -74,7 +74,20 @@
 <script setup lang="ts">
 import { useAuth } from '@/services/student/useAuth'
 import ReUsableButtons from '@/views/buttons/ReUsableButtons.vue'
+import { anyContains } from '@/utils/permissions/roles.ts'
+import { useRouter } from 'vue-router'
 const { handleUserLogin, credentials, isPassword, handlePasswordChange } = useAuth()
+
+const router = useRouter()
+
+const login = async () => {
+  const d = await handleUserLogin()
+
+  // route based on
+  if(anyContains(['student'], d.data.roles)){
+    await router.push("/student")
+  }
+}
 </script>
 
 <style scoped>

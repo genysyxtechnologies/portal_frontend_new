@@ -7,6 +7,7 @@ import type {
   ResetPasswordData,
   User,
 } from '@/types/auth.ts'
+import { useAuthStore } from '@/stores/shared/auth.ts'
 
 class AuthService {
   // Login user
@@ -16,9 +17,12 @@ class AuthService {
       password: credentials.password,
     })
     if (response.data.jwt) {
-      localStorage.setItem('auth_token', response.data.jwt)
-      localStorage.setItem('isAuthenticated', 'true')
-      setUserRole(response.data.user.roles as Array<Role>)
+      sessionStorage.setItem('auth_token', response.data.jwt)
+      sessionStorage.setItem('isAuthenticated', 'true')
+      const roles = response.data.roles.map(e => e.toLowerCase())
+      setUserRole(roles as Array<Role>)
+      response.data.roles = roles
+      sessionStorage.setItem("roles", JSON.stringify(roles))
     }
     return response
   }
@@ -28,8 +32,8 @@ class AuthService {
     const response = await apiClient.post<AuthResponse>('/auth/register', data)
 
     if (response.data.jwt) {
-      localStorage.setItem('auth_token', response.data.jwt)
-      localStorage.setItem('isAuthenticated', 'true')
+      sessionStorage.setItem('auth_token', response.data.jwt)
+      sessionStorage.setItem('isAuthenticated', 'true')
       setUserRole(response.data.user.roles as Array<Role>)
     }
 
@@ -41,15 +45,16 @@ class AuthService {
     const response = await apiClient.post<null>('/auth/logout')
 
     // Clear auth data regardless of response
-    localStorage.removeItem('auth_token')
-    localStorage.removeItem('isAuthenticated')
+    sessionStorage.removeItem('auth_token')
+    sessionStorage.removeItem('isAuthenticated')
+    sessionStorage.removeItem('roles')
 
     return response
   }
 
   // Get current user profile
   public async getCurrentUser(): Promise<ApiResponse<User>> {
-    return apiClient.get<User>('/current-user')
+    return apiClient.get<User>('/get-current-user')
   }
 
   // Send password reset link
@@ -69,12 +74,12 @@ class AuthService {
 
   // Check if user is authenticated
   public isAuthenticated(): boolean {
-    return localStorage.getItem('isAuthenticated') === 'true'
+    return sessionStorage.getItem('isAuthenticated') === 'true'
   }
 
   // Get auth token
   public getToken(): string | null {
-    return localStorage.getItem('auth_token')
+    return sessionStorage.getItem('auth_token')
   }
 
   // Refresh token
@@ -82,7 +87,7 @@ class AuthService {
     const response = await apiClient.post<{ jwt: string }>('/auth/refresh')
 
     if (response.data.jwt) {
-      localStorage.setItem('auth_token', response.data.jwt)
+      sessionStorage.setItem('auth_token', response.data.jwt)
     }
 
     return response

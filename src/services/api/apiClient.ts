@@ -1,8 +1,8 @@
-import axios, { type AxiosInstance, type AxiosRequestConfig, type AxiosResponse } from 'axios'
+import axios, { type AxiosError, type AxiosInstance, type AxiosRequestConfig, type AxiosResponse } from 'axios'
 import { processError } from '@/utils/apiErrorResolver'
 
 // Define response type structure
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T =unknown> {
   data: T
   success: boolean
   message?: string
@@ -38,10 +38,12 @@ class ApiClient {
     this.instance.interceptors.request.use(
       (config) => {
         // Get token from storage
-        const token = localStorage.getItem('auth_token')
+        const token = sessionStorage.getItem('auth_token')
+
+        console.log("Auth", token)
 
         // If token exists, add to headers
-        if (token && config.url?.includes('authenticate')) {
+        if (token && !config.url?.includes('authenticate')) {
           config.headers.Authorization = `Bearer ${token}`
           config.withCredentials = true
         } else {
@@ -64,8 +66,8 @@ class ApiClient {
           // Authentication errors
           if (status === 401) {
             // Clear authentication state
-            localStorage.removeItem('auth_token')
-            localStorage.removeItem('isAuthenticated')
+            sessionStorage.removeItem('auth_token')
+            sessionStorage.removeItem('isAuthenticated')
 
             // Redirect to login page if not already there
             /* if (window.location.pathname !== '/auth/login') {
@@ -100,25 +102,23 @@ class ApiClient {
   public async request<T>(config: AxiosRequestConfig): Promise<ApiResponse<T>> {
     try {
       const response: AxiosResponse<ApiResponse<T>> = await this.instance.request(config)
-      localStorage.setItem('auth_token', (response as AxiosResponse).data.jwt)
-      localStorage.setItem('isAuthenticated', 'true')
       return {
         success: true,
         data: (response as AxiosResponse).data,
         message: 'Success',
       }
-    } catch (error: any) {
+    } catch (error:unknown) {
       const errorMessage = await processError(error)
       return {
         success: false,
-        data: (error as Error).message,
+        data: (error as Error).message as T,
         message: errorMessage,
       }
     }
   }
 
   // GET method
-  public async get<T>(url: string, params?: any): Promise<ApiResponse<T>> {
+  public async get<T>(url: string, params?:unknown): Promise<ApiResponse<T>> {
     return this.request<T>({
       method: 'GET',
       url,
@@ -127,7 +127,7 @@ class ApiClient {
   }
 
   // POST method
-  public async post<T = any>(url: string, data?: any): Promise<ApiResponse<T>> {
+  public async post<T =unknown>(url: string, data?:unknown): Promise<ApiResponse<T>> {
     return this.request<T>({
       method: 'POST',
       url,
@@ -136,7 +136,7 @@ class ApiClient {
   }
 
   // PUT method
-  public async put<T = any>(url: string, data?: any): Promise<ApiResponse<T>> {
+  public async put<T =unknown>(url: string, data?:unknown): Promise<ApiResponse<T>> {
     return this.request<T>({
       method: 'PUT',
       url,
@@ -145,7 +145,7 @@ class ApiClient {
   }
 
   // PATCH method
-  public async patch<T = any>(url: string, data?: any): Promise<ApiResponse<T>> {
+  public async patch<T =unknown>(url: string, data?:unknown): Promise<ApiResponse<T>> {
     return this.request<T>({
       method: 'PATCH',
       url,
@@ -154,7 +154,7 @@ class ApiClient {
   }
 
   // DELETE method
-  public async delete<T = any>(url: string, params?: any): Promise<ApiResponse<T>> {
+  public async delete<T =unknown>(url: string, params?:unknown): Promise<ApiResponse<T>> {
     return this.request<T>({
       method: 'DELETE',
       url,
@@ -163,7 +163,7 @@ class ApiClient {
   }
 
   // Upload files method
-  public async upload<T = any>(url: string, formData: FormData): Promise<ApiResponse<T>> {
+  public async upload<T = unknown>(url: string, formData: FormData): Promise<ApiResponse<T>> {
     return this.request<T>({
       method: 'POST',
       url,
@@ -175,7 +175,7 @@ class ApiClient {
   }
 
   // Download file method
-  public async download(url: string, filename: string, params?: any): Promise<boolean> {
+  public async download(url: string, filename: string, params?:unknown): Promise<boolean> {
     try {
       const response = await this.instance.get(url, {
         params,

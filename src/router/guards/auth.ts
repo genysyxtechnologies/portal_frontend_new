@@ -1,5 +1,6 @@
 import type { NavigationGuardNext, RouteLocationNormalized } from 'vue-router'
 import { anyContains, userRole } from '@/utils/permissions/roles'
+import authService from '@/services/api/authService.ts'
 
 /**
  * Authentication route guard
@@ -11,8 +12,7 @@ export const authGuard = (
   from: RouteLocationNormalized,
   next: NavigationGuardNext,
 ) => {
-  // TODO: Replace with actual authentication check from auth service
-  const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true'
+  const isAuthenticated = authService.isAuthenticated()
 
   if (!isAuthenticated && to.meta.requiresAuth) {
     // Redirect to login page and store the intended destination
@@ -38,14 +38,13 @@ export const roleGuard = (
 ) => {
 
   // If the route doesn't specify roles, allow access
-  if (!to.meta.roles) {    
+  if (!to.meta.roles) {
     return next()
   }
 
   // Ensure user is authenticated first
-  const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true'
+  const isAuthenticated = authService.isAuthenticated()
   if (!isAuthenticated && to.meta.requiresAuth) {
-    console.log("test here iii")
     return next({
       path: '/',
       query: { redirect: to.fullPath },
@@ -55,7 +54,6 @@ export const roleGuard = (
   // Check if user's role is allowed
   const allowedRoles = to.meta.roles as string[]
   if (!anyContains(userRole.current, allowedRoles)) {
-    console.log("test here iv", userRole.current)
     // Redirect to forbidden page or dashboard based on current role
     if(anyContains(['admin'], userRole.current)) {
       return next({ path: '/admin/dashboard' })
@@ -66,8 +64,6 @@ export const roleGuard = (
     }
     return next({ path: '/forbidden' })
   }
-
-  console.log("test here v")
 
   next()
 }

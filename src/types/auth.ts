@@ -26,6 +26,7 @@ export interface RegisterData {
 
 export interface AuthResponse {
   user: User;
+  roles: string[]
   jwt: string;
   mfa: boolean;
   old: string;

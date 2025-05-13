@@ -4,7 +4,7 @@ import { RouterView } from 'vue-router'
 
 <template>
   <RouterView />
-  <Toa-st />
+  <Toast />
 </template>
 
 <style scoped>

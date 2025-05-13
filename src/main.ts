@@ -114,6 +114,7 @@ import TreeTable from 'primevue/treetable'
 import Toast from 'primevue/toast';
 import ToastService from 'primevue/toastservice'
 
+
 const app = createApp(App)
 
 app.use(ToastService)
@@ -228,7 +229,13 @@ app.use(PrimeVue, {
 })
 app.use(MotionPlugin)
 
-app.use(createPinia())
+const pinia = createPinia()
+app.use(pinia)
 app.use(router)
+
+import { useAuthStore } from '@/stores/shared/auth.ts'
+const authStore = useAuthStore()
+
+authStore.initialize().then(r => {})
 
 app.mount('#app')
