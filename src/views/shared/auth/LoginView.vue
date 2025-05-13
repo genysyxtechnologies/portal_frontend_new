@@ -2,18 +2,18 @@
   <div
     class="h-screen bg-gradient-to-br from-[#90CAF9] to-[#64B5F6] w-full flex items-center justify-center p-5 overflow-hidden"
   >
-    <div class="grid grid-cols-1 lg:grid-cols-2 w-full lg:w-3/4 h-full max-w-6xl">
+    <div class="grid grid-cols-1 lg:grid-cols-2 w-full lg:w-3/4 h-full">
       <!-- Left hand side -->
       <div
         class="hidden lg:flex flex-col items-center justify-center gap-8 left-text transform transition-all duration-1000 ease-in-out"
       >
         <div
-          class="bg-white rounded-full flex items-center justify-center p-2 shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-105"
+          class="bg-white w-1/2 rounded-full flex items-center justify-center p-2 shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-105"
         >
           <img
             :src="image1"
             alt="Logo"
-            class="image1 rounded-t-full scale-75 transition-transform duration-700 hover:scale-90"
+            class="image1 rounded-t-full scale-70 transition-transform duration-700 hover:scale-90"
           />
         </div>
         <div class="text-center space-y-2">
@@ -30,14 +30,16 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import LoginPage from './LoginPage.vue'
 import RegistrationPage from './RegistrationPage.vue'
 import { useAuth } from '@/services/student/useAuth'
 import urlUtil from '@/utils/urlUtil'
+import { useToast } from 'primevue/usetoast'
+const $toast = useToast()
 
-const { isLoginPage, handlePageChange } = useAuth()
+const { isLoginPage, handlePageChange, isAuthenticated, message } = useAuth()
 
 const $router = useRouter()
 
@@ -47,12 +49,29 @@ const handleButtonClick = () => {
 
 const image1 = urlUtil.getBaseUrl() + '/api/global/logo'
 
-
 onMounted(() => {
   document.querySelectorAll('.animate-on-scroll').forEach((el) => {
     el.classList.add('animate-fade-in-up')
   })
 })
+
+watch(
+  () => [message.value, isAuthenticated.value],
+  ([message, isAuthenticated]) => {
+    if (message) {
+      $toast.add({
+        severity: isAuthenticated ? 'success' : 'error',
+        summary: isAuthenticated ? 'Success' : 'Error',
+        detail: message,
+        life: 3000,
+      })
+    }
+  },
+)
+
+{
+  /* NSU/NAS/CMP/0696/17/18 */
+}
 </script>
 
 <style scoped>

@@ -11,7 +11,7 @@
         <i class="pi pi-check-circle"></i>
         <h1>Email Verified!</h1>
         <p class="subtitle">Your email has been successfully verified. You can now access all features of the portal.</p>
-        <router-link to="/auth/login" class="btn-primary">
+        <router-link to="/" class="btn-primary">
           Sign In
         </router-link>
       </div>

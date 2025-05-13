@@ -11,7 +11,7 @@ const authRoutes: RouteRecordRaw[] = [
     children: [
       {
         path: '',
-        redirect: '/auth/login'
+        redirect: '/'
       },
       {
         path: 'login',

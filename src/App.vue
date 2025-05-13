@@ -2,8 +2,9 @@
 import { RouterView } from 'vue-router'
 </script>
 
-<template >
-<RouterView />
+<template>
+  <RouterView />
+  <Toa-st />
 </template>
 
 <style scoped>

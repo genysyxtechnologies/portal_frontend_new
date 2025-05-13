@@ -1,10 +1,10 @@
+import StudentDashboard from '@/views/student/StudentDashboard.vue'
 import type { RouteRecordRaw } from 'vue-router'
-import StudentLayout from '@/components/layout/student/StudentLayout.vue'
 
 const studentRoutes: RouteRecordRaw[] = [
   {
     path: '/student',
-    component: StudentLayout,
+    component: StudentDashboard,
     meta: {
       requiresAuth: true,
       roles: ['student'],

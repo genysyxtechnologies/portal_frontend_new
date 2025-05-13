@@ -35,7 +35,7 @@
       </form>
 
       <div class="auth-links">
-        <p>Remember your password? <router-link to="/auth/login">Sign in</router-link></p>
+        <p>Remember your password? <router-link to="/">Sign in</router-link></p>
         <p>Don't have an account? <router-link to="/auth/register">Register</router-link></p>
       </div>
     </div>

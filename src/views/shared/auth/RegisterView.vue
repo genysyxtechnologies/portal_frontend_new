@@ -94,7 +94,7 @@
       </form>
 
       <div class="auth-links">
-        <p>Already have an account? <router-link to="/auth/login">Sign in</router-link></p>
+        <p>Already have an account? <router-link to="/">Sign in</router-link></p>
       </div>
     </div>
   </div>

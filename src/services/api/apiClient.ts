@@ -1,4 +1,5 @@
 import axios, { type AxiosInstance, type AxiosRequestConfig, type AxiosResponse } from 'axios'
+import { processError } from '@/utils/apiErrorResolver'
 
 // Define response type structure
 export interface ApiResponse<T = any> {
@@ -40,10 +41,10 @@ class ApiClient {
         const token = localStorage.getItem('auth_token')
 
         // If token exists, add to headers
-        if (token && config.url?.includes("authenticate")) {
+        if (token && config.url?.includes('authenticate')) {
           config.headers.Authorization = `Bearer ${token}`
           config.withCredentials = true
-        } else{
+        } else {
           config.withCredentials = false
         }
 
@@ -67,9 +68,9 @@ class ApiClient {
             localStorage.removeItem('isAuthenticated')
 
             // Redirect to login page if not already there
-            if (window.location.pathname !== '/auth/login') {
+            /* if (window.location.pathname !== '/auth/login') {
               window.location.href = '/auth/login'
-            }
+            } */
           }
 
           // Permission errors
@@ -95,28 +96,29 @@ class ApiClient {
       },
     )
   }
-
   // Generic request method
-  public async request<T = any>(config: AxiosRequestConfig): Promise<ApiResponse<T>> {
+  public async request<T>(config: AxiosRequestConfig): Promise<ApiResponse<T>> {
     try {
       const response: AxiosResponse<ApiResponse<T>> = await this.instance.request(config)
-      return response.data
-    } catch (error: any) {
-      console.log('THIS IS THE ERROR FROM THE MAIN ROOT: ', error)
-      if (error.response && error.response.data) {
-        return error.response.data
+      localStorage.setItem('auth_token', (response as AxiosResponse).data.jwt)
+      localStorage.setItem('isAuthenticated', 'true')
+      return {
+        success: true,
+        data: (response as AxiosResponse).data,
+        message: 'Success',
       }
-
+    } catch (error: any) {
+      const errorMessage = await processError(error)
       return {
         success: false,
-        data: null as any,
-        message: error.message || 'Network error',
+        data: (error as Error).message,
+        message: errorMessage,
       }
     }
   }
 
   // GET method
-  public async get<T = any>(url: string, params?: any): Promise<ApiResponse<T>> {
+  public async get<T>(url: string, params?: any): Promise<ApiResponse<T>> {
     return this.request<T>({
       method: 'GET',
       url,
@@ -200,7 +202,7 @@ class ApiClient {
 
 // Create and export default API client instance
 const apiConfig: ApiClientConfig = {
-  baseURL: (import.meta.env.VITE_API_BASE_URL || 'https://test.nsuk.edu.ng') + "/api",
+  baseURL: (import.meta.env.VITE_API_BASE_URL || 'https://test.nsuk.edu.ng') + '/api',
 }
 
 export const apiClient = new ApiClient(apiConfig)

@@ -1,3 +1,4 @@
+import { setUserRole, type Role } from '@/utils/permissions/roles'
 import apiClient, { type ApiResponse } from './apiClient'
 import type {
   AuthResponse,
@@ -11,12 +12,13 @@ class AuthService {
   // Login user
   public async login(credentials: LoginCredentials): Promise<ApiResponse<AuthResponse>> {
     const response = await apiClient.post<AuthResponse>('/authenticate', {
-      email: credentials.email,
+      username: credentials.email,
       password: credentials.password,
     })
-    if (response.success && response.data.token) {
-      localStorage.setItem('auth_token', response.data.token)
+    if (response.data.jwt) {
+      localStorage.setItem('auth_token', response.data.jwt)
       localStorage.setItem('isAuthenticated', 'true')
+      setUserRole(response.data.user.roles as Array<Role>)
     }
     return response
   }
@@ -25,9 +27,10 @@ class AuthService {
   public async register(data: RegisterData): Promise<ApiResponse<AuthResponse>> {
     const response = await apiClient.post<AuthResponse>('/auth/register', data)
 
-    if (response.success && response.data.token) {
-      localStorage.setItem('auth_token', response.data.token)
+    if (response.data.jwt) {
+      localStorage.setItem('auth_token', response.data.jwt)
       localStorage.setItem('isAuthenticated', 'true')
+      setUserRole(response.data.user.roles as Array<Role>)
     }
 
     return response
@@ -46,7 +49,7 @@ class AuthService {
 
   // Get current user profile
   public async getCurrentUser(): Promise<ApiResponse<User>> {
-    return apiClient.get<User>('/auth/user')
+    return apiClient.get<User>('/current-user')
   }
 
   // Send password reset link
@@ -75,11 +78,11 @@ class AuthService {
   }
 
   // Refresh token
-  public async refreshToken(): Promise<ApiResponse<{ token: string }>> {
-    const response = await apiClient.post<{ token: string }>('/auth/refresh')
+  public async refreshToken(): Promise<ApiResponse<{ jwt: string }>> {
+    const response = await apiClient.post<{ jwt: string }>('/auth/refresh')
 
-    if (response.success && response.data.token) {
-      localStorage.setItem('auth_token', response.data.token)
+    if (response.data.jwt) {
+      localStorage.setItem('auth_token', response.data.jwt)
     }
 
     return response

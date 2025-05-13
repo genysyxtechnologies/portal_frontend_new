@@ -67,7 +67,7 @@
             <div>
               <h3>Password Reset Successful</h3>
               <p>Your password has been successfully reset. You can now log in with your new password.</p>
-              <router-link to="/auth/login" class="btn-login">
+              <router-link to="/" class="btn-login">
                 Go to Login
               </router-link>
             </div>
@@ -76,7 +76,7 @@
       </form>
 
       <div v-if="isValid && !success" class="auth-links">
-        <p>Remember your password? <router-link to="/auth/login">Sign in</router-link></p>
+        <p>Remember your password? <router-link to="/">Sign in</router-link></p>
       </div>
     </div>
   </div>

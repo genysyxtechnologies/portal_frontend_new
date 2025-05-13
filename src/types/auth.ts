@@ -3,7 +3,7 @@ export interface User {
   id: string;
   name: string;
   email: string;
-  role: string;
+  roles: string[];
   avatar?: string;
   department?: string;
   position?: string;
@@ -26,7 +26,9 @@ export interface RegisterData {
 
 export interface AuthResponse {
   user: User;
-  token: string;
+  jwt: string;
+  mfa: boolean;
+  old: string;
 }
 
 export interface ResetPasswordData {

@@ -113,17 +113,17 @@ export function hasPermission(role: Role, permission: Permission): boolean {
 
 // Current user role (to be set from authentication)
 export const userRole = reactive<{
-  current: Role;
+  current: Array<Role>;
   permissions: Permission[];
 }>({
-  current: 'guest',
+  current: ['guest'],
   permissions: [...rolePermissions.guest]
 });
 
 // Set the user role and update permissions
-export function setUserRole(role: Role): void {
-  userRole.current = role;
-  userRole.permissions = [...rolePermissions[role]];
+export function setUserRole(roles: Array<Role>): void {
+  userRole.current = roles;
+  userRole.permissions = [...roles.flatMap(e => rolePermissions[e])];
 }
 
 // Check if the current user has a specific permission
@@ -139,4 +139,8 @@ export function currentUserHasAnyPermission(permissions: Permission[]): boolean 
 // Check if the current user has all of the specified permissions
 export function currentUserHasAllPermissions(permissions: Permission[]): boolean {
   return permissions.every(permission => userRole.permissions.includes(permission));
+}
+
+export function anyContains(base: Array<string>, target: Array<string>): boolean {
+  return target.some(role => base.includes(role));
 }

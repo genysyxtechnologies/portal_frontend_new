@@ -14,7 +14,7 @@
           <i class="pi pi-home"></i>
           Return to Home
         </router-link>
-        <router-link to="/auth/login" class="btn-login">
+        <router-link to="/" class="btn-login">
           <i class="pi pi-sign-in"></i>
           Sign In as Different User
         </router-link>

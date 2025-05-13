@@ -1,11 +1,9 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import authService from '@/services/api/authService'
-import { setUserRole } from '@/utils/permissions/roles'
+import { anyContains, setUserRole, type Role } from '@/utils/permissions/roles'
 import router from '@/router'
 import type { LoginCredentials, RegisterData, User } from '@/types/auth.ts'
-
-type UserRole = 'admin' | 'staff' | 'student' | 'guest'
 
 interface ApiError extends Error {
   message: string
@@ -20,7 +18,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   // Getters
   const isAuthenticated = computed(() => !!user.value)
-  const userRole = computed(() => user.value?.role || 'guest')
+  const userRole = computed(() => user.value?.roles  || ['guest'])
   const userFullName = computed(() => user.value?.name || '')
   const userEmail = computed(() => user.value?.email || '')
   const userAvatar = computed(() => user.value?.avatar || '/assets/default-avatar.png')
@@ -37,7 +35,7 @@ export const useAuthStore = defineStore('auth', () => {
         const response = await authService.getCurrentUser()
         if (response.success && response.data) {
           user.value = response.data
-          setUserRole(response.data.role as UserRole)
+          setUserRole(response.data.roles as Array<Role>)
         } else {
           // Token is invalid, clear auth state
           logout()
@@ -61,10 +59,10 @@ export const useAuthStore = defineStore('auth', () => {
 
       if (response.success && response.data.user) {
         user.value = response.data.user
-        setUserRole(response.data.user.role as UserRole)
+        setUserRole(response.data.user.roles as Array<Role>)
 
         // Redirect based on role
-        const redirectPath = getRedirectPathBasedOnRole(response.data.user.role)
+        const redirectPath = getRedirectPathBasedOnRole(response.data.user.roles)
         router.push(redirectPath)
 
         return true
@@ -90,7 +88,7 @@ export const useAuthStore = defineStore('auth', () => {
 
       if (response.success && response.data.user) {
         user.value = response.data.user
-        setUserRole(response.data.user.role as UserRole)
+        setUserRole(response.data.user.roles as Array<Role>)
 
         // Redirect to verification page
         router.push('/auth/verify-email')
@@ -119,11 +117,11 @@ export const useAuthStore = defineStore('auth', () => {
     } finally {
       // Clear user state regardless of API response
       user.value = null
-      setUserRole('guest')
+      setUserRole(['guest'])
       loading.value = false
 
       // Redirect to login
-      router.push('/auth/login')
+      router.push('/')
     }
   }
 
@@ -155,17 +153,15 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  function getRedirectPathBasedOnRole(role: string): string {
-    switch (role) {
-      case 'admin':
+  function getRedirectPathBasedOnRole(roles: string[]): string {
+    if(anyContains(['admin'], roles)) {
         return '/admin/dashboard'
-      case 'staff':
+      } else if(anyContains(['lecturer'], roles)) {
         return '/staff/dashboard'
-      case 'student':
+      } else if(anyContains(['student'], roles)) {
         return '/student/dashboard'
-      default:
-        return '/'
-    }
+      }
+      return '/'
   }
 
   return {

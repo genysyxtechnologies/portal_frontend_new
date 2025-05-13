@@ -6,6 +6,10 @@ import authService from '@/services/api/authService'
 export const useAuth = createSharedComposable(() => {
   const isLoginPage = ref<boolean>(true)
   const isPassword = ref<boolean>(false)
+  const isLoading = ref<boolean>(false)
+  const message = ref<string | null>(null)
+  const isAuthenticated = ref<boolean>(false)
+  const error = ref<string | null>(null)
   const credentials = ref<LoginCredentials>({
     email: '',
     password: '',
@@ -20,17 +24,22 @@ export const useAuth = createSharedComposable(() => {
   const handleUserLogin = async () => {
     try {
       const response = await authService.login(credentials.value)
-      console.log('Login response:', response)
+      console.log(response)
+      if (response.success) {
+        isAuthenticated.value = true
+        message.value = 'Successfully logged in'
+      } else {
+        message.value = response.message as string
+        isAuthenticated.value = false
+      }
       return response
     } catch (error) {
-      console.error('Login error:', error)
       return error
     }
   }
 
   // handle password
   const handlePasswordChange = () => {
-    console.log('Hello world')
     return (isPassword.value = !isPassword.value)
   }
 
@@ -40,6 +49,10 @@ export const useAuth = createSharedComposable(() => {
     handlePageChange,
     handleUserLogin,
     handlePasswordChange,
+    isLoading,
+    isAuthenticated,
+    error,
+    message,
     credentials,
   }
 })

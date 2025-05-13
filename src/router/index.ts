@@ -21,6 +21,27 @@ const baseRoutes = [
   },
 
   {
+    path: '/auth/login',
+    name: 'Login',
+    component: () => import('@/views/shared/auth/LoginView.vue'),
+    meta: {
+      requiresAuth: false,
+      title: 'Login',
+    },
+  },
+
+
+  {
+    path: '/forbidden',
+    name: 'Forbidden',
+    component: () => import('@/views/shared/auth/LoginView.vue'),
+    meta: {
+      requiresAuth: false,
+      title: 'Forbidden',
+    },
+  },
+
+  {
     path: '/redirect',
     name: 'Redirect',
     component: () => import('@/views/shared/RedirectView.vue'),
