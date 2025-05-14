@@ -23,7 +23,7 @@
                   v-model="credentials.email"
                   id="username"
                   class="w-full"
-                  :class="{ 
+                  :class="{
                     'p-invalid': usernameError || invalidCredentials,
                     'shake-animation': usernameError || invalidCredentials
                   }"
@@ -47,7 +47,7 @@
                   v-model="credentials.password"
                   id="password"
                   class="w-full"
-                  :class="{ 
+                  :class="{
                     'p-invalid': passwordError || invalidCredentials,
                     'shake-animation': passwordError || invalidCredentials
                   }"
@@ -70,9 +70,9 @@
         <!-- Buttons with hover effects -->
         <div class="flex flex-col gap-6">
           <div class="flex flex-col space-y-4">
-            <ReUsableButtons 
-              :label="'Login'" 
-              @on-click="login" 
+            <ReUsableButtons
+              :label="'Login'"
+              @on-click="login"
               :loading="isLoading"
               class="hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300"
             />
@@ -103,9 +103,9 @@
     </div>
 
     <transition name="fade">
-      <div 
-        v-if="loginSuccess" 
-        class="absolute inset-0 bg-white bg-opacity-90 flex flex-col items-center justify-center rounded-xl"
+      <div
+        v-if="loginSuccess"
+        class="absolute inset-0 bg-white z-50 bg-opacity-90 flex flex-col items-center justify-center rounded-xl"
       >
         <div class="animate-checkmark">
           <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
@@ -141,27 +141,27 @@ const resetErrors = () => {
 
 const validateForm = () => {
   let isValid = true
-  
+
   if (!credentials.value.email.trim()) {
     usernameError.value = true
     isValid = false
   }
-  
+
   if (!credentials.value.password.trim()) {
     passwordError.value = true
     isValid = false
   }
-  
+
   return isValid
 }
 
 const login = async () => {
   resetErrors()
-  
+
   if (!validateForm()) {
     return
   }
-  
+
   try {
     const d = await handleUserLogin()
     if (anyContains(['student'], (d.data as { roles: string[] }).roles)) {

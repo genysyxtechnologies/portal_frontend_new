@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-white rounded-xl shadow-lg w-full p-6 transition-all duration-500"
+  <div class="bg-white rounded-xl shadow-lg w-full p-6 transition-all duration-500 relative"
     :class="{ 'opacity-0 scale-95': loading, 'opacity-100 scale-100': !loading }">
     <!-- Loading Overlay -->
     <div v-if="loading"

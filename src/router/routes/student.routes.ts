@@ -1,3 +1,4 @@
+import StudentCourseRegistration from '@/views/student/course_registration/StudentCourseRegistration.vue'
 import StudentDashboard from '@/views/student/StudentDashboard.vue'
 import type { RouteRecordRaw } from 'vue-router'
 
@@ -35,6 +36,15 @@ const studentRoutes: RouteRecordRaw[] = [
         meta: {
           title: 'Student Bio Data',
           icon: 'pi pi-user',
+        },
+      },
+      {
+        path: 'course-registration',
+        name: 'StudentCourseRegistration',
+        component: () => import('@/views/student/course_registration/StudentCourseRegistration.vue'),
+        meta: {
+          title: 'Student Course Registration',
+          icon: 'pi pi-book',
         },
       },
     ],

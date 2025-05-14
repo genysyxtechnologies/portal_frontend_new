@@ -30,9 +30,11 @@
 
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import CourseRegistration from './CourseRegistration.vue';
 import CourseRegistrationForm from './CourseRegistrationForm.vue';
+import { useStudentCourses } from '@/services/student/useStudentCourses';
+const { fetchAllCoursesForStudent } = useStudentCourses();
 
 const tabCount = ref<string>('0')
 
@@ -40,6 +42,12 @@ const tabs = [
   { label: 'Registration', component: CourseRegistration },
   { label: 'Forms', component: CourseRegistrationForm },
 ];
+
+
+// fetch data immediately the component mounted
+onMounted(async () => {
+  await fetchAllCoursesForStudent('', '', '');
+})
 
 
 

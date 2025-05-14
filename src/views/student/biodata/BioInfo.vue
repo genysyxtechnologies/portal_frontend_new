@@ -103,7 +103,7 @@
           <label for="tribe" class="block text-sm font-medium text-gray-700 mb-1 labels">Tribe</label>
           <div class="relative">
             <InputText id="tribe" v-model="formData.tribe" type="text" class="w-full pr-10"
-              :placeholder="user?.information.tribe.name || 'Enter Tribe'" :readonly="!editableFields.tribe"
+              :placeholder="user?.information?.tribe?.name || 'Not Specified'" :readonly="!editableFields.tribe"
               :class="{ 'bg-gray-50': !editableFields.tribe }" />
             <EditToggle :is-editing="editableFields.tribe" @click="toggleEdit('tribe')"
               class="absolute right-3 top-3" />
@@ -224,7 +224,7 @@ const formData = ref<FormData>({
   placeOfBirth: props.user?.information.placeOfBirth || 'Not Specified',
   dateOfBirth: formatDateOfBirth(props.user?.information?.dob) || '',
   gender: props.user?.gender || 'Not Specified',
-  tribe: props.user?.information.tribe.name || 'Not Specified',
+  tribe: props.user?.information?.tribe?.name || 'Not Specified',
 });
 
 // Selected values for select inputs
@@ -244,7 +244,7 @@ watch(() => props.user, (newUser) => {
       placeOfBirth: newUser.information.placeOfBirth || '',
       dateOfBirth: formatDateOfBirth(newUser.information?.dob) || '',
       gender: newUser.gender || '',
-      tribe: newUser.information.tribe.name || 'Not Specified',
+      tribe: newUser.information?.tribe?.name || 'Not Specified',
     };
     selectedCountry.value = newUser.information.country;
     selectedState.value = newUser.information.state;
