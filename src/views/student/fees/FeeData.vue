@@ -1,107 +1,221 @@
 <template>
-  <div class="bg-gray-100  flex items-center justify-center">
-    <div class="bg-white rounded-lg shadow-xl w-full  p-8 transition-all duration-300 hover:shadow-2xl" v-motion="{
-      initial: { opacity: 0, y: 20 },
-      enter: { opacity: 1, y: 0, transition: { duration: 500, type: 'spring' } }
+  <div class="bg-white rounded-xl shadow-lg w-full p-6 transition-all duration-500"
+    :class="{ 'opacity-0 scale-95': loading, 'opacity-100 scale-100': !loading }">
+    <!-- Loading Overlay -->
+    <div v-if="loading"
+      class="absolute inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center rounded-xl z-10" v-motion="{
+        initial: { opacity: 1 },
+        enter: { opacity: 1 },
+        leave: { opacity: 0, transition: { duration: 300 } }
+      }">
+      <div class="text-center">
+        <div class="flex justify-center mb-4">
+          <div class="relative w-16 h-16">
+            <div class="absolute inset-0 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"
+              style="animation-duration: 1s"></div>
+            <div class="absolute inset-1 border-4 border-blue-300 border-t-transparent rounded-full animate-spin"
+              style="animation-duration: 1.5s; animation-direction: reverse"></div>
+          </div>
+        </div>
+        <p class="text-gray-600 font-medium">Loading student data...</p>
+        <p class="text-sm text-gray-400 mt-1">Please wait while we fetch your information</p>
+      </div>
+    </div>
+
+    <!-- Student Information Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8" v-motion="{
+      initial: { opacity: 0 },
+      enter: {
+        opacity: 1,
+        transition: {
+          staggerChildren: 0.05,
+          delayChildren: 0.3
+        }
+      }
     }">
-      <!-- Header with animated gradient -->
-
-
-      <!-- Student Information Grid -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        <div v-for="(field, index) in studentFields" :key="field.id" v-motion="{
+      <template v-for="(field, index) in studentFields" :key="field.id">
+        <div v-motion="{
           initial: { opacity: 0, x: -20 },
           enter: {
             opacity: 1,
             x: 0,
             transition: {
-              delay: 200 + (index * 50),
-              duration: 300
+              duration: 400,
+              type: 'spring',
+              damping: 15
             }
           }
         }">
           <label class="block text-gray-600 text-sm font-medium mb-2">{{ field.label }}</label>
-          <InputText v-model="field.value" readonly class="w-full" :pt="{
-            root: {
-              class: 'border-gray-300 hover:border-blue-500 focus:border-blue-500 transition-colors duration-300'
-            }
-          }" />
+          <div class="relative">
+            <InputText :placeholder="field.value" readonly class="w-full pl-3 pr-8" :pt="{
+              root: {
+                class: 'border-gray-200 hover:border-blue-300 focus:border-blue-400 transition-all duration-300 shadow-sm'
+              }
+            }" />
+            <div class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+              <i class="pi pi-lock"></i>
+            </div>
+          </div>
         </div>
-      </div>
+      </template>
+    </div>
 
-      <Div-ider class="my-4 opacity-30" style="height: 2px; background-color: #0D47A1;" />
+    <Divider class="my-6 opacity-20"
+      style="height: 1px; background: linear-gradient(90deg, transparent, #0D47A1, transparent);" />
 
-      <!-- Fees Information Section -->
-      <div class="pt-6" v-motion="{
-        initial: { opacity: 0, y: 20 },
-        enter: { opacity: 1, y: 0, transition: { delay: 500, duration: 500 } }
-      }">
-        <DataTable :value="fees" class="p-datatable-sm shadow-sm rounded-lg" :pt="{
-          header: { class: 'bg-gray-100 border-b border-gray-200' },
-          bodyRow: { class: 'hover:bg-gray-50 transition-colors duration-200' }
+    <!-- Fees Information Section -->
+    <div class="pt-4" v-motion="{
+      initial: { opacity: 0, y: 20 },
+      enter: {
+        opacity: 1,
+        y: 0,
+        transition: {
+          delay: 0.5,
+          duration: 500,
+          type: 'spring',
+          stiffness: 80
+        }
+      }
+    }">
+      <h2 class="text-xl font-semibold text-gray-700 mb-4 flex items-center">
+        <i class="pi pi-wallet mr-2 text-blue-500"></i>
+        Fee Payment Details
+      </h2>
+
+      <DataTable :value="feeItems" class="p-datatable-sm rounded-lg border border-gray-100 shadow-sm" :loading="loading"
+        :pt="{
+          wrapper: { class: 'rounded-lg overflow-hidden' },
+          header: { class: 'bg-gray-50 border-b border-gray-100' },
+          bodyRow: {
+            class: 'hover:bg-blue-50/50 transition-colors duration-200 border-b border-gray-50 last:border-b-0',
+            style: 'animation: fadeIn 0.3s ease-out forwards'
+          },
+          loadingOverlay: { class: 'bg-white/80 backdrop-blur-sm' },
+          loadingIcon: { class: 'text-blue-500' }
         }">
-          <Column field="index" header="S/N" style="width: 10%">
-            <template #body="{ index }">
-              {{ index + 1 }}.
-            </template>
-          </Column>
-          <Column field="title" header="Title" style="width: 40%"></Column>
-          <Column field="amount" header="Amount" style="width: 20%"></Column>
-          <Column field="status" header="Status" style="width: 30%">
-            <template #body="{ data }">
-              <Tag :value="data.status" :severity="data.status === 'Success' ? 'success' : 'danger'"
-                class="text-xs font-semibold" />
-            </template>
-          </Column>
-        </DataTable>
-      </div>
+        <Column field="index" header="S/N" style="width: 10%">
+          <template #body="{ index }">
+            <div class="text-gray-500 font-medium">{{ index + 1 }}.</div>
+          </template>
+        </Column>
+        <Column field="itemTitle.title" header="Fee Item" style="width: 40%">
+          <template #body="{ data }">
+            <div class="flex items-center">
+              <i class="pi pi-file mr-2 text-blue-400"></i>
+              <span>{{ data.itemTitle.title }}</span>
+            </div>
+          </template>
+        </Column>
+        <Column field="amount" header="Amount" style="width: 20%">
+          <template #body="{ data }">
+            <div class="font-medium text-gray-700">
+              {{ formatCurrency(data.amount) }}
+            </div>
+          </template>
+        </Column>
+        <Column field="feePayment.cleared" header="Status" style="width: 30%">
+          <template #body="{ data }">
+            <Tag :value="data ? 'Paid' : 'Pending'" :severity="data ? 'success' : 'warning'"
+              class="text-xs font-semibold py-1 px-3 rounded-full" :pt="{
+                root: ({ props }) => ({
+                  class: [
+                    'shadow-sm',
+                    props.severity === 'success' ? 'bg-green-100 text-green-800' : '',
+                    props.severity === 'warning' ? 'bg-amber-100 text-amber-800' : ''
+                  ]
+                })
+              }" />
+          </template>
+        </Column>
+      </DataTable>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import InputText from 'primevue/inputtext';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import Tag from 'primevue/tag';
+import Divider from 'primevue/divider';
 
-const studentFields = ref([
-  { id: 1, label: 'Name', value: 'Najimuddeen Musa El-wakil' },
-  { id: 2, label: 'Level', value: '200' },
-  { id: 3, label: 'Matric', value: '2022/AR/ARA/0002' },
-  { id: 4, label: 'Session', value: '2025/2026' },
-  { id: 5, label: 'Faculty', value: 'Natural and Applied Sciences' },
-  { id: 6, label: 'Email', value: 'najimuddeenelwakil@gmail.com' },
-  { id: 7, label: 'Department', value: 'Computer Science' },
-  { id: 8, label: 'Date', value: 'Fri, 25 Apr 2025, 14:48:53' },
-  { id: 9, label: 'Programme', value: 'B.Sc Computer Science' },
-  { id: 10, label: 'Invoice', value: 'Not Generated' }
-]);
+const props = defineProps({
+  name: String,
+  level: String,
+  matric: String,
+  session: String,
+  faculty: String,
+  email: String,
+  department: String,
+  date: String,
+  programme: String,
+  feeItems: Array,
+  loading: {
+    type: Boolean,
+    default: false
+  }
+});
 
-const fees = ref([
-  { title: 'Undergraduate School Fees', amount: 'N22,500', status: 'Success' },
+const formatCurrency = (amount: number) => {
+  return new Intl.NumberFormat('en-NG', {
+    style: 'currency',
+    currency: 'NGN'
+  }).format(amount);
+};
+
+const studentFields = computed(() => [
+  { id: 1, label: 'Name', value: props.name || 'Not available' },
+  { id: 2, label: 'Level', value: props.level || 'Not available' },
+  { id: 3, label: 'Matric Number', value: props.matric || 'Not available' },
+  { id: 4, label: 'Session', value: props.session || 'Not available' },
+  { id: 5, label: 'Faculty', value: props.faculty || 'Not available' },
+  { id: 6, label: 'Email', value: props.email || 'Not available' },
+  { id: 7, label: 'Department', value: props.department || 'Not available' },
+  { id: 8, label: 'Date', value: props.date || 'Not available' },
+  { id: 9, label: 'Programme', value: props.programme || 'Not available' }
 ]);
 </script>
 
 <style scoped>
-/* Custom animations */
-:deep(.p-inputtext) {
-  transition: all 0.3s ease;
-}
-
-:deep(.p-datatable .p-datatable-tbody > tr) {
-  transition: all 0.2s ease;
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .grid {
-    grid-template-columns: 1fr;
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
   }
 
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+:deep(.p-datatable-tbody > tr) {
+  animation: fadeIn 0.4s ease-out forwards;
+  animation-delay: calc(var(--row-index) * 50ms);
+}
+
+:deep(.p-inputtext) {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+}
+
+:deep(.p-inputtext:hover) {
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+}
+
+:deep(.p-inputtext:focus) {
+  box-shadow: 0 0 0 3px rgb(59 130 246 / 0.2);
+}
+
+@media (max-width: 768px) {
   :deep(.p-datatable) {
     font-size: 0.875rem;
+  }
+
+  :deep(.p-column-title) {
+    font-size: 0.75rem;
   }
 }
 </style>

@@ -1,7 +1,7 @@
 <template>
   <div class="dashboard-layout">
     <!-- fixedss Sidebar -->
-    <SidebarView />
+    <SidebarView :username="user?.name" :userID="user?.username" />
 
     <!-- main Content Area -->
     <div class="main-content">
@@ -14,12 +14,22 @@
 </template>
 
 <script setup lang="ts">
-{/* import DashboardContent from './dashboard/DashoardContent.vue'
-import StudentFee from './fees/StudentFee.vue' */}
+{
+  /* import DashboardContent from './dashboard/DashoardContent.vue'
+import StudentFee from './fees/StudentFee.vue' */
+}
 
+import { onMounted } from 'vue'
 /* The Navbar and Sidebar */
 import NavbarView from './NavbarView.vue'
 import SidebarView from './SidebarView.vue'
+
+import { useStudentDashboard } from '@/services/student/useStudentDashboard'
+const { user, getStudentInformation } = useStudentDashboard()
+
+onMounted(async () => {
+  await getStudentInformation()
+})
 </script>
 
 <style scoped>

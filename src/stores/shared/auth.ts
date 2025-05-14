@@ -18,7 +18,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   // Getters
   const isAuthenticated = computed(() => !!user.value)
-  const userRole = computed(() => user.value?.roles  || ['guest'])
+  const userRole = computed(() => user.value?.roles || ['guest'])
   const userFullName = computed(() => user.value?.name || '')
   const userEmail = computed(() => user.value?.email || '')
   const userAvatar = computed(() => user.value?.avatar || '/assets/default-avatar.png')
@@ -31,12 +31,12 @@ export const useAuthStore = defineStore('auth', () => {
     error.value = null
 
     // first load roles from session storage
-    const r = sessionStorage.getItem("roles")
-    if(r && authService.isAuthenticated()){
+    const r = sessionStorage.getItem('roles')
+    if (r && authService.isAuthenticated()) {
       // pass
       try {
         setUserRole(JSON.parse(r))
-      } catch (e: unknown){
+      } catch (e: unknown) {
         console.log(e)
         setUserRole([])
       }
@@ -49,8 +49,9 @@ export const useAuthStore = defineStore('auth', () => {
         if (response.success && response.data) {
           user.value = response.data
           setUserRole(response.data.user.roles as Array<Role>)
+          return response.data
         } else {
-          console.log("Logount called")
+          console.log('Logount called')
           // Token is invalid, clear auth state
           logout()
         }
@@ -64,8 +65,8 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  async function storeRoles(roles: string[]){
-    sessionStorage.setItem("roles", JSON.stringify(roles))
+  async function storeRoles(roles: string[]) {
+    sessionStorage.setItem('roles', JSON.stringify(roles))
   }
 
   async function login(credentials: LoginCredentials) {
@@ -172,14 +173,14 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   function getRedirectPathBasedOnRole(roles: string[]): string {
-    if(anyContains(['admin'], roles)) {
-        return '/admin/dashboard'
-      } else if(anyContains(['lecturer'], roles)) {
-        return '/staff/dashboard'
-      } else if(anyContains(['student'], roles)) {
-        return '/student/dashboard'
-      }
-      return '/'
+    if (anyContains(['admin'], roles)) {
+      return '/admin/dashboard'
+    } else if (anyContains(['lecturer'], roles)) {
+      return '/staff/dashboard'
+    } else if (anyContains(['student'], roles)) {
+      return '/student/dashboard'
+    }
+    return '/'
   }
 
   return {
@@ -202,6 +203,6 @@ export const useAuthStore = defineStore('auth', () => {
     register,
     logout,
     updateProfile,
-    storeRoles
+    storeRoles,
   }
 })

@@ -10,6 +10,8 @@ export const useAuth = createSharedComposable(() => {
   const isLoading = ref<boolean>(false)
   const message = ref<string | null>(null)
   const isAuthenticated = ref<boolean>(false)
+  const usernameError = ref<boolean>(false)
+  const passwordError = ref<boolean>(false)
   const error = ref<string | null>(null)
   const credentials = ref<LoginCredentials>({
     email: '',
@@ -23,18 +25,22 @@ export const useAuth = createSharedComposable(() => {
 
   // handle login
   const handleUserLogin = async (): Promise<ApiResponse> => {
+    isLoading.value = true
     try {
       const response = await authService.login(credentials.value)
       if (response.success) {
         isAuthenticated.value = true
         message.value = 'Successfully logged in'
+        return response
       } else {
         message.value = response.message as string
         isAuthenticated.value = false
+        return response
       }
-      return response
     } catch (error) {
       throw error
+    } finally {
+      isLoading.value = false
     }
   }
 
@@ -54,5 +60,7 @@ export const useAuth = createSharedComposable(() => {
     error,
     message,
     credentials,
+    usernameError,
+    passwordError,
   }
 })

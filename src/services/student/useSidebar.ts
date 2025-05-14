@@ -1,6 +1,5 @@
 import { createSharedComposable } from '@vueuse/core'
 import { ref } from 'vue'
-import image1 from '../../assets/images/student/sidebar/image1.png'
 import image2 from '../../assets/images/student/sidebar/image2.png'
 import image3 from '../../assets/images/student/sidebar/image3.png'
 import image4 from '../../assets/images/student/sidebar/image4.png'
@@ -21,7 +20,7 @@ export const useStudentSideBar = createSharedComposable(() => {
     {
       title: 'Fees',
       icon: image2,
-      path: '/student/fee',
+      path: '/student/fees',
     },
     {
       title: 'Bio Data',

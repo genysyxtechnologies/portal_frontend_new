@@ -44,9 +44,6 @@ class ApiClient {
       (config) => {
         // Get token from storage
         const token = sessionStorage.getItem('auth_token')
-
-        console.log('Auth', token)
-
         // If token exists, add to headers
         if (token && !config.url?.includes('authenticate')) {
           config.headers.Authorization = `Bearer ${token}`
@@ -107,7 +104,6 @@ class ApiClient {
   public async request<T>(config: AxiosRequestConfig): Promise<ApiResponse<T>> {
     try {
       const response: AxiosResponse<ApiResponse<T>> = await this.instance.request(config)
-      console.log("THIS IS THE RESPONSE: ", response.data)
       return {
         success: true,
         data: (response as AxiosResponse).data,

@@ -31,12 +31,10 @@ export const authGuard = (
  * Checks if user has the required role to access a route
  */
 export const roleGuard = (
-
   to: RouteLocationNormalized,
   from: RouteLocationNormalized,
   next: NavigationGuardNext,
 ) => {
-
   // If the route doesn't specify roles, allow access
   if (!to.meta.roles) {
     return next()
@@ -55,14 +53,14 @@ export const roleGuard = (
   const allowedRoles = to.meta.roles as string[]
   if (!anyContains(userRole.current, allowedRoles)) {
     // Redirect to forbidden page or dashboard based on current role
-    if(anyContains(['admin'], userRole.current)) {
+    if (anyContains(['admin'], userRole.current)) {
       return next({ path: '/admin/dashboard' })
-    } else if(anyContains(['lecturer'], userRole.current)) {
+    } else if (anyContains(['lecturer'], userRole.current)) {
       return next({ path: '/staff/dashboard' })
-    } else if(anyContains(['student'], userRole.current)) {
+    } else if (anyContains(['student'], userRole.current)) {
       return next({ path: '/student/dashboard' })
     }
-    return next({ path: '/forbidden' })
+    /*     return next({ path: '/forbidden' }) */
   }
 
   next()

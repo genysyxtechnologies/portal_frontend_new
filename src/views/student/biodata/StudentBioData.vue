@@ -4,7 +4,7 @@
       <h1 class="head-title text-2xl font-bold text-gray-800">Bio Data</h1>
       <div class="flex items-center gap-4">
         <ReUsableButtons :label="'Download'" class="hover:scale-105 transition-transform" />
-        <ReUsableButtons :label="'Update'" class="hover:scale-105 transition-transform" />
+        <ReUsableButtons :label="'Update'" class="hover:scale-105 transition-transform" @click="updateBioData" />
       </div>
     </div>
 
@@ -13,7 +13,7 @@
       <div class="lg:col-span-5 bg-white rounded-xl shadow-sm transition-all duration-300 hover:shadow-md">
         <div class="p-6 h-full">
           <UserInformation :first-label="'Name'" :second-label="'Matric Number'" :third-label="'Phone Number'"
-            :third-input="'09068842993'" />
+            :third-input="user?.phone" :first-input="user?.name" :second-input="user?.username" />
         </div>
       </div>
 
@@ -36,7 +36,7 @@
           <TabPanels class="flex-1 overflow-auto p-6">
             <transition-group name="fade-slide" mode="out-in">
               <TabPanel v-for="(tab, index) in tabs" :key="index" :value="index.toString()" class="h-full">
-                <component :is="tab.component" />
+                <component :is="tab.component" :user="user!" :loading="loading" />
               </TabPanel>
             </transition-group>
           </TabPanels>
@@ -52,17 +52,24 @@ import BioInfo from './BioInfo.vue';
 import HealthInfo from './HealthInfo.vue';
 import ReUsableButtons from '@/views/buttons/ReUsableButtons.vue';
 import NextOfKinInfo from './NextOfKinInfo.vue';
-import SponsorInformation from './SponsorInformation.vue';
+/* import SponsorInformation from './SponsorInformation.vue'; */
 import { useStudentBioData } from '@/services/student/useStudentBioData';
-import { watch } from 'vue';
+import { onMounted, watch } from 'vue';
+import { useStudentDashboard } from '@/services/student/useStudentDashboard';
 
-const { tabCount } = useStudentBioData();
+const { tabCount, updateBioData } = useStudentBioData();
+const { user, getStudentInformation, loading } = useStudentDashboard()
+
+onMounted(async () => {
+  await getStudentInformation()
+  console.log('THIS IS THE USER: ', user.value)
+})
 
 const tabs = [
-  { label: 'Bio Info', component: BioInfo },
-  { label: 'Health Info', component: HealthInfo },
-  { label: 'Next Of Kin Info', component: NextOfKinInfo },
-  { label: 'Sponsorship Info', component: SponsorInformation }
+  { label: 'Bio Info', component: BioInfo, user: user.value, loading: loading },
+  { label: 'Health Info', component: HealthInfo, user: user.value, loading: loading },
+  { label: 'Next Of Kin Info', component: NextOfKinInfo, user: user.value, loading: loading },
+  /*   { label: 'Sponsorship Info', component: SponsorInformation, user: user.value, loading: loading } */
 ];
 
 

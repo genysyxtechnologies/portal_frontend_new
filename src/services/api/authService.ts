@@ -7,7 +7,8 @@ import type {
   ResetPasswordData,
   User,
 } from '@/types/auth.ts'
-import { useAuthStore } from '@/stores/shared/auth.ts'
+import type { UserResponse } from '@/types/student/dashboard_information'
+import constant from '@/stores/constant'
 
 class AuthService {
   // Login user
@@ -19,10 +20,10 @@ class AuthService {
     if (response.data.jwt) {
       sessionStorage.setItem('auth_token', response.data.jwt)
       sessionStorage.setItem('isAuthenticated', 'true')
-      const roles = response.data.roles.map(e => e.toLowerCase())
+      const roles = response.data.roles.map((e) => e.toLowerCase())
       setUserRole(roles as Array<Role>)
       response.data.roles = roles
-      sessionStorage.setItem("roles", JSON.stringify(roles))
+      sessionStorage.setItem('roles', JSON.stringify(roles))
     }
     return response
   }
@@ -53,8 +54,8 @@ class AuthService {
   }
 
   // Get current user profile
-  public async getCurrentUser(): Promise<ApiResponse<User>> {
-    return apiClient.get<User>('/get-current-user')
+  public async getCurrentUser(): Promise<ApiResponse<UserResponse>> {
+    return apiClient.get<UserResponse>(constant.current_user.current_user)
   }
 
   // Send password reset link
