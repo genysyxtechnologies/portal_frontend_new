@@ -9,8 +9,13 @@ class StudentCourseRepository extends StudentDashboardRepositories {
   }
 
   // remove student course
-  async unRegisterNewCourse(endpoint: string, data: Omit<RegisterStudentCourse,  'sessionId'>) {
+  async unRegisterNewCourse(endpoint: string, data: Omit<RegisterStudentCourse, 'sessionId'>) {
     return apiClient.post(endpoint, data)
+  }
+
+  // download student course for registration
+  async downloadSstudentDocument(endpoint: string, fileName: string) {
+    return apiClient.downloads(endpoint, fileName)
   }
 }
 

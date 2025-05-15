@@ -5,8 +5,8 @@
         class="absolute inset-0 bg-white bg-opacity-80 z-50 flex items-center justify-center rounded-lg">
         <div class="loading-content text-center">
           <div class="spinner"></div>
-          <p class="mt-4 text-lg font-medium text-gray-700">Loading your information...</p>
-          <p class="text-sm text-gray-500">Please wait while we prepare your form</p>
+          <p class="mt-4 text-lg font-medium text-gray-700">{{ headTitle }}</p>
+          <p class="text-sm text-gray-500">{{ subTitle }}</p>
         </div>
       </div>
     </transition>
@@ -30,6 +30,15 @@ defineProps({
     type: Boolean,
     default: false,
   },
+  headTitle: {
+    type: String,
+    default: 'Loading your information...'
+  },
+
+  subTitle: {
+    type: String,
+    default: 'Please wait while we prepare your form'
+  }
 })
 
 </script>

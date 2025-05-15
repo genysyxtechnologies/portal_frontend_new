@@ -256,7 +256,7 @@ interface Programme {
 }
 
 // Main User interface
-interface User {
+export interface User {
   accountNonExpired: boolean
   accountNonLocked: boolean
   authorities: Authority[]

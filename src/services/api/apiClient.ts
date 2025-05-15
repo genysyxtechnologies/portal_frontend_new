@@ -203,6 +203,27 @@ class ApiClient {
       return false
     }
   }
+
+  async downloads(endpoint: string, filename: string, params?: unknown) {
+    try {
+      const response = await this.instance.get(endpoint, {
+        params,
+        responseType: 'blob',
+      })
+      const url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }))
+      const link = document.createElement('a')
+      link.href = url
+      const fileName = filename
+      link.setAttribute('download', `${fileName}.pdf`)
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      return true
+    } catch (error) {
+      console.log('Download failed', error)
+      return false
+    }
+  }
 }
 
 // Create and export default API client instance

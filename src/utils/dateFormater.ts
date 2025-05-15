@@ -10,3 +10,10 @@ export const formatDateOfBirth = (dobArray: [number, number, number]) => {
 
   return formattedDate
 }
+
+// get the current date and time
+
+export const getCurrentDateAndTime = () => {
+  const formattedDate = dayjs().format('YYYY-MM-DD HH:mm:ss')
+  return formattedDate
+}

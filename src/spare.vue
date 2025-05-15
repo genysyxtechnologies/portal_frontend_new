@@ -22,13 +22,17 @@
       <SpinningAnimation :loading="courseLoading" />
     </div>
 
-    <div
+    <EmptyData
+      v-else-if="(!registeredCourses || registeredCourses?.length === 0) && (!courseList || courseList?.length === 0) && !courseLoading"
+      :emptyMessage="emptyStateMessage" />
+
+    <!-- <div
       v-if="(!registeredCourses || registeredCourses?.length === 0) && (!courseList || courseList?.length === 0) && !courseLoading"
       class="bg-white rounded-xl shadow-sm p-8 flex flex-col items-center justify-center h-64">
       <i class="pi pi-book text-4xl text-gray-300 mb-3"></i>
       <h2 class="text-xl font-medium text-gray-500">{{ emptyStateMessage }}</h2>
       <p class="text-gray-400 mt-1 text-sm">Try changing your filters</p>
-    </div>
+    </div> -->
 
     <!-- Course List -->
     <div v-else class="flex w-full gap-12">
@@ -129,6 +133,7 @@
 </template>
 
 <script setup lang="ts">
+import EmptyData from '@/views/empty/EmptyData.vue';
 import SpinningAnimation from '@/views/spinner/SpinningAnimation.vue';
 import { computed, type PropType } from 'vue';
 

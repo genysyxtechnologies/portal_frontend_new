@@ -1,6 +1,9 @@
 <template>
-  <div class="flex flex-col gap-6">
-    <div class="bg-[#fff] flex justify-between gap-4 p-12 rounded-xl">
+  <div class="flex flex-col gap-6 relative">
+    <div v-if="!loading" class="bg-[#fff] flex justify-between gap-4 p-12 rounded-xl">
+      <Sel-ect :options="documents" optionLabel="name" :size="'large'" placeholder="Select Document"
+        :modelValue="selectedDocument"
+        @update:modelValue="(value: string | null) => $emit('update:selectedDocument', value)" class="card w-full" />
       <Sel-ect :options="sessionOptions" optionLabel="name" :size="'large'" :placeholder="sessionPlaceholder"
         :modelValue="selectedSession"
         @update:modelValue="(value: string | null) => $emit('update:selectedSession', value)" class="card w-full" />
@@ -8,57 +11,63 @@
         :modelValue="selectedSemester"
         @update:modelValue="(value: string | null) => $emit('update:selectedSemester', value)" class="card w-full" />
       <div class="w-full relative">
-      <ReUsableButtons :label="'Download'" class="flex-1" />
+        <ReUsableButtons :label="'Download'" class="flex-1 w-full"
+          @on-click="emit('on-download', selectedDocument.value)"
+          :disabled="!selectedDocument || loading || !selectedSession || !selectedSemester" />
+      </div>
     </div>
-    </div>
+    <SpinningAnimation v-if="loading" :loading="loading" :headTitle="headTitle" :subTitle="subTitle" />
+    <EmptyData v-if="!selectedSemester || !selectedSession" :emptyMessage="emptyStateMessage" />
+
+
 
     <!-- Enhanced Student Information Section -->
-    <div class="bg-[#fff] w-full rounded-xl overflow-hidden shadow-lg transition-all duration-300 hover:shadow-xl">
-      <div class="p-8">
+    <div v-else
+      class="bg-[#fff] w-full rounded-xl overflow-hidden shadow-lg transition-all duration-300 hover:shadow-xl">
+      <div v-if="!loading" class="p-8">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <!-- Left Column -->
           <div class="space-y-4">
             <div class="bg-gray-50 p-4 rounded-lg transition-all duration-200 hover:bg-gray-100 hover:scale-[1.01]">
               <p class="text-sm text-gray-500 font-medium">Full Name</p>
-              <p class="text-lg font-semibold text-gray-800">{{ student.name }}</p>
+              <p class="text-lg font-semibold text-gray-800">{{ user.name }}</p>
             </div>
 
             <div class="bg-gray-50 p-4 rounded-lg transition-all duration-200 hover:bg-gray-100 hover:scale-[1.01]">
               <p class="text-sm text-gray-500 font-medium">Matric Number</p>
-              <p class="text-lg font-semibold text-gray-800">{{ student.matricNumber }}</p>
+              <p class="text-lg font-semibold text-gray-800">{{ user.username }}</p>
             </div>
 
             <div class="bg-gray-50 p-4 rounded-lg transition-all duration-200 hover:bg-gray-100 hover:scale-[1.01]">
               <p class="text-sm text-gray-500 font-medium">Faculty</p>
-              <p class="text-lg font-semibold text-gray-800">{{ student.faculty }}</p>
+              <p class="text-lg font-semibold text-gray-800">{{ user.programme.department.faculty.name }}</p>
             </div>
 
             <div class="bg-gray-50 p-4 rounded-lg transition-all duration-200 hover:bg-gray-100 hover:scale-[1.01]">
               <p class="text-sm text-gray-500 font-medium">Department</p>
-              <p class="text-lg font-semibold text-gray-800">{{ student.department }}</p>
+              <p class="text-lg font-semibold text-gray-800">{{ user.programme.department.name }}</p>
             </div>
           </div>
-
           <!-- Right Column -->
           <div class="space-y-4">
             <div class="bg-gray-50 p-4 rounded-lg transition-all duration-200 hover:bg-gray-100 hover:scale-[1.01]">
               <p class="text-sm text-gray-500 font-medium">Programme</p>
-              <p class="text-lg font-semibold text-gray-800">{{ student.programme }}</p>
+              <p class="text-lg font-semibold text-gray-800">{{ user.programme.name }}</p>
             </div>
 
             <div class="bg-gray-50 p-4 rounded-lg transition-all duration-200 hover:bg-gray-100 hover:scale-[1.01]">
               <p class="text-sm text-gray-500 font-medium">Level</p>
-              <p class="text-lg font-semibold text-gray-800">{{ student.level }}</p>
+              <p class="text-lg font-semibold text-gray-800">{{ user.level.title }}</p>
             </div>
 
             <div class="bg-gray-50 p-4 rounded-lg transition-all duration-200 hover:bg-gray-100 hover:scale-[1.01]">
               <p class="text-sm text-gray-500 font-medium">Academic Session</p>
-              <p class="text-lg font-semibold text-gray-800">{{ student.session }}</p>
+              <p class="text-lg font-semibold text-gray-800">{{ academicSession }}</p>
             </div>
 
             <div class="bg-gray-50 p-4 rounded-lg transition-all duration-200 hover:bg-gray-100 hover:scale-[1.01]">
               <p class="text-sm text-gray-500 font-medium">Registration Date</p>
-              <p class="text-lg font-semibold text-gray-800">{{ student.date }}</p>
+              <p class="text-lg font-semibold text-gray-800">{{ currentDateAndTime }}</p>
             </div>
           </div>
         </div>
@@ -69,7 +78,11 @@
 
 <script setup lang="ts">
 import ReUsableButtons from '@/views/buttons/ReUsableButtons.vue';
-import { ref, type PropType } from "vue";
+import { ref, watch, type PropType } from "vue";
+import EmptyData from '@/views/empty/EmptyData.vue';
+import type { UserResponse } from '@/types/student/dashboard_information';
+import SpinningAnimation from '@/views/spinner/SpinningAnimation.vue';
+
 
 
 interface Course {
@@ -101,6 +114,12 @@ const props = defineProps({
     type: String as PropType<string | null>,
     default: null
   },
+
+  selectedDocument: {
+    type: Object as PropType<{ name: string; value: string }>,
+    default: () => ({ name: 'Course form', value: 1 })
+  },
+
   searchQuery: {
     type: String,
     default: ''
@@ -122,41 +141,65 @@ const props = defineProps({
     default: 'No courses available'
   },
 
+  academicSession: {
+    type: String || null,
+    default: null
+  },
+
+  user: {
+    type: Object as PropType<UserResponse['user']>,
+    default: () => ({})
+  },
+
+  documents: {
+    type: Array as PropType<{ name: string; value: string }[]>,
+    default: () => []
+  },
+
+  currentDateAndTime: {
+    type: String
+  },
+  loading: {
+    type: Boolean,
+    default: false
+  },
+
+  headTitle: {
+    type: String,
+    default: 'Loading your information...'
+  },
+
+  subTitle: {
+    type: String,
+    default: 'Please wait while we prepare your form'
+  }
+
 });
 
 const emit = defineEmits<{
   (e: 'update:selectedSession', value: string | null): void
   (e: 'update:selectedSemester', value: string | null): void
+  (e: 'update:selectedDocument', value: string | null): void
   (e: 'update:searchQuery', value: string): void
   (e: 'course-selected', course: Course): void
   (e: 'remove-selected', course: Course): void
   (e: 'register-selected', registeredCourses: Course[]): void
+  (e: 'on-download', value: string): void
 }>();
 
 
+/* const documents = ref([
+  {
+    name: 'Course form',
+    value: 1
+  },
+  {
+    name: 'Exam card',
+    value: 2
+  }
+]) */
 
 
-interface Student {
-  name: string;
-  matricNumber: string;
-  faculty: string;
-  department: string;
-  programme: string;
-  level: number;
-  session: string;
-  date: string;
-}
-
-const student = ref<Student>({
-  name: "Najimuddeen Musa El-wakil",
-  matricNumber: "2022/AR/ARA/0002",
-  faculty: "Natural and Applied Sciences",
-  department: "Computer Science",
-  programme: "B.Sc Computer Science",
-  level: 200,
-  session: "2025/2026",
-  date: "25-04-2025, 17:05:21",
-});
 
 </script>
 

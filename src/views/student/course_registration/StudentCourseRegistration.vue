@@ -19,11 +19,15 @@
         <TabPanels class="flex-1 overflow-auto p-6">
           <div name="fade-slide" mode="out-in">
             <TabPanel v-for="(tab, index) in tabs" :key="index" :value="index.toString()" class="h-full">
-              <component :is="tab.component" v-model:selectedSession="selectedSession"
-                v-model:selectedSemester="selectedSemester" :sessionOptions="sessions" :semesterOptions="semesters"
+              <component :is="tab.component" :user="user" v-model:selectedSession="selectedSession"
+                v-model:selectedSemester="selectedSemester" :sessionOptions="sessions"
+                :academicSession="selectedSession?.name" :semesterOptions="semesters"
                 :registeredCourses="courses?.registeredCourses" :courseLoading="courseLoading"
                 @course-selected="handleRegistredCoursesCheckboxChange" @remove-selected="handleCourseRemovalCheckBox"
-                @register-selected="handleRegistration" :courseList="courses?.courseList" />
+                @register-selected="handleRegistration" :courseList="courses?.courseList!"
+                :currentDateAndTime="currentDateAndTime" :documents="documents"
+                v-model:selectedDocument="selectedDocument" @on-download="handleDownload" :headTitle="headTitle"
+                :subTitle="subTitle" :loading="courseLoading" />
 
             </TabPanel>
           </div>
@@ -40,12 +44,13 @@ import CourseRegistration from './CourseRegistration.vue';
 import CourseRegistrationForm from './CourseRegistrationForm.vue';
 import { useStudentCourses } from '@/services/student/useStudentCourses';
 import { useStudentDashboard } from '@/services/student/useStudentDashboard';
-import constant from '@/stores/constant';
-import { useToast } from 'vue-toast-notification';
-const { session } = constant
-const { fetchAllCoursesForStudent, registerStudentCourse, removeStudentCourse, courses, selectedSession, selectedSemester, loading: courseLoading } = useStudentCourses();
-const { user, getStudentInformation, getSessions, sessions, loading: dashboardLoading } = useStudentDashboard()
+import { getCurrentDateAndTime } from '@/utils/dateFormater';
+const currentDateAndTime = getCurrentDateAndTime()
+const { fetchAllCoursesForStudent, registerStudentCourse, removeStudentCourse, courses, selectedSession, selectedSemester, loading: courseLoading, documents, selectedDocument, tabCount, downloadStudentCourseForm, headTitle, subTitle } = useStudentCourses();
+const { user, getStudentInformation, getSessions, sessions } = useStudentDashboard()
 const semesters = ref([])
+
+
 
 // handle course selection
 const handleRegistredCoursesCheckboxChange = async (course: any) => {
@@ -58,7 +63,9 @@ const handleCourseRemovalCheckBox = async (course: any) => {
   console.log('Removed course:', course)
 }
 
-
+const handleDownload = async (document: number) => {
+  await downloadStudentCourseForm(user.value?.id!, selectedSession.value!.id, selectedSemester.value!.id)
+}
 
 // handle registration
 const handleRegistration = (courses: any) => {
@@ -70,6 +77,7 @@ const handleRegistration = (courses: any) => {
 onMounted(async () => {
   await getStudentInformation()
   await getSessions()
+  console.log('THIS IS THE SELECTED USER: ', user.value)
 })
 
 watch(
@@ -90,12 +98,17 @@ watch(() => [selectedSession.value, selectedSemester.value], async ([session, se
   }
 })
 
-const tabCount = ref<string>('0')
 
 const tabs = [
   { label: 'Registration', component: CourseRegistration },
   { label: 'Forms', component: CourseRegistrationForm },
 ];
+
+
+
+watch(() => selectedDocument.value, (value) => {
+  console.log('Selected document:', value)
+})
 
 
 // fetch data immediately the component mounted
