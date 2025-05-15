@@ -1,8 +1,8 @@
 <template>
   <header class="navbar">
-    <button class="sidebar-toggle">
+    <router-link to="/" class="sidebar-toggle sidebar-toggle">
       <i class="pi pi-arrow-left"></i>
-    </button>
+    </router-link>
     <div class="current-date">{{ currentDate }}</div>
   </header>
 </template>
@@ -22,8 +22,6 @@ const currentDate = computed(() => {
 });
 </script>
 <style scoped>
-
-
 .navbar {
   position: sticky;
   top: 0;

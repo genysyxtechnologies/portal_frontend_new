@@ -49,7 +49,7 @@ onMounted(() => {
   })
 })
 
-watch(
+/* watch(
   () => [message.value, isAuthenticated.value],
   ([message, isAuthenticated]) => {
     if (message) {
@@ -61,7 +61,7 @@ watch(
       })
     }
   },
-)
+) */
 
 {
   /* NSU/NAS/CMP/0696/17/18 */

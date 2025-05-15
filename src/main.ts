@@ -1,5 +1,5 @@
 import './assets/main.css'
-
+import "vue-toast-notification/dist/theme-bootstrap.css";
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import { MotionPlugin } from '@vueuse/motion'
@@ -8,7 +8,7 @@ import router from './router'
 import PrimeVue from 'primevue/config'
 import { themeConfig } from './themes'
 import 'primeicons/primeicons.css'
-
+import ToastPlugin from "vue-toast-notification";
 import AutoComplete from 'primevue/autocomplete'
 import Accordion from 'primevue/accordion'
 import AccordionTab from 'primevue/accordiontab'
@@ -131,7 +131,7 @@ app.component('ButtonGroup', ButtonGroup)
 app.component('Cal-endar', Calendar)
 app.component('Ca-rd', Card)
 app.component('CascadeSelect', CascadeSelect)
-app.component('Che-ckbox', Checkbox)
+app.component('Check-box', Checkbox)
 app.component('Ch-ip', Chip)
 app.component('Ch-ips', Chips)
 app.component('ColorPicker', ColorPicker)
@@ -221,10 +221,10 @@ app.use(PrimeVue, {
   theme: themeConfig,
   ripple: true,
   zIndex: {
-    modal: 1100, //dialog, drawer
-    overlay: 1000, //select, popover
-    menu: 1000, //overlay menus
-    tooltip: 1100, //tooltip
+    modal: 1100,
+    overlay: 1000,
+    menu: 1000,
+    tooltip: 1100,
   },
 })
 app.use(MotionPlugin)
@@ -232,6 +232,9 @@ app.use(MotionPlugin)
 const pinia = createPinia()
 app.use(pinia)
 app.use(router)
+app.use(ToastPlugin, {
+  position: "top",
+});
 
 import { useAuthStore } from '@/stores/shared/auth.ts'
 const authStore = useAuthStore()

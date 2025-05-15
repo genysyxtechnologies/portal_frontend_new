@@ -1,10 +1,15 @@
 <template>
   <div class="flex flex-col gap-6">
     <div class="bg-[#fff] flex justify-between gap-4 p-12 rounded-xl">
-      <ReUsableSelect class="flex-1" />
-      <ReUsableSelect class="flex-1" />
-      <ReUsableSelect class="flex-1" />
+      <Sel-ect :options="sessionOptions" optionLabel="name" :size="'large'" :placeholder="sessionPlaceholder"
+        :modelValue="selectedSession"
+        @update:modelValue="(value: string | null) => $emit('update:selectedSession', value)" class="card w-full" />
+      <Sel-ect :options="semesterOptions" optionLabel="title" :size="'large'" :placeholder="semesterPlaceholder"
+        :modelValue="selectedSemester"
+        @update:modelValue="(value: string | null) => $emit('update:selectedSemester', value)" class="card w-full" />
+      <div class="w-full relative">
       <ReUsableButtons :label="'Download'" class="flex-1" />
+    </div>
     </div>
 
     <!-- Enhanced Student Information Section -->
@@ -64,8 +69,72 @@
 
 <script setup lang="ts">
 import ReUsableButtons from '@/views/buttons/ReUsableButtons.vue';
-import ReUsableSelect from '@/views/select/ReUsableSelect.vue';
-import { ref } from "vue";
+import { ref, type PropType } from "vue";
+
+
+interface Course {
+  id: number;
+  courseCode: string;
+  title: string;
+  creditUnit: number;
+  selected: boolean;
+}
+
+const props = defineProps({
+  courseLoading: {
+    type: Boolean,
+    default: false
+  },
+  sessionOptions: {
+    type: Array as PropType<{ name: string; value: string }[]>,
+    default: () => []
+  },
+  semesterOptions: {
+    type: Array as PropType<{ name: string; value: string }[]>,
+    default: () => []
+  },
+  selectedSession: {
+    type: String as PropType<string | null>,
+    default: null
+  },
+  selectedSemester: {
+    type: String as PropType<string | null>,
+    default: null
+  },
+  searchQuery: {
+    type: String,
+    default: ''
+  },
+  sessionPlaceholder: {
+    type: String,
+    default: 'Select Session'
+  },
+  semesterPlaceholder: {
+    type: String,
+    default: 'Select Semester'
+  },
+  searchPlaceholder: {
+    type: String,
+    default: 'Search Course'
+  },
+  emptyStateMessage: {
+    type: String,
+    default: 'No courses available'
+  },
+
+});
+
+const emit = defineEmits<{
+  (e: 'update:selectedSession', value: string | null): void
+  (e: 'update:selectedSemester', value: string | null): void
+  (e: 'update:searchQuery', value: string): void
+  (e: 'course-selected', course: Course): void
+  (e: 'remove-selected', course: Course): void
+  (e: 'register-selected', registeredCourses: Course[]): void
+}>();
+
+
+
 
 interface Student {
   name: string;

@@ -1,284 +1,265 @@
 <template>
-  <div class="container mx-auto p-8 bg-white rounded-lg shadow-md relative min-h-[500px]">
-    <SpinningAnimation :loading="loading" />
+  <div class="flex flex-col gap-6">
+    <!-- Filter Section -->
+    <div class="bg-white flex flex-col md:flex-row justify-between gap-4 p-6 rounded-xl shadow-sm">
+      <Sel-ect :options="sessionOptions" optionLabel="name" :size="'large'" :placeholder="sessionPlaceholder"
+        :modelValue="selectedSession"
+        @update:modelValue="(value: string | null) => $emit('update:selectedSession', value)" class="card w-full" />
+      <Sel-ect :options="semesterOptions" optionLabel="title" :size="'large'" :placeholder="semesterPlaceholder"
+        :modelValue="selectedSemester"
+        @update:modelValue="(value: string | null) => $emit('update:selectedSemester', value)" class="card w-full" />
+      <div class="w-full relative">
+        <InputText class="flex-1 w-full h-full" :placeholder="searchPlaceholder" :modelValue="searchQuery"
+          @update:modelValue="(value: string) => $emit('update:searchQuery', value)" />
+        <span class="absolute top-3 right-3 text-gray-400">
+          <i class="pi pi-search"></i>
+        </span>
+      </div>
+    </div>
 
-    <transition name="fade">
-      <div v-if="!loading" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <!-- Country Field -->
-        <div>
-          <label for="country" class="block text-sm font-medium text-gray-700 mb-1 labels">Country</label>
-          <div class="relative">
-            <Sel-ect 
-              :size="'large'" 
-              v-model="selectedCountry" 
-              :options="[user?.information.country]" 
-              optionLabel="name"
-              placeholder="Select Session" 
-              class="card w-full" 
-              :disabled="!editableFields.country"
-            />
-            <EditToggle 
-              :is-editing="editableFields.country"
-              @click="toggleEdit('country')"
-              class="absolute right-3 top-3"
-            />
+    <!-- Loading State -->
+    <div v-if="courseLoading" class="relative">
+      <SpinningAnimation :loading="courseLoading" />
+    </div>
+
+    <div
+      v-if="(!registeredCourses || registeredCourses?.length === 0) && (!courseList || courseList?.length === 0) && !courseLoading"
+      class="bg-white rounded-xl shadow-sm p-8 flex flex-col items-center justify-center h-64">
+      <i class="pi pi-book text-4xl text-gray-300 mb-3"></i>
+      <h2 class="text-xl font-medium text-gray-500">{{ emptyStateMessage }}</h2>
+      <p class="text-gray-400 mt-1 text-sm">Try changing your filters</p>
+    </div>
+
+    <!-- Course List -->
+    <div v-else class="flex w-full gap-12">
+      <div v-if="!courseLoading" class="w-full">
+        <h2>Available Courses</h2>
+        <div class=" flex items-center">
+          <div class="bg-white rounded-xl shadow-sm overflow-hidden flex-1">
+            <div class="grid grid-cols-1 divide-y divide-gray-100">
+              <div name="list">
+                <div v-for="course in courseList" :key="course.id"
+                  class="group hover:bg-gray-50 transition-colors duration-200"
+                  :class="{ 'bg-blue-50': course.selected }">
+                  <div class="flex items-center p-4">
+                    <div class="mr-4 flex-shrink-0">
+
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <div class="flex justify-between items-baseline">
+                        <div class="flex items-center gap-4">
+                          <Check-box v-model="course.selected" :binary="true"
+                            @change="handleRegistredCoursesCheckboxChange(course)"
+                            class="h-5 w-5 text-blue-600 rounded focus:ring-blue-500" />
+                          <div>
+                            <h3 class="text-lg font-semibold text-gray-800">{{ course.courseCode }}</h3>
+                            <p class="text-gray-600 text-sm mt-1">{{ course.title }}</p>
+                          </div>
+                        </div>
+                        <span class="ml-2 text-sm font-medium text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">
+                          {{ course.creditUnit }} Credit Unit
+                        </span>
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Summary Footer -->
+            <div v-if="selectedCount > 0"
+              class="bg-gray-50 px-4 py-3 flex justify-between items-center border-t border-gray-200">
+              <div class="text-sm text-gray-500">
+                {{ selectedCount }} of {{ registeredCourses.length }} selected
+              </div>
+              <Button label="Register Selected" icon="pi pi-send" class="p-button-sm" @click="handleRegistration" />
+            </div>
           </div>
-        </div>
-
-        <!-- State Field -->
-        <div>
-          <label for="state" class="block text-sm font-medium text-gray-700 mb-1 labels">State</label>
-          <div class="relative">
-            <Sel-ect 
-              :size="'large'" 
-              v-model="selectedState" 
-              :options="[user?.information.state]" 
-              optionLabel="name"
-              placeholder="Select Session" 
-              class="card w-full" 
-              :disabled="!editableFields.state"
-            />
-            <EditToggle 
-              :is-editing="editableFields.state"
-              @click="toggleEdit('state')"
-              class="absolute right-3 top-3"
-            />
-          </div>
-        </div>
-
-        <!-- LGA/City Field -->
-        <div>
-          <label for="lgaCity" class="block text-sm font-medium text-gray-700 mb-1 labels">LGA/City</label>
-          <div class="relative">
-            <InputText 
-              id="lgaCity" 
-              v-model="formData.lgaCity" 
-              type="text" 
-              class="w-full pr-10"
-              :placeholder="user?.information.lga.name"
-              :readonly="!editableFields.lgaCity"
-              :class="{'bg-gray-50': !editableFields.lgaCity}"
-            />
-            <EditToggle 
-              :is-editing="editableFields.lgaCity"
-              @click="toggleEdit('lgaCity')"
-              class="absolute right-3 top-3"
-            />
-          </div>
-        </div>
-
-        <!-- Contact Address Field -->
-        <div>
-          <label for="contactAddress" class="block text-sm font-medium text-gray-700 mb-1 labels">Contact Address</label>
-          <div class="relative">
-            <InputText 
-              id="contactAddress" 
-              v-model="formData.contactAddress" 
-              type="text" 
-              class="w-full pr-10"
-              :placeholder="user?.information.contactAddress!"
-              :readonly="!editableFields.contactAddress"
-              :class="{'bg-gray-50': !editableFields.contactAddress}"
-            />
-            <EditToggle 
-              :is-editing="editableFields.contactAddress"
-              @click="toggleEdit('contactAddress')"
-              class="absolute right-3 top-3"
-            />
-          </div>
-        </div>
-
-        <!-- Continue this pattern for all other fields -->
-        <!-- Hometown -->
-        <div>
-          <label for="hometown" class="block text-sm font-medium text-gray-700 mb-1 labels">Hometown</label>
-          <div class="relative">
-            <InputText 
-              id="hometown" 
-              v-model="formData.hometown" 
-              type="text" 
-              class="w-full pr-10"
-              :placeholder="user?.information.homeTown!"
-              :readonly="!editableFields.hometown"
-              :class="{'bg-gray-50': !editableFields.hometown}"
-            />
-            <EditToggle 
-              :is-editing="editableFields.hometown"
-              @click="toggleEdit('hometown')"
-              class="absolute right-3 top-3"
-            />
-          </div>
-        </div>
-
-        <!-- Home Address -->
-        <div>
-          <label for="homeAddress" class="block text-sm font-medium text-gray-700 mb-1 labels">Home Address</label>
-          <div class="relative">
-            <InputText 
-              id="homeAddress" 
-              v-model="formData.homeAddress" 
-              type="text" 
-              class="w-full pr-10"
-              :placeholder="user?.information.contactAddress!"
-              :readonly="!editableFields.homeAddress"
-              :class="{'bg-gray-50': !editableFields.homeAddress}"
-            />
-            <EditToggle 
-              :is-editing="editableFields.homeAddress"
-              @click="toggleEdit('homeAddress')"
-              class="absolute right-3 top-3"
-            />
-          </div>
-        </div>
-
-        <!-- Place of Birth -->
-        <div>
-          <label for="placeOfBirth" class="block text-sm font-medium text-gray-700 mb-1 labels">Place of Birth</label>
-          <div class="relative">
-            <InputText 
-              id="placeOfBirth" 
-              v-model="formData.placeOfBirth" 
-              type="text" 
-              class="w-full pr-10"
-              :placeholder="user?.information.homeAddress"
-              :readonly="!editableFields.placeOfBirth"
-              :class="{'bg-gray-50': !editableFields.placeOfBirth}"
-            />
-            <EditToggle 
-              :is-editing="editableFields.placeOfBirth"
-              @click="toggleEdit('placeOfBirth')"
-              class="absolute right-3 top-3"
-            />
-          </div>
-        </div>
-
-        <!-- Date of Birth -->
-        <div>
-          <label for="dateOfBirth" class="block text-sm font-medium text-gray-700 mb-1 labels">Date of Birth</label>
-          <div class="relative">
-            <InputText 
-              id="dateOfBirth" 
-              class="w-full pr-10"
-              :value="formatDateOfBirth(user?.information?.dob)"
-              :readonly="true"
-              :class="{'bg-gray-50': true}"
-            />
-            <LockIndicator class="absolute right-3 top-3" />
-          </div>
-        </div>
-
-        <!-- Continue with other fields following the same pattern -->
-
-        <div class="flex justify-end mt-8">
-          <Button 
-            label="Save Changes" 
-            @click="handleSave" 
-            class="p-button-primary" 
-            :disabled="!hasChanges || loading"
-            v-if="isEditingAnyField"
-          />
-          <Button 
-            label="Next" 
-            @click="handleNext" 
-            class="p-button-primary" 
-            :disabled="loading"
-            v-else
-          />
         </div>
       </div>
-    </transition>
+
+      <!-- REGISTRED COURSE -->
+      <div v-if="!courseLoading" class="w-full">
+        <h1>Registered Courses</h1>
+        <div class="bg-white rounded-xl shadow-sm overflow-hidden flex-1">
+          <div class="grid grid-cols-1 divide-y divide-gray-100">
+            <div name="list">
+              <div v-for="course in registeredCourses" :key="course.id"
+                class="group hover:bg-gray-50 transition-colors duration-200"
+                :class="{ 'bg-blue-50': course.selected }">
+                <div class="flex items-center p-4">
+                  <div class="mr-4 flex-shrink-0">
+
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <div class="flex justify-between items-baseline">
+                      <div class="flex items-center gap-4">
+                        <Check-box v-model="course.selected" :binary="true"
+                          @change="handleCourseRemovalCheckBox(course)"
+                          class="h-5 w-5 text-blue-600 rounded focus:ring-blue-500" />
+                        <div>
+                          <h3 class="text-lg font-semibold text-gray-800">{{ course.courseCode }}</h3>
+                          <p class="text-gray-600 text-sm mt-1">{{ course.title }}</p>
+                        </div>
+                      </div>
+                      <span class="ml-2 text-sm font-medium text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">
+                        {{ course.creditUnit }} Credit Units
+                      </span>
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Summary Footer -->
+          <div v-if="selectedCount > 0"
+            class="bg-gray-50 px-4 py-3 flex justify-between items-center border-t border-gray-200">
+            <div class="text-sm text-gray-500">
+              {{ selectedCount }} of {{ registeredCourses.length }} selected
+            </div>
+            <Button label="Register Selected" icon="pi pi-send" class="p-button-sm" @click="handleRegistration" />
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, watch, computed } from 'vue';
-import { formatDateOfBirth } from '@/utils/dateFormater';
-import type { UserResponse } from '@/types/student/dashboard_information';
 import SpinningAnimation from '@/views/spinner/SpinningAnimation.vue';
-import EditToggle from '@/components/EditToggle.vue';
-import LockIndicator from '@/components/LockIndicator.vue';
+import { computed, type PropType } from 'vue';
 
-const props = defineProps<{
-  user: UserResponse['user']
-  loading: boolean
-}>()
 
-// Editable state for each field
-const editableFields = ref({
-  country: false,
-  state: false,
-  lgaCity: false,
-  contactAddress: false,
-  hometown: false,
-  homeAddress: false,
-  placeOfBirth: false,
-  // Add other fields here
-});
+interface Course {
+  id: number;
+  courseCode: string;
+  title: string;
+  creditUnit: number;
+  selected: boolean;
+}
 
-// Form data
-const formData = ref({
-  lgaCity: props.user?.information.lga.name || '',
-  contactAddress: props.user?.information.contactAddress || '',
-  hometown: props.user?.information.homeTown || '',
-  homeAddress: props.user?.information.homeAddress || '',
-  placeOfBirth: props.user?.information.placeOfBirth || '',
-  // Initialize other fields here
-});
-
-// Computed properties
-const isEditingAnyField = computed(() => {
-  return Object.values(editableFields.value).some(val => val);
-});
-
-const hasChanges = computed(() => {
-  // Implement logic to detect if any fields have been modified
-  return true; // Placeholder
-});
-
-// Methods
-const toggleEdit = (field: string) => {
-  // Close all other editable fields when opening a new one
-  if (!editableFields.value[field]) {
-    Object.keys(editableFields.value).forEach(key => {
-      editableFields.value[key] = false;
-    });
+const props = defineProps({
+  courseLoading: {
+    type: Boolean,
+    default: false
+  },
+  sessionOptions: {
+    type: Array as PropType<{ name: string; value: string }[]>,
+    default: () => []
+  },
+  semesterOptions: {
+    type: Array as PropType<{ name: string; value: string }[]>,
+    default: () => []
+  },
+  selectedSession: {
+    type: String as PropType<string | null>,
+    default: null
+  },
+  selectedSemester: {
+    type: String as PropType<string | null>,
+    default: null
+  },
+  searchQuery: {
+    type: String,
+    default: ''
+  },
+  sessionPlaceholder: {
+    type: String,
+    default: 'Select Session'
+  },
+  semesterPlaceholder: {
+    type: String,
+    default: 'Select Semester'
+  },
+  searchPlaceholder: {
+    type: String,
+    default: 'Search Course'
+  },
+  emptyStateMessage: {
+    type: String,
+    default: 'No courses available'
+  },
+  registeredCourses: {
+    type: Array as PropType<Course[]>,
+    required: true
+  },
+  courseList: {
+    type: Array as PropType<Course[]>,
+    required: true
   }
-  editableFields.value[field] = !editableFields.value[field];
+});
+
+const emit = defineEmits<{
+  (e: 'update:selectedSession', value: string | null): void
+  (e: 'update:selectedSemester', value: string | null): void
+  (e: 'update:searchQuery', value: string): void
+  (e: 'course-selected', course: Course): void
+  (e: 'remove-selected', course: Course): void
+  (e: 'register-selected', registeredCourses: Course[]): void
+}>();
+
+const selectedCount = computed(() => {
+  return props.registeredCourses?.filter(c => c.selected).length;
+});
+
+
+
+const handleRegistredCoursesCheckboxChange = (course: Course) => {
+  emit('course-selected', course);
 };
 
-const handleSave = () => {
-  // Implement save logic
-  Object.keys(editableFields.value).forEach(key => {
-    editableFields.value[key] = false;
-  });
+const handleCourseRemovalCheckBox = (course: Course) => {
+  emit('remove-selected', course);
+}
+
+const handleRegistration = () => {
+  const selectedCourses = props.registeredCourses?.filter(c => c.selected);
+  emit('register-selected', selectedCourses);
 };
 
-const handleNext = () => {
-  // Your next button logic
-};
+
 </script>
 
 <style scoped>
-/* Transition effects */
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.3s ease;
+/* List transition */
+.list-enter-active,
+.list-leave-active {
+  transition: all 0.3s ease;
 }
 
-.fade-enter-from,
-.fade-leave-to {
+.list-enter-from,
+.list-leave-to {
   opacity: 0;
+  transform: translateY(-10px);
 }
 
-/* Input field styling */
-input:read-only {
-  cursor: not-allowed;
-  color: #4b5563;
+/* Custom checkbox styling */
+:deep(.p-checkbox .p-checkbox-box) {
+  border-radius: 0.25rem;
+  border-width: 1px;
+  transition: all 0.2s ease;
 }
 
-input:not(:read-only) {
-  background-color: white;
+:deep(.p-checkbox .p-checkbox-box.p-highlight) {
+  background-color: #3b82f6;
   border-color: #3b82f6;
-  box-shadow: 0 0 0 1px #3b82f6;
+}
+
+/* Button hover effect */
+:deep(.p-button) {
+  transition: all 0.2s ease;
+}
+
+:deep(.p-button:not(:disabled):hover) {
+  transform: translateY(-1px);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Credit unit badge */
+.badge {
+  transition: all 0.2s ease;
 }
 </style>

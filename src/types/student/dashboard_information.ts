@@ -129,7 +129,7 @@ interface School {
 }
 
 // Department interface
-interface Department {
+export interface Department {
   code: string
   creationTime: number
   faculty: {
@@ -192,7 +192,7 @@ interface Semester {
 // Academic Session interface
 interface AcademicSession {
   creationTime: number
-  currentSemesters: any[] // Could be refined if structure is known
+  currentSemesters: any[]
   dateOnAdmission: null
   enableRegistrationApproval: boolean
   id: number

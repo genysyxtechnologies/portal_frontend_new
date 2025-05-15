@@ -5,6 +5,8 @@ import axios, {
   type AxiosResponse,
 } from 'axios'
 import { processError } from '@/utils/apiErrorResolver'
+import { useToast } from 'vue-toast-notification'
+const toast = useToast()
 
 // Define response type structure
 export interface ApiResponse<T = unknown> {
@@ -111,6 +113,7 @@ class ApiClient {
       }
     } catch (error: unknown) {
       const errorMessage = await processError(error)
+      toast.error(errorMessage)
       return {
         success: false,
         data: (error as Error).message as T,

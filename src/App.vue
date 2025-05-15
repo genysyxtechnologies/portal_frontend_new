@@ -4,7 +4,7 @@ import { RouterView } from 'vue-router'
 
 <template>
   <div class="bg-[#E9F5FF]">
-    <RouterView />
+    <router-view/>
     <Toast />
   </div>
 </template>

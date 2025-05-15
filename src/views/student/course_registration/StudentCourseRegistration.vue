@@ -17,11 +17,16 @@
         </TabList>
 
         <TabPanels class="flex-1 overflow-auto p-6">
-          <transition-group name="fade-slide" mode="out-in">
+          <div name="fade-slide" mode="out-in">
             <TabPanel v-for="(tab, index) in tabs" :key="index" :value="index.toString()" class="h-full">
-              <component :is="tab.component" />
+              <component :is="tab.component" v-model:selectedSession="selectedSession"
+                v-model:selectedSemester="selectedSemester" :sessionOptions="sessions" :semesterOptions="semesters"
+                :registeredCourses="courses?.registeredCourses" :courseLoading="courseLoading"
+                @course-selected="handleRegistredCoursesCheckboxChange" @remove-selected="handleCourseRemovalCheckBox"
+                @register-selected="handleRegistration" :courseList="courses?.courseList" />
+
             </TabPanel>
-          </transition-group>
+          </div>
         </TabPanels>
       </Ta-bs>
     </div>
@@ -30,11 +35,60 @@
 
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import CourseRegistration from './CourseRegistration.vue';
 import CourseRegistrationForm from './CourseRegistrationForm.vue';
 import { useStudentCourses } from '@/services/student/useStudentCourses';
-const { fetchAllCoursesForStudent } = useStudentCourses();
+import { useStudentDashboard } from '@/services/student/useStudentDashboard';
+import constant from '@/stores/constant';
+import { useToast } from 'vue-toast-notification';
+const { session } = constant
+const { fetchAllCoursesForStudent, registerStudentCourse, removeStudentCourse, courses, selectedSession, selectedSemester, loading: courseLoading } = useStudentCourses();
+const { user, getStudentInformation, getSessions, sessions, loading: dashboardLoading } = useStudentDashboard()
+const semesters = ref([])
+
+// handle course selection
+const handleRegistredCoursesCheckboxChange = async (course: any) => {
+  await registerStudentCourse(user.value?.username!, course.id, selectedSession.value!.id, selectedSemester.value!.id)
+  console.log('Selected course:', course)
+}
+
+const handleCourseRemovalCheckBox = async (course: any) => {
+  await removeStudentCourse(user.value?.username!, course.id, selectedSession.value!.id, selectedSemester.value!.id)
+  console.log('Removed course:', course)
+}
+
+
+
+// handle registration
+const handleRegistration = (courses: any) => {
+  console.log('Registering courses:', courses)
+}
+
+
+// load the sessions and semesters
+onMounted(async () => {
+  await getStudentInformation()
+  await getSessions()
+})
+
+watch(
+  () => selectedSession.value,
+  (value) => {
+    if (selectedSemester.value) {
+      selectedSemester.value = null
+    }
+    console.log("THIS IS THE SELECTED SESSION: ", value)
+    semesters.value = value.currentSemesters
+  },
+)
+
+watch(() => [selectedSession.value, selectedSemester.value], async ([session, semester]) => {
+  if (session && semester && user.value) {
+    console.log('THIS IS THE SELECTED SEMESTER: ', semester)
+    await fetchAllCoursesForStudent(user.value.username, session.id, semester.id)
+  }
+})
 
 const tabCount = ref<string>('0')
 
