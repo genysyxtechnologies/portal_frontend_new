@@ -45,12 +45,12 @@ export const useStudentSideBar = createSharedComposable(() => {
     {
       title: 'Change Programme',
       icon: image7,
-      path: '',
+      path: '/student/change-programme',
     },
     {
       title: 'My Document',
       icon: image8,
-      path: '',
+      path: 'my-documents',
     },
     {
       title: 'Self Service',

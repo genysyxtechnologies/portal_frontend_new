@@ -118,7 +118,13 @@ export const useStudentCourses = createSharedComposable(() => {
       loading.value = true
       const response = await studentCourseRepository.downloadSstudentDocument(
         document === 1
-          ? constant.downloads.courseForm
+          ? constant.downloads.courseForm +
+              '?session=' +
+              session +
+              '&semester=' +
+              semester +
+              '&student=' +
+              student
           : constant.downloads.examCard +
               '?session=' +
               session +

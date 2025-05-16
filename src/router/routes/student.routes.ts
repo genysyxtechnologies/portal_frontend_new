@@ -1,7 +1,5 @@
-import StudentCourseRegistration from '@/views/student/course_registration/StudentCourseRegistration.vue'
 import StudentDashboard from '@/views/student/StudentDashboard.vue'
 import type { RouteRecordRaw } from 'vue-router'
-
 const studentRoutes: RouteRecordRaw[] = [
   {
     path: '/student',
@@ -45,6 +43,42 @@ const studentRoutes: RouteRecordRaw[] = [
           import('@/views/student/course_registration/StudentCourseRegistration.vue'),
         meta: {
           title: 'Student Course Registration',
+          icon: 'pi pi-book',
+        },
+      },
+      {
+        path: 'my-results',
+        name: 'StudentResult',
+        component: () => import('@/views/student/result/StudentResult.vue'),
+        meta: {
+          title: 'Student Results',
+          icon: 'pi pi-book',
+        },
+      },
+      {
+        path: 'my-accomodation',
+        name: 'StudentAccomodation',
+        component: () => import('@/views/student/accomodation/StudentAccomodation.vue'),
+        meta: {
+          title: 'Student Accomodation',
+          icon: 'pi pi-book',
+        },
+      },
+      {
+        path: 'change-programme',
+        name: 'StudentChangeProgramme',
+        component: () => import('@/views/student/programme/StudentProgramme.vue'),
+        meta: {
+          title: 'Student Change Programme',
+          icon: 'pi pi-book',
+        },
+      },
+      {
+        path: 'my-documents',
+        name: 'StudentDocuments',
+        component: () => import('@/views/student/documents/StudentDocuments.vue'),
+        meta: {
+          title: 'Student Documents',
           icon: 'pi pi-book',
         },
       },

@@ -382,5 +382,4 @@ watch(
 </script>
 
 <style scoped>
-/* Add any additional scoped styles here */
 </style>

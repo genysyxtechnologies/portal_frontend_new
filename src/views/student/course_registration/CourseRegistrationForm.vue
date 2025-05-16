@@ -1,85 +1,49 @@
 <template>
   <div class="flex flex-col gap-6 relative">
     <div v-if="!loading" class="bg-[#fff] flex justify-between gap-4 p-12 rounded-xl">
-      <Sel-ect
-        :options="documents"
-        optionLabel="name"
-        :size="'large'"
-        placeholder="Select Document"
+      <Sel-ect :options="documents" optionLabel="name" :size="'large'" placeholder="Select Document"
         :modelValue="selectedDocument"
-        @update:modelValue="(value: string | null) => $emit('update:selectedDocument', value)"
-        class="card w-full"
-      />
-      <Sel-ect
-        :options="sessionOptions"
-        optionLabel="name"
-        :size="'large'"
-        :placeholder="sessionPlaceholder"
+        @update:modelValue="(value: string | null) => $emit('update:selectedDocument', value)" class="card w-full" />
+      <Sel-ect :options="sessionOptions" optionLabel="name" :size="'large'" :placeholder="sessionPlaceholder"
         :modelValue="selectedSession"
-        @update:modelValue="(value: string | null) => $emit('update:selectedSession', value)"
-        class="card w-full"
-      />
-      <Sel-ect
-        :options="semesterOptions"
-        optionLabel="title"
-        :size="'large'"
-        :placeholder="semesterPlaceholder"
+        @update:modelValue="(value: string | null) => $emit('update:selectedSession', value)" class="card w-full" />
+      <Sel-ect :options="semesterOptions" optionLabel="title" :size="'large'" :placeholder="semesterPlaceholder"
         :modelValue="selectedSemester"
-        @update:modelValue="(value: string | null) => $emit('update:selectedSemester', value)"
-        class="card w-full"
-      />
+        @update:modelValue="(value: string | null) => $emit('update:selectedSemester', value)" class="card w-full" />
       <div class="w-full relative">
-        <ReUsableButtons
-          :label="'Download'"
-          class="flex-1 w-full"
+        <ReUsableButtons :label="'Download'" class="flex-1 w-full"
           @on-click="emit('on-download', selectedDocument.value)"
-          :disabled="!selectedDocument || loading || !selectedSession || !selectedSemester"
-        />
+          :disabled="!selectedDocument || loading || !selectedSession || !selectedSemester" />
       </div>
     </div>
-    <SpinningAnimation
-      v-if="loading"
-      :loading="loading"
-      :headTitle="headTitle"
-      :subTitle="subTitle"
-    />
-    <EmptyData v-if="!selectedSemester || !selectedSession" :emptyMessage="emptyStateMessage" />
+    <SpinningAnimation v-if="loading" :loading="loading" :headTitle="headTitle" :subTitle="subTitle" />
+    <EmptySelection v-else-if="!selectedSemester || !selectedSession" :emptyMessage="emptyStateMessage" />
 
     <!-- Enhanced Student Information Section -->
-    <div
-      v-else
-      class="bg-[#fff] w-full rounded-xl overflow-hidden shadow-lg transition-all duration-300 hover:shadow-xl"
-    >
+    <div v-else
+      class="bg-[#fff] w-full rounded-xl overflow-hidden shadow-lg transition-all duration-300 hover:shadow-xl">
       <div v-if="!loading" class="p-8">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <!-- Left Column -->
           <div class="space-y-4">
-            <div
-              class="bg-gray-50 p-4 rounded-lg transition-all duration-200 hover:bg-gray-100 hover:scale-[1.01]"
-            >
+            <div class="bg-gray-50 p-4 rounded-lg transition-all duration-200 hover:bg-gray-100 hover:scale-[1.01]">
               <p class="text-sm text-gray-500 font-medium">Full Name</p>
               <p class="text-lg font-semibold text-gray-800">{{ user.name }}</p>
             </div>
 
-            <div
-              class="bg-gray-50 p-4 rounded-lg transition-all duration-200 hover:bg-gray-100 hover:scale-[1.01]"
-            >
+            <div class="bg-gray-50 p-4 rounded-lg transition-all duration-200 hover:bg-gray-100 hover:scale-[1.01]">
               <p class="text-sm text-gray-500 font-medium">Matric Number</p>
               <p class="text-lg font-semibold text-gray-800">{{ user.username }}</p>
             </div>
 
-            <div
-              class="bg-gray-50 p-4 rounded-lg transition-all duration-200 hover:bg-gray-100 hover:scale-[1.01]"
-            >
+            <div class="bg-gray-50 p-4 rounded-lg transition-all duration-200 hover:bg-gray-100 hover:scale-[1.01]">
               <p class="text-sm text-gray-500 font-medium">Faculty</p>
               <p class="text-lg font-semibold text-gray-800">
                 {{ user.programme.department.faculty.name }}
               </p>
             </div>
 
-            <div
-              class="bg-gray-50 p-4 rounded-lg transition-all duration-200 hover:bg-gray-100 hover:scale-[1.01]"
-            >
+            <div class="bg-gray-50 p-4 rounded-lg transition-all duration-200 hover:bg-gray-100 hover:scale-[1.01]">
               <p class="text-sm text-gray-500 font-medium">Department</p>
               <p class="text-lg font-semibold text-gray-800">
                 {{ user.programme.department.name }}
@@ -88,30 +52,22 @@
           </div>
           <!-- Right Column -->
           <div class="space-y-4">
-            <div
-              class="bg-gray-50 p-4 rounded-lg transition-all duration-200 hover:bg-gray-100 hover:scale-[1.01]"
-            >
+            <div class="bg-gray-50 p-4 rounded-lg transition-all duration-200 hover:bg-gray-100 hover:scale-[1.01]">
               <p class="text-sm text-gray-500 font-medium">Programme</p>
               <p class="text-lg font-semibold text-gray-800">{{ user.programme.name }}</p>
             </div>
 
-            <div
-              class="bg-gray-50 p-4 rounded-lg transition-all duration-200 hover:bg-gray-100 hover:scale-[1.01]"
-            >
+            <div class="bg-gray-50 p-4 rounded-lg transition-all duration-200 hover:bg-gray-100 hover:scale-[1.01]">
               <p class="text-sm text-gray-500 font-medium">Level</p>
               <p class="text-lg font-semibold text-gray-800">{{ user.level.title }}</p>
             </div>
 
-            <div
-              class="bg-gray-50 p-4 rounded-lg transition-all duration-200 hover:bg-gray-100 hover:scale-[1.01]"
-            >
+            <div class="bg-gray-50 p-4 rounded-lg transition-all duration-200 hover:bg-gray-100 hover:scale-[1.01]">
               <p class="text-sm text-gray-500 font-medium">Academic Session</p>
               <p class="text-lg font-semibold text-gray-800">{{ academicSession }}</p>
             </div>
 
-            <div
-              class="bg-gray-50 p-4 rounded-lg transition-all duration-200 hover:bg-gray-100 hover:scale-[1.01]"
-            >
+            <div class="bg-gray-50 p-4 rounded-lg transition-all duration-200 hover:bg-gray-100 hover:scale-[1.01]">
               <p class="text-sm text-gray-500 font-medium">Registration Date</p>
               <p class="text-lg font-semibold text-gray-800">{{ currentDateAndTime }}</p>
             </div>
@@ -125,9 +81,10 @@
 <script setup lang="ts">
 import ReUsableButtons from '@/views/buttons/ReUsableButtons.vue'
 import { ref, watch, type PropType } from 'vue'
-import EmptyData from '@/views/empty/EmptyData.vue'
+
 import type { UserResponse } from '@/types/student/dashboard_information'
 import SpinningAnimation from '@/views/spinner/SpinningAnimation.vue'
+import EmptySelection from '@/views/empty/EmptySelection.vue'
 
 interface Course {
   id: number

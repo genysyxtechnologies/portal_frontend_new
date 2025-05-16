@@ -1,314 +1,695 @@
 <template>
-  <div class="flex flex-col gap-6">
-    <!-- Filter Section -->
-    <div class="bg-white flex flex-col md:flex-row justify-between gap-4 p-6 rounded-xl shadow-sm">
-      <Sel-ect
-        :options="sessionOptions"
-        optionLabel="name"
-        :size="'large'"
-        :placeholder="sessionPlaceholder"
-        :modelValue="selectedSession"
-        @update:modelValue="(value: string | null) => $emit('update:selectedSession', value)"
-        class="card w-full"
-      />
-      <Sel-ect
-        :options="semesterOptions"
-        optionLabel="title"
-        :size="'large'"
-        :placeholder="semesterPlaceholder"
-        :modelValue="selectedSemester"
-        @update:modelValue="(value: string | null) => $emit('update:selectedSemester', value)"
-        class="card w-full"
-      />
-      <div class="w-full relative">
-        <InputText
-          class="flex-1 w-full h-full"
-          :placeholder="searchPlaceholder"
-          :modelValue="searchQuery"
-          @update:modelValue="(value: string) => $emit('update:searchQuery', value)"
-        />
-        <span class="absolute top-3 right-3 text-gray-400">
-          <i class="pi pi-search"></i>
-        </span>
-      </div>
-    </div>
-
-    <!-- Loading State -->
-    <div v-if="courseLoading" class="relative">
-      <SpinningAnimation :loading="courseLoading" />
-    </div>
-
-    <EmptyData
-      v-else-if="
-        (!registeredCourses || registeredCourses?.length === 0) &&
-        (!courseList || courseList?.length === 0) &&
-        !courseLoading
-      "
-      :emptyMessage="emptyStateMessage"
-    />
-
-    <!-- <div
-      v-if="(!registeredCourses || registeredCourses?.length === 0) && (!courseList || courseList?.length === 0) && !courseLoading"
-      class="bg-white rounded-xl shadow-sm p-8 flex flex-col items-center justify-center h-64">
-      <i class="pi pi-book text-4xl text-gray-300 mb-3"></i>
-      <h2 class="text-xl font-medium text-gray-500">{{ emptyStateMessage }}</h2>
-      <p class="text-gray-400 mt-1 text-sm">Try changing your filters</p>
-    </div> -->
-
-    <!-- Course List -->
-    <div v-else class="flex w-full gap-12">
-      <div v-if="!courseLoading" class="w-full">
-        <h2>Available Courses</h2>
-        <div class="flex items-center">
-          <div class="bg-white rounded-xl shadow-sm overflow-hidden flex-1">
-            <div class="grid grid-cols-1 divide-y divide-gray-100">
-              <div name="list">
-                <div
-                  v-for="course in courseList"
-                  :key="course.id"
-                  class="group hover:bg-gray-50 transition-colors duration-200"
-                  :class="{ 'bg-blue-50': course.selected }"
-                >
-                  <div class="flex items-center p-4">
-                    <div class="mr-4 flex-shrink-0"></div>
-                    <div class="flex-1 min-w-0">
-                      <div class="flex justify-between items-baseline">
-                        <div class="flex items-center gap-4">
-                          <Check-box
-                            v-model="course.selected"
-                            :binary="true"
-                            @change="handleRegistredCoursesCheckboxChange(course)"
-                            class="h-5 w-5 text-blue-600 rounded focus:ring-blue-500"
-                          />
-                          <div>
-                            <h3 class="text-lg font-semibold text-gray-800">
-                              {{ course.courseCode }}
-                            </h3>
-                            <p class="text-gray-600 text-sm mt-1">{{ course.title }}</p>
-                          </div>
-                        </div>
-                        <span
-                          class="ml-2 text-sm font-medium text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full"
-                        >
-                          {{ course.creditUnit }} Credit Unit
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Summary Footer -->
-            <div
-              v-if="selectedCount > 0"
-              class="bg-gray-50 px-4 py-3 flex justify-between items-center border-t border-gray-200"
-            >
-              <div class="text-sm text-gray-500">
-                {{ selectedCount }} of {{ registeredCourses.length }} selected
-              </div>
-              <Button
-                label="Register Selected"
-                icon="pi pi-send"
-                class="p-button-sm"
-                @click="handleRegistration"
-              />
-            </div>
-          </div>
+  <div class="academic-dashboard relative">
+    <SpinningAnimation v-if="loading" :loading="loading" :head-title="'Academic Performance'"
+      class="absolute inset-0" />
+    <div class="profile-card animate-fade-in">
+      <div class="profile-header">
+        <div class="profile-avatar">
+          <i class="pi pi-user text-4xl text-white"></i>
+        </div>
+        <div class="profile-info">
+          <h1 class="profile-name">{{ name }}</h1>
+          <p class="profile-id">{{ username }}</p>
         </div>
       </div>
 
-      <!-- REGISTRED COURSE -->
-      <div v-if="!courseLoading" class="w-full">
-        <h1>Registered Courses</h1>
-        <div class="bg-white rounded-xl shadow-sm overflow-hidden flex-1">
-          <div class="grid grid-cols-1 divide-y divide-gray-100">
-            <div name="list">
-              <div
-                v-for="course in registeredCourses"
-                :key="course.id"
-                class="group hover:bg-gray-50 transition-colors duration-200"
-                :class="{ 'bg-blue-50': course.selected }"
-              >
-                <div class="flex items-center p-4">
-                  <div class="mr-4 flex-shrink-0"></div>
-                  <div class="flex-1 min-w-0">
-                    <div class="flex justify-between items-baseline">
-                      <div class="flex items-center gap-4">
-                        <Check-box
-                          v-model="course.selected"
-                          :binary="true"
-                          @change="handleCourseRemovalCheckBox(course)"
-                          class="h-5 w-5 text-blue-600 rounded focus:ring-blue-500"
-                        />
-                        <div>
-                          <h3 class="text-lg font-semibold text-gray-800">
-                            {{ course.courseCode }}
-                          </h3>
-                          <p class="text-gray-600 text-sm mt-1">{{ course.title }}</p>
-                        </div>
-                      </div>
-                      <span
-                        class="ml-2 text-sm font-medium text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full"
-                      >
-                        {{ course.creditUnit }} Credit Units
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+      <div class="profile-grid">
+        <div v-for="(item, index) in profileItems" :key="index" class="profile-item"
+          :style="{ 'transition-delay': `${index * 50}ms` }">
+          <div class="item-icon">
+            <i :class="item.icon"></i>
           </div>
-
-          <!-- Summary Footer -->
-          <div
-            v-if="selectedCount > 0"
-            class="bg-gray-50 px-4 py-3 flex justify-between items-center border-t border-gray-200"
-          >
-            <div class="text-sm text-gray-500">
-              {{ selectedCount }} of {{ registeredCourses.length }} selected
-            </div>
-            <Button
-              label="Register Selected"
-              icon="pi pi-send"
-              class="p-button-sm"
-              @click="handleRegistration"
-            />
+          <div>
+            <p class="item-label">{{ item.label }}</p>
+            <p class="item-value">{{ item.value }}</p>
           </div>
         </div>
+      </div>
+    </div>
+
+    <div class="performance-section animate-fade-in" style="animation-delay: 100ms">
+      <div class="section-header">
+        <h2 class="section-title">
+          <i class="pi pi-table"></i> Academic Performance
+        </h2>
+        <div class="gpa-display">
+          <span class="gpa-label">Current GPA:</span>
+          <span class="gpa-value">{{ gpa }}</span>
+        </div>
+        <div class="gpa-display">
+          <span class="gpa-label">CGPA:</span>
+          <span class="gpa-value">{{ cgpa }}</span>
+        </div>
+      </div>
+
+
+      <div class="table-container">
+        <DataTable :value="results" class="p-datatable-striped academic-table" :paginator="true" :rows="10"
+          paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport"
+          currentPageReportTemplate="Showing {first} to {last} of {totalRecords} courses" responsiveLayout="scroll">
+          <Column field="course.courseCode" header="Course Code">
+            <template #body="{ data }">
+              <span class="course-code">{{ data.course.courseCode }}</span>
+            </template>
+          </Column>
+          <Column field="course.creditUnit" header="Unit">
+            <template #body="{ data }">
+              <span class="credit-badge">{{ data.course.creditUnit }}</span>
+            </template>
+          </Column>
+          <Column field="ca" header="CA">
+            <template #body="{ data }">
+              <span :class="['score', getScoreClass(data.ca)]">{{
+                formatScore(data.ca)
+                }}</span>
+              <span v-if="data.ca2" :class="['score', getScoreClass(data.ca2)]">{{
+                formatScore(data.ca2)
+                }}</span>
+            </template>
+          </Column>
+          <Column field="exam" header="Exam">
+            <template #body="{ data }">
+              <span :class="['score', getScoreClass(data.exam)]">{{
+                data.exam
+                }}</span>
+            </template>
+          </Column>
+          <Column field="total" header="Total">
+            <template #body="{ data }">
+              <span :class="['score', getScoreClass(data.total)]">{{
+                data.total
+                }}</span>
+            </template>
+          </Column>
+          <Column field="grade" header="Grade">
+            <template #body="{ data }">
+              <span :class="['grade-badge', getGradeClass(data.grade)]">{{
+                data.grade
+                }}</span>
+            </template>
+          </Column>
+          <Column header="Status">
+            <template #body="{ data }">
+              <span class="status-badge" :class="getStatusClass(data.total)">
+                {{ getStatusText(data.total) }}
+              </span>
+            </template>
+          </Column>
+        </DataTable>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import EmptyData from '@/views/empty/EmptyData.vue'
-import SpinningAnimation from '@/views/spinner/SpinningAnimation.vue'
-import { computed, type PropType } from 'vue'
+import { computed, ref, type PropType } from "vue";
+import DataTable from "primevue/datatable";
+import Column from "primevue/column";
+import type { StudentResult } from "@/types/student/result.information";
+import SpinningAnimation from "@/views/spinner/SpinningAnimation.vue";
 
-interface Course {
-  id: number
-  courseCode: string
-  title: string
-  creditUnit: number
-  selected: boolean
-}
+
 
 const props = defineProps({
-  courseLoading: {
+  name: String,
+  username: String,
+  session: String,
+  currentDate: String,
+  department: Object,
+  level: String,
+  programme: String,
+  gpa: String,
+  cgpa: String,
+  loading: {
     type: Boolean,
     default: false,
   },
-  sessionOptions: {
-    type: Array as PropType<{ name: string; value: string }[]>,
-    default: () => [],
-  },
-  semesterOptions: {
-    type: Array as PropType<{ name: string; value: string }[]>,
-    default: () => [],
-  },
-  selectedSession: {
-    type: String as PropType<string | null>,
-    default: null,
-  },
-  selectedSemester: {
-    type: String as PropType<string | null>,
-    default: null,
-  },
-  searchQuery: {
-    type: String,
-    default: '',
-  },
-  sessionPlaceholder: {
-    type: String,
-    default: 'Select Session',
-  },
-  semesterPlaceholder: {
-    type: String,
-    default: 'Select Semester',
-  },
-  searchPlaceholder: {
-    type: String,
-    default: 'Search Course',
-  },
-  emptyStateMessage: {
-    type: String,
-    default: 'No courses available',
-  },
-  registeredCourses: {
-    type: Array as PropType<Course[]>,
+
+  results: {
+    type: Array as PropType<StudentResult['results']>,
     required: true,
   },
-  courseList: {
-    type: Array as PropType<Course[]>,
-    required: true,
+});
+
+
+const profileItems = computed(() => [
+  {
+    label: "Faculty",
+    value: props.department?.faculty.name,
+    icon: "pi pi-building",
   },
-})
+  {
+    label: "Department",
+    value: props.department?.name,
+    icon: "pi pi-briefcase",
+  },
+  { label: "Programme", value: props.programme, icon: "pi pi-book" },
+  { label: "Level", value: props.level, icon: "pi pi-sort-numeric-up" },
+  {
+    label: "Academic Session",
+    value: props.session,
+    icon: "pi pi-calendar",
+  },
+  { label: "Date", value: props.currentDate, icon: "pi pi-clock" },
+]);
 
-const emit = defineEmits<{
-  (e: 'update:selectedSession', value: string | null): void
-  (e: 'update:selectedSemester', value: string | null): void
-  (e: 'update:searchQuery', value: string): void
-  (e: 'course-selected', course: Course): void
-  (e: 'remove-selected', course: Course): void
-  (e: 'register-selected', registeredCourses: Course[]): void
-}>()
+const formatScore = (score: null | number) => {
+  return score ? Number(score).toFixed(1) : '-';
+};
 
-const selectedCount = computed(() => {
-  return props.registeredCourses?.filter((c) => c.selected).length
-})
+const getScoreClass = (score: string | number) => {
+  const num = score === "-" ? 0 : Number(score);
+  if (num >= 70) return "score-excellent";
+  if (num >= 60) return "score-good";
+  if (num >= 50) return "score-average";
+  return "score-poor";
+};
 
-const handleRegistredCoursesCheckboxChange = (course: Course) => {
-  emit('course-selected', course)
-}
+const getGradeClass = (grade: string) => {
+  if (grade === "A") return "grade-a";
+  if (grade === "B") return "grade-b";
+  if (grade === "C") return "grade-c";
+  return "grade-f";
+};
 
-const handleCourseRemovalCheckBox = (course: Course) => {
-  emit('remove-selected', course)
-}
+const getStatusClass = (total: number) => {
+  if (total >= 70) return "status-passed";
+  if (total >= 50) return "status-passed";
+  return "status-failed";
+};
 
-const handleRegistration = () => {
-  const selectedCourses = props.registeredCourses?.filter((c) => c.selected)
-  emit('register-selected', selectedCourses)
-}
+const getStatusText = (total: number) => {
+  if (total >= 70) return "Excellent";
+  if (total >= 50) return "Passed";
+  return "Failed";
+};
 </script>
 
 <style scoped>
-/* List transition */
-.list-enter-active,
-.list-leave-active {
-  transition: all 0.3s ease;
+/* Base Styles */
+.academic-dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  font-family: "Inter", system-ui, sans-serif;
 }
 
-.list-enter-from,
-.list-leave-to {
+/* Profile Card */
+.profile-card {
+  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+  color: white;
+  border-radius: 1.25rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  animation: fadeIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.profile-header {
+  display: flex;
+  align-items: center;
+  padding: 1.5rem;
+  gap: 1rem;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.profile-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 4rem;
+  height: 4rem;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.profile-name {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.profile-id {
+  color: #d1d5db;
+}
+
+.profile-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  gap: 0.125rem;
+  padding: 0.125rem;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.profile-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background-color: rgba(255, 255, 255, 0.9);
+  color: #374151;
+  transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
   opacity: 0;
-  transform: translateY(-10px);
+  transform: translateY(20px);
+  animation: fadeInUp 0.6s forwards;
 }
 
-/* Custom checkbox styling */
-:deep(.p-checkbox .p-checkbox-box) {
-  border-radius: 0.25rem;
-  border-width: 1px;
+.item-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+  color: white;
+}
+
+.item-label {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.item-value {
+  font-weight: 600;
+}
+
+/* Performance Section */
+.performance-section {
+  background-color: white;
+  border-radius: 1.25rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.section-header {
+  display: flex;
+  flex-direction: column;
+
+  @media (min-width: 768px) {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  padding: 1.5rem;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.section-title {
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: #374151;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.gpa-display {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+
+  @media (min-width: 768px) {
+    margin-top: 0;
+  }
+}
+
+.gpa-label {
+  color: #6b7280;
+}
+
+.gpa-value {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #2563eb;
+}
+
+.table-container {
+  padding: 0.5rem;
+}
+
+/* Table Styles */
+:deep(.academic-table .p-datatable-header) {
+  background-color: transparent;
+  border: none;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+:deep(.academic-table .p-datatable-thead > tr > th) {
+  background-color: #f9fafb;
+  color: #4b5563;
+  font-weight: 600;
+  border-bottom: 1px solid #e5e7eb;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.05rem;
+}
+
+:deep(.academic-table .p-datatable-tbody > tr) {
   transition: all 0.2s ease;
 }
 
-:deep(.p-checkbox .p-checkbox-box.p-highlight) {
-  background-color: #3b82f6;
-  border-color: #3b82f6;
+:deep(.academic-table .p-datatable-tbody > tr:hover) {
+  background-color: #eff6ff;
 }
 
-/* Button hover effect */
-:deep(.p-button) {
-  transition: all 0.2s ease;
+:deep(.academic-table .p-datatable-tbody > tr > td) {
+  border-bottom: 1px solid #f3f4f6;
+  padding: 1rem;
 }
 
-:deep(.p-button:not(:disabled):hover) {
-  transform: translateY(-1px);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+.course-code {
+  font-family: "Monaco", monospace;
+  font-weight: bold;
+  color: #2563eb;
 }
 
-/* Credit unit badge */
-.badge {
-  transition: all 0.2s ease;
+.credit-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background-color: #e0f2fe;
+  color: #0369a1;
+  font-weight: bold;
+}
+
+.score {
+  font-weight: 600;
+}
+
+.score-excellent {
+  color: #16a34a;
+}
+
+.score-good {
+  color: #2563eb;
+}
+
+.score-average {
+  color: #d97706;
+}
+
+.score-poor {
+  color: #dc2626;
+}
+
+.grade-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  font-weight: bold;
+}
+
+.grade-a {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.grade-b {
+  background-color: #bfdbfe;
+  color: #1e40af;
+}
+
+.grade-c {
+  background-color: #fef08a;
+  color: #78350f;
+}
+
+.grade-f {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 1rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.status-passed {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.status-failed {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+/* Paginator Styles */
+:deep(.academic-table .p-paginator) {
+  background-color: transparent;
+  border-top: 1px solid #e5e7eb;
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+:deep(.academic-table .p-paginator .p-paginator-pages .p-paginator-page.p-highlight) {
+  background-color: #2563eb;
+  color: white;
+}
+
+:deep(.academic-table .p-paginator .p-paginator-pages .p-paginator-page:not(.p-highlight):hover) {
+  background-color: #eff6ff;
+  color: #2563eb;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .profile-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .profile-avatar {
+    margin-bottom: 1rem;
+  }
+
+  :deep(.academic-table .p-datatable-thead) {
+    display: none;
+  }
+
+  :deep(.academic-table .p-datatable-tbody > tr > td) {
+    display: block;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+    text-align: right;
+  }
+
+  :deep(.academic-table .p-datatable-tbody > tr > td:before) {
+    content: attr(data-label);
+    float: left;
+    font-weight: 600;
+    color: #6b7280;
+  }
+
+  :deep(.academic-table .p-paginator) {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
 }
 </style>
+
+
+
+
+
+
+
+
+
+
+<template>
+  <div class="flex flex-col gap-6">
+    <h1 class="head-title">Course Registration</h1>
+    <div
+      class="lg:col-span-7 bg-white rounded-xl shadow-sm overflow-hidden transition-all duration-300 hover:shadow-md">
+      <Ta-bs v-model:value="tabCount" class="h-full flex flex-col">
+        <TabList class="flex border-b border-gray-200">
+          <T-ab v-for="(tab, index) in tabs" :key="index" :value="index.toString()"
+            class="px-6 py-3 text-sm font-medium h-[5rem] relative transition-all duration-200" :class="{
+              'text-primary-500': tabCount === index.toString(),
+              'text-gray-500 hover:text-gray-700': tabCount !== index.toString(),
+            }">
+            {{ tab.label }}
+            <span v-if="tabCount === index.toString()"
+              class="absolute bottom-0 left-0 right-0 h-0.5 bg-primary-500 animate-underline"></span>
+          </T-ab>
+        </TabList>
+
+        <TabPanels class="flex-1 overflow-auto p-6">
+          <div name="fade-slide" mode="out-in">
+            <TabPanel v-for="(tab, index) in tabs" :key="index" :value="index.toString()" class="h-full">
+              <component :is="tab.component" :user="user" v-model:selectedSession="selectedSession"
+                v-model:selectedSemester="selectedSemester" :sessionOptions="sessions"
+                :academicSession="selectedSession?.name" :semesterOptions="semesters"
+                :registeredCourses="courses?.registeredCourses" :courseLoading="courseLoading"
+                @course-selected="handleRegistredCoursesCheckboxChange" @remove-selected="handleCourseRemovalCheckBox"
+                @register-selected="handleRegistration" :courseList="courses?.courseList!"
+                :currentDateAndTime="currentDateAndTime" :documents="documents"
+                v-model:selectedDocument="selectedDocument" @on-download="handleDownload" :headTitle="headTitle"
+                :subTitle="subTitle" :loading="courseLoading" />
+            </TabPanel>
+          </div>
+        </TabPanels>
+      </Ta-bs>
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { onMounted, ref, watch } from 'vue'
+import CourseRegistration from './CourseRegistration.vue'
+import CourseRegistrationForm from './CourseRegistrationForm.vue'
+import { useStudentCourses } from '@/services/student/useStudentCourses'
+import { useStudentDashboard } from '@/services/student/useStudentDashboard'
+import { getCurrentDateAndTime } from '@/utils/dateFormater'
+const currentDateAndTime = getCurrentDateAndTime()
+const {
+  fetchAllCoursesForStudent,
+  registerStudentCourse,
+  removeStudentCourse,
+  courses,
+  selectedSession,
+  selectedSemester,
+  loading: courseLoading,
+  documents,
+  selectedDocument,
+  tabCount,
+  downloadStudentCourseForm,
+  headTitle,
+  subTitle,
+} = useStudentCourses()
+const { user, getStudentInformation, getSessions, sessions } = useStudentDashboard()
+const semesters = ref([])
+
+// handle course selection
+const handleRegistredCoursesCheckboxChange = async (course: any) => {
+  await registerStudentCourse(
+    user.value?.username!,
+    course.id,
+    selectedSession.value!.id,
+    selectedSemester.value!.id,
+  )
+  console.log('Selected course:', course)
+}
+
+const handleCourseRemovalCheckBox = async (course: any) => {
+  await removeStudentCourse(
+    user.value?.username!,
+    course.id,
+    selectedSession.value!.id,
+    selectedSemester.value!.id,
+  )
+  console.log('Removed course:', course)
+}
+
+const handleDownload = async (document: number) => {
+  await downloadStudentCourseForm(
+    user.value?.id!,
+    selectedSession.value!.id,
+    selectedSemester.value!.id,
+    document,
+  )
+}
+
+// handle registration
+const handleRegistration = (courses: any) => {
+  console.log('Registering courses:', courses)
+}
+
+// load the sessions and semesters
+onMounted(async () => {
+  await getStudentInformation()
+  await getSessions()
+})
+
+
+// watch for session changes and update semester
+watch(
+  () => selectedSession.value,
+  (value) => {
+    if (selectedSemester.value) {
+      selectedSemester.value = null
+    }
+    semesters.value = value.currentSemesters
+  },
+)
+
+
+// watch for session and semester changes before uploading courses
+watch(
+  () => [selectedSession.value, selectedSemester.value],
+  async ([session, semester]) => {
+    if (session && semester && user.value) {
+      await fetchAllCoursesForStudent(user.value.username, session.id, semester.id)
+    }
+  },
+)
+
+const tabs = [
+  { label: 'Registration', component: CourseRegistration },
+  { label: 'Forms', component: CourseRegistrationForm },
+]
+
+
+// watch for selected documents (COURSE FORM, EXAM CARD)
+watch(
+  () => selectedDocument.value,
+  (value) => {
+    console.log('Selected document:', value)
+  },
+)
+
+</script>

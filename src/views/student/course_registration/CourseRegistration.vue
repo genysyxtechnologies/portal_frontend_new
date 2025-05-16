@@ -1,34 +1,20 @@
 <template>
-  <div class="flex flex-col gap-6">
+  <div class="course-registration-wrapper">
     <!-- Filter Section with enhanced styling -->
-    <div
-      class="bg-white flex flex-col md:flex-row justify-between gap-4 p-6 rounded-xl shadow-sm border border-gray-100 transition-all duration-300 hover:shadow-md"
-    >
-      <Sel-ect
-        :options="sessionOptions"
-        optionLabel="name"
-        :size="'large'"
-        :placeholder="sessionPlaceholder"
+    <div class="filter-section">
+      <Sel-ect :options="sessionOptions" optionLabel="name" :size="'large'" :placeholder="sessionPlaceholder"
         :modelValue="selectedSession"
         @update:modelValue="(value: string | null) => $emit('update:selectedSession', value)"
-        class="card w-full transition-all duration-200 hover:border-blue-400 focus-within:ring-2 focus-within:ring-blue-200"
-      />
-      <Sel-ect
-        :options="semesterOptions"
-        optionLabel="title"
-        :size="'large'"
-        :placeholder="semesterPlaceholder"
+        class="card w-full transition-all duration-200 hover:border-blue-400 focus-within:ring-2 focus-within:ring-blue-200" />
+      <Sel-ect :options="semesterOptions" optionLabel="title" :size="'large'" :placeholder="semesterPlaceholder"
         :modelValue="selectedSemester"
         @update:modelValue="(value: string | null) => $emit('update:selectedSemester', value)"
-        class="card w-full transition-all duration-200 hover:border-blue-400 focus-within:ring-2 focus-within:ring-blue-200"
-      />
+        class="card w-full transition-all duration-200 hover:border-blue-400 focus-within:ring-2 focus-within:ring-blue-200" />
       <div class="w-full relative">
         <InputText
           class="flex-1 w-full h-full transition-all duration-200 hover:border-blue-400 focus:ring-2 focus:ring-blue-200"
-          :placeholder="searchPlaceholder"
-          :modelValue="searchQuery"
-          @update:modelValue="(value: string) => $emit('update:searchQuery', value)"
-        />
+          :placeholder="searchPlaceholder" :modelValue="searchQuery"
+          @update:modelValue="(value: string | undefined) => $emit('update:searchQuery', value as string)" />
         <span class="absolute top-3 right-3 text-gray-400 transition-colors duration-200">
           <i class="pi pi-search"></i>
         </span>
@@ -46,69 +32,47 @@
     </div>
 
     <!-- Empty State with improved design -->
-    <EmptyData
-      v-else-if="
-        (!registeredCourses || registeredCourses?.length === 0) &&
-        (!courseList || courseList?.length === 0) &&
-        !courseLoading
-      "
-      :emptyMessage="emptyStateMessage"
-      class="transition-all duration-300"
-    />
+    <EmptySelection v-else-if="
+      (!registeredCourses || registeredCourses?.length === 0) &&
+      (!courseList || courseList?.length === 0) &&
+      !courseLoading
+    " :emptyMessage="emptyStateMessage" class="transition-all duration-300" />
 
     <!-- Main Content Area -->
-    <div v-else class="flex flex-col lg:flex-row w-full gap-6 transition-all duration-300">
+    <div v-else class="course-panels-container">
       <!-- Available Courses Panel -->
-      <div class="w-full lg:w-1/2 transition-all duration-300">
-        <div class="flex items-center justify-between mb-4">
-          <h2 class="text-xl font-semibold text-gray-800 flex items-center gap-2">
-            <i class="pi pi-book text-blue-500"></i>
+      <div class="course-panel available-courses-panel">
+        <div class="panel-header">
+          <h2 class="panel-title">
+            <i class="pi pi-book panel-icon"></i>
             Available Courses
-            <span class="text-sm font-normal text-gray-500 ml-2">
+            <span class="course-count">
               ({{ courseList.length }} courses)
             </span>
           </h2>
-          <div class="text-sm text-gray-500">Select courses to register</div>
+          <div class="panel-subtitle">Select courses to register</div>
         </div>
 
-        <div
-          class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100 transition-all duration-300 hover:shadow-md"
-        >
-          <div class="max-h-[500px] overflow-y-auto custom-scroll">
+        <div class="course-list-container available-courses-list">
+          <div class="course-list-scroll">
             <transition-group name="list" tag="div">
-              <div
-                v-for="course in courseList"
-                :key="`available-${course.id}`"
-                class="group hover:bg-gray-50 transition-all duration-200 ease-in-out"
-                :class="{ 'bg-blue-50': course.selected }"
-              >
-                <div class="flex items-center p-4">
-                  <div class="flex-1 min-w-0 ml-4">
-                    <div class="flex justify-between items-baseline">
-                      <div class="flex items-center gap-3">
-                        <Check-box
-                          v-model="course.selected"
-                          :binary="true"
-                          @change="handleRegistredCoursesCheckboxChange(course)"
-                          class="custom-checkbox"
-                        />
-                        <div>
-                          <h3
-                            class="text-lg font-semibold text-gray-800 group-hover:text-blue-600 transition-colors duration-200"
-                          >
-                            {{ course.courseCode }}
-                          </h3>
-                          <p class="text-gray-600 text-sm mt-1">{{ course.title }}</p>
-                        </div>
-                      </div>
-                      <span
-                        class="ml-2 text-sm font-medium text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full transition-all duration-200 group-hover:bg-blue-100"
-                      >
-                        {{ course.creditUnit }} CU
-                      </span>
+              <div v-for="course in courseList" :key="`available-${course.id}`"
+                class="course-item"
+                :class="{ 'course-item-selected': course.selected }">
+                <div class="course-item-content">
+                  <div class="course-item-checkbox">
+                    <Check-box v-model="course.selected" :binary="true"
+                      @change="handleRegistredCoursesCheckboxChange(course)" class="custom-checkbox" />
+                  </div>
+                  <div class="course-item-details">
+                    <div class="course-item-header">
+                      <h3 class="course-item-code">{{ course.courseCode }}</h3>
+                      <span class="course-item-units available-units">{{ course.creditUnit }} CU</span>
                     </div>
+                    <p class="course-item-title">{{ course.title }}</p>
                   </div>
                 </div>
+                <div class="course-item-hover-effect"></div>
               </div>
             </transition-group>
           </div>
@@ -116,73 +80,51 @@
       </div>
 
       <!-- Registered Courses Panel -->
-      <div class="w-full lg:w-1/2 transition-all duration-300">
-        <div class="flex items-center justify-between mb-4">
-          <h2 class="text-xl font-semibold text-gray-800 flex items-center gap-2">
-            <i class="pi pi-check-circle text-green-500"></i>
+      <div class="course-panel registered-courses-panel">
+        <div class="panel-header">
+          <h2 class="panel-title">
+            <i class="pi pi-check-circle panel-icon registered-icon"></i>
             Registered Courses
-            <span class="text-sm font-normal text-gray-500 ml-2">
+            <span class="course-count">
               ({{ registeredCourses.length }} courses)
             </span>
           </h2>
-          <div class="text-sm text-gray-500">Selected: {{ selectedCount }}</div>
+          <div class="panel-subtitle">Select courses to remove</div>
         </div>
 
-        <div
-          class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100 transition-all duration-300 hover:shadow-md"
-        >
-          <div class="max-h-[500px] overflow-y-auto custom-scroll">
+        <div class="course-list-container registered-courses-list">
+          <div class="course-list-scroll">
             <transition-group name="list" tag="div">
-              <div
-                v-for="course in registeredCourses"
-                :key="`registered-${course.id}`"
-                class="group hover:bg-gray-50 transition-all duration-200 ease-in-out"
-                :class="{ 'bg-blue-50': course.selected }"
-              >
-                <div class="flex items-center p-4 gap-3">
-                  <Check-box
-                    v-model="course.selected"
-                    :binary="true"
-                    @change="handleCourseRemovalCheckBox(course)"
-                    class="custom-checkbox"
-                  />
-                  <div class="flex-1 min-w-0 ml-4">
-                    <div class="flex justify-between items-baseline">
-                      <div>
-                        <h3
-                          class="text-lg font-semibold text-gray-800 group-hover:text-blue-600 transition-colors duration-200"
-                        >
-                          {{ course.courseCode }}
-                        </h3>
-                        <p class="text-gray-600 text-sm mt-1">{{ course.title }}</p>
-                      </div>
-                      <span
-                        class="ml-2 text-sm font-medium text-green-600 bg-green-50 px-2.5 py-1 rounded-full transition-all duration-200 group-hover:bg-green-100"
-                      >
-                        {{ course.creditUnit }} CU
-                      </span>
+              <div v-for="course in registeredCourses" :key="`registered-${course.id}`"
+                class="course-item"
+                :class="{ 'course-item-selected': course.selected }">
+                <div class="course-item-content">
+                  <div class="course-item-checkbox">
+                    <Check-box v-model="course.selected" :binary="true"
+                      @change="handleCourseRemovalCheckBox(course)" class="custom-checkbox" />
+                  </div>
+                  <div class="course-item-details">
+                    <div class="course-item-header">
+                      <h3 class="course-item-code">{{ course.courseCode }}</h3>
+                      <span class="course-item-units registered-units">{{ course.creditUnit }} CU</span>
                     </div>
+                    <p class="course-item-title">{{ course.title }}</p>
                   </div>
                 </div>
+                <div class="course-item-hover-effect registered-effect"></div>
               </div>
             </transition-group>
           </div>
 
           <!-- Summary Footer with enhanced styling -->
-          <div
-            v-if="selectedCount > 0"
-            class="bg-gray-50 px-4 py-3 flex justify-between items-center border-t border-gray-200 transition-all duration-300"
-          >
-            <div class="text-sm text-gray-500">
-              <span class="font-medium">{{ selectedCount }}</span> of
+          <div v-if="selectedCount > 0" class="course-action-footer">
+            <div class="selected-count">
+              <span class="count-highlight">{{ selectedCount }}</span> of
               {{ registeredCourses.length }} selected
             </div>
-            <Button
-              label="Register Selected"
-              icon="pi pi-send"
-              class="p-button-sm p-button-raised p-button-success transition-all duration-200 hover:scale-105"
-              @click="handleRegistration"
-            />
+            <Button label="Register Selected" icon="pi pi-send"
+              class="action-button"
+              @click="handleRegistration" />
           </div>
         </div>
       </div>
@@ -191,7 +133,8 @@
 </template>
 
 <script setup lang="ts">
-import EmptyData from '@/views/empty/EmptyData.vue'
+
+import EmptySelection from '@/views/empty/EmptySelection.vue'
 import { computed, type PropType } from 'vue'
 
 interface Course {
@@ -281,17 +224,315 @@ const handleRegistration = () => {
 </script>
 
 <style scoped>
+/* Main Container Styles */
+.course-registration-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  animation: fadeIn 0.6s ease-out forwards;
+}
+
+/* Filter Section Styles */
+.filter-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.5rem;
+  background-color: #ffffff;
+  border-radius: 1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  transition: all 0.3s ease;
+  animation: slideDown 0.5s ease-out forwards;
+}
+
+@media (min-width: 768px) {
+  .filter-section {
+    flex-direction: row;
+  }
+}
+
+.filter-section:hover {
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+
+/* Course Panels Container */
+.course-panels-container {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  width: 100%;
+  transition: all 0.3s ease;
+}
+
+@media (min-width: 1024px) {
+  .course-panels-container {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* Course Panel Styles */
+.course-panel {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  transition: all 0.3s ease;
+}
+
+.available-courses-panel {
+  animation: slideInFromLeft 0.6s ease-out forwards;
+}
+
+.registered-courses-panel {
+  animation: slideInFromRight 0.6s ease-out forwards;
+}
+
+/* Panel Header Styles */
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.panel-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.panel-icon {
+  color: #3b82f6;
+  font-size: 1.25rem;
+}
+
+.registered-icon {
+  color: #10b981;
+}
+
+.course-count {
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: #64748b;
+  margin-left: 0.5rem;
+}
+
+.panel-subtitle {
+  font-size: 0.875rem;
+  color: #64748b;
+}
+
+/* Course List Container Styles */
+.course-list-container {
+  background-color: #ffffff;
+  border-radius: 1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  overflow: hidden;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.course-list-container:hover {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+
+.available-courses-list {
+  border-top: 3px solid #3b82f6;
+}
+
+.registered-courses-list {
+  border-top: 3px solid #10b981;
+}
+
+.course-list-scroll {
+  max-height: 500px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #c1c1c1 #f1f1f1;
+}
+
+/* Course Item Styles */
+.course-item {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+.course-item:last-child {
+  border-bottom: none;
+}
+
+.course-item-content {
+  display: flex;
+  align-items: flex-start;
+  padding: 1.25rem;
+  position: relative;
+  z-index: 1;
+}
+
+.course-item-checkbox {
+  margin-right: 1rem;
+}
+
+.course-item-details {
+  flex: 1;
+  min-width: 0;
+}
+
+.course-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 0.5rem;
+}
+
+.course-item-code {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1e293b;
+  transition: color 0.3s ease;
+}
+
+.course-item:hover .course-item-code {
+  color: #3b82f6;
+}
+
+.course-item-title {
+  font-size: 0.875rem;
+  color: #64748b;
+  margin-top: 0.25rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 90%;
+}
+
+.course-item-units {
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 0.25rem 0.75rem;
+  border-radius: 1rem;
+  transition: all 0.3s ease;
+}
+
+.available-units {
+  background-color: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+}
+
+.course-item:hover .available-units {
+  background-color: rgba(59, 130, 246, 0.2);
+}
+
+.registered-units {
+  background-color: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+}
+
+.course-item:hover .registered-units {
+  background-color: rgba(16, 185, 129, 0.2);
+}
+
+.course-item-hover-effect {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(241, 245, 249, 0);
+  transition: background-color 0.3s ease;
+  z-index: 0;
+}
+
+.course-item:hover .course-item-hover-effect {
+  background-color: rgba(241, 245, 249, 0.8);
+}
+
+.course-item-selected {
+  background-color: rgba(59, 130, 246, 0.05);
+}
+
+.course-item-selected .course-item-hover-effect {
+  background-color: rgba(59, 130, 246, 0.1);
+}
+
+.course-item-selected.course-item:hover .course-item-hover-effect {
+  background-color: rgba(59, 130, 246, 0.15);
+}
+
+.registered-effect {
+  background-color: rgba(16, 185, 129, 0);
+}
+
+.course-item:hover .registered-effect {
+  background-color: rgba(241, 245, 249, 0.8);
+}
+
+.course-item-selected .registered-effect {
+  background-color: rgba(16, 185, 129, 0.1);
+}
+
+.course-item-selected.course-item:hover .registered-effect {
+  background-color: rgba(16, 185, 129, 0.15);
+}
+
+/* Course Action Footer */
+.course-action-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  background-color: #f8fafc;
+  border-top: 1px solid rgba(226, 232, 240, 0.8);
+  transition: all 0.3s ease;
+}
+
+.selected-count {
+  font-size: 0.875rem;
+  color: #64748b;
+}
+
+.count-highlight {
+  font-weight: 600;
+  color: #3b82f6;
+}
+
+.action-button {
+  background-color: #10b981 !important;
+  border-color: #10b981 !important;
+  color: white !important;
+  padding: 0.5rem 1rem !important;
+  font-size: 0.875rem !important;
+  border-radius: 0.5rem !important;
+  transition: all 0.3s ease !important;
+  box-shadow: 0 2px 5px rgba(16, 185, 129, 0.2) !important;
+}
+
+.action-button:hover {
+  background-color: #059669 !important;
+  border-color: #059669 !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3) !important;
+}
+
 /* Enhanced List transition */
 .list-move,
 .list-enter-active,
 .list-leave-active {
-  transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: all 0.5s ease;
 }
 
 .list-enter-from,
 .list-leave-to {
   opacity: 0;
-  transform: translateX(30px);
+  transform: translateY(30px);
 }
 
 .list-leave-active {
@@ -356,6 +597,61 @@ const handleRegistration = () => {
   width: 3rem;
 }
 
+/* Animation Keyframes */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInFromLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInFromRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
 .spinner-circle {
   position: absolute;
   width: 1rem;
@@ -381,6 +677,7 @@ const handleRegistration = () => {
 }
 
 @keyframes spinner-animation {
+
   0%,
   80%,
   100% {
@@ -418,10 +715,8 @@ const handleRegistration = () => {
 }
 
 :deep(.p-inputtext:enabled:focus) {
-  --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width)
-    var(--tw-ring-offset-color);
-  --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width))
-    var(--tw-ring-color);
+  --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+  --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);
   box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000);
   --tw-ring-color: rgb(191 219 254 / var(--tw-ring-opacity));
   --tw-ring-opacity: 1;

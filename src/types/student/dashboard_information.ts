@@ -174,7 +174,7 @@ interface ProgrammeType {
 }
 
 // Semester interface
-interface Semester {
+export interface Semester {
   creationTime: number
   endDate: number
   firstSemester: boolean
@@ -238,7 +238,7 @@ interface ModeOfEntry {
 }
 
 // Programme interface
-interface Programme {
+export interface Programme {
   availableOnline: boolean
   award: Award
   awardName: string

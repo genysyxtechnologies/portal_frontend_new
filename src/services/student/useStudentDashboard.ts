@@ -5,7 +5,7 @@ import { onMounted, ref } from 'vue'
 import authService from '../api/authService'
 import type { UserResponse } from '@/types/student/dashboard_information'
 import { type Session } from '@/types/student/sessions'
-const { session } = constant
+const { session, user:  users } = constant
 
 export const useStudentDashboard = createSharedComposable(() => {
   const user = ref<UserResponse['user'] | null>(null)
@@ -19,6 +19,7 @@ export const useStudentDashboard = createSharedComposable(() => {
     error.value = null
     try {
       const response = await authService.getCurrentUser()
+      console.log('THIS IS THE MAIN RESPONSE: ', response)
       user.value = response.data.user
     } catch (err) {
       console.error(err)
@@ -40,6 +41,23 @@ export const useStudentDashboard = createSharedComposable(() => {
       sessions.value = response.data as Session[]
       console.log('THIS IS THE STUDENT SESSION: ', response)
       return response.data as Session[]
+    } catch (err) {
+      console.error(err)
+      error.value = err instanceof Error ? err.message : 'Unknown error'
+    } finally {
+      loading.value = false
+    }
+  }
+
+  // get user dashboard
+  async function getUserDashboard() {
+    loading.value = true
+    error.value = null
+    const dashboard = new StudentDashboardRepositories()
+    try {
+      const response = await dashboard.getInformation(users.dashboard)
+      console.log('THIS IS THE USER DASHBOARD: ', response)
+      return response.data
     } catch (err) {
       console.error(err)
       error.value = err instanceof Error ? err.message : 'Unknown error'
@@ -71,6 +89,7 @@ export const useStudentDashboard = createSharedComposable(() => {
     getStudentInformation,
     getSessions,
     getCurrentSessison,
+    getUserDashboard,
     user,
     sessions,
     loading,
