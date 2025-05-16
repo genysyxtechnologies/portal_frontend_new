@@ -1,4 +1,5 @@
 import './assets/main.css'
+import './assets/darkmode.css'
 import 'vue-toast-notification/dist/theme-bootstrap.css'
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'

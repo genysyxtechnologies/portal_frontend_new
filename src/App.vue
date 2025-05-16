@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
 import ThemeDebug from '@/components/debug/ThemeDebug.vue'
+import Toast from 'primevue/toast'
 
 // Only show the debug component in development mode
 const isDevelopment = import.meta.env.DEV

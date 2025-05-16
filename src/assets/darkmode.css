@@ -1,0 +1,103 @@
+/* Dark Mode Styles */
+:root {
+  --bg-light: #ffffff;
+  --text-light: #333333;
+  --primary-light: #0d47a1;
+  --secondary-light: #64b5f6;
+  --border-light: #e2e8f0;
+  --card-bg-light: #ffffff;
+  
+  --bg-dark: #1e293b;
+  --text-dark: #e2e8f0;
+  --primary-dark: #60a5fa;
+  --secondary-dark: #3b82f6;
+  --border-dark: #334155;
+  --card-bg-dark: #0f172a;
+}
+
+html.dark {
+  color-scheme: dark;
+}
+
+/* Apply dark mode to main elements */
+html.dark body {
+  background-color: var(--bg-dark);
+  color: var(--text-dark);
+}
+
+html.dark .p-component {
+  color: var(--text-dark);
+}
+
+/* Cards in dark mode */
+html.dark .p-card {
+  background-color: var(--card-bg-dark);
+  border-color: var(--border-dark);
+}
+
+/* Buttons in dark mode */
+html.dark .p-button.p-button-text {
+  color: var(--primary-dark);
+}
+
+/* Inputs in dark mode */
+html.dark .p-inputtext {
+  background-color: var(--card-bg-dark);
+  color: var(--text-dark);
+  border-color: var(--border-dark);
+}
+
+/* Table in dark mode */
+html.dark .p-datatable .p-datatable-thead > tr > th {
+  background-color: var(--card-bg-dark);
+  color: var(--text-dark);
+  border-color: var(--border-dark);
+}
+
+html.dark .p-datatable .p-datatable-tbody > tr {
+  background-color: var(--card-bg-dark);
+  color: var(--text-dark);
+  border-color: var(--border-dark);
+}
+
+html.dark .p-datatable .p-datatable-tbody > tr > td {
+  border-color: var(--border-dark);
+}
+
+/* Menu in dark mode */
+html.dark .p-menu {
+  background-color: var(--card-bg-dark);
+  border-color: var(--border-dark);
+}
+
+html.dark .p-menu .p-menuitem-link {
+  color: var(--text-dark);
+}
+
+html.dark .p-menu .p-menuitem-link:hover {
+  background-color: var(--border-dark);
+}
+
+/* Dialog in dark mode */
+html.dark .p-dialog {
+  background-color: var(--card-bg-dark);
+  color: var(--text-dark);
+}
+
+html.dark .p-dialog .p-dialog-header {
+  background-color: var(--card-bg-dark);
+  color: var(--text-dark);
+  border-color: var(--border-dark);
+}
+
+html.dark .p-dialog .p-dialog-content {
+  background-color: var(--card-bg-dark);
+  color: var(--text-dark);
+  border-color: var(--border-dark);
+}
+
+html.dark .p-dialog .p-dialog-footer {
+  background-color: var(--card-bg-dark);
+  color: var(--text-dark);
+  border-color: var(--border-dark);
+}
