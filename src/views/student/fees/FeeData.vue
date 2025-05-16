@@ -1,179 +1,202 @@
 <template>
   <div
-    class="bg-white rounded-xl shadow-lg w-full p-6 transition-all duration-500 relative"
+    class="relative bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300"
     :class="{ 'opacity-0 scale-95': loading, 'opacity-100 scale-100': !loading }"
   >
-    <!-- Loading Overlay -->
+    <!-- Sleek accent strip at top -->
+    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#0D47A1] to-[#90CAF9]"></div>
+    
+    <!-- Loading overlay with minimal design -->
     <div
       v-if="loading"
-      class="absolute inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center rounded-xl z-10"
-      v-motion="{
-        initial: { opacity: 1 },
-        enter: { opacity: 1 },
-        leave: { opacity: 0, transition: { duration: 300 } },
-      }"
+      class="absolute inset-0 bg-white/90 backdrop-blur-sm flex items-center justify-center z-10"
     >
-      <div class="text-center">
-        <div class="flex justify-center mb-4">
-          <div class="relative w-16 h-16">
-            <div
-              class="absolute inset-0 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"
-              style="animation-duration: 1s"
-            ></div>
-            <div
-              class="absolute inset-1 border-4 border-blue-300 border-t-transparent rounded-full animate-spin"
-              style="animation-duration: 1.5s; animation-direction: reverse"
-            ></div>
-          </div>
-        </div>
-        <p class="text-gray-600 font-medium">Loading student data...</p>
-        <p class="text-sm text-gray-400 mt-1">Please wait while we fetch your information</p>
+      <div class="flex flex-col items-center">
+        <div class="w-10 h-10 border-2 border-[#0D47A1]/20 border-t-[#0D47A1] rounded-full animate-spin mb-3"></div>
+        <span class="text-gray-500 text-sm">Loading</span>
       </div>
     </div>
 
-    <!-- Student Information Grid -->
-    <div
-      class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8"
-      v-motion="{
-        initial: { opacity: 0 },
-        enter: {
-          opacity: 1,
-          transition: {
-            staggerChildren: 0.05,
-            delayChildren: 0.3,
-          },
-        },
-      }"
-    >
-      <template v-for="(field, index) in studentFields" :key="field.id">
-        <div
-          v-motion="{
-            initial: { opacity: 0, x: -20 },
-            enter: {
-              opacity: 1,
-              x: 0,
-              transition: {
-                duration: 400,
-                type: 'spring',
-                damping: 15,
-              },
-            },
-          }"
-        >
-          <label class="block text-gray-600 text-sm font-medium mb-2">{{ field.label }}</label>
-          <div class="relative">
-            <InputText
-              :placeholder="field.value"
-              readonly
-              class="w-full pl-3 pr-8"
-              :pt="{
-                root: {
-                  class:
-                    'border-gray-200 hover:border-blue-300 focus:border-blue-400 transition-all duration-300 shadow-sm',
-                },
-              }"
-            />
-            <div class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400">
-              <i class="pi pi-lock"></i>
+    <div class="p-6">
+      <!-- Student Header - Minimal elegant design -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
+        <div class="flex items-center">
+          <!-- Simple avatar with initials -->
+          <div class="w-12 h-12 rounded-full bg-gradient-to-br from-[#0D47A1] to-[#90CAF9] flex items-center justify-center text-white font-bold text-lg mr-4 shadow-sm">
+            {{ getInitials(name) }}
+          </div>
+          
+          <div>
+            <h3 class="text-xl font-semibold text-gray-800 mb-1">{{ name || 'Student' }}</h3>
+            <div class="flex items-center gap-3 text-gray-500 text-sm">
+              <div class="flex items-center gap-1">
+                <i class="pi pi-id-card text-[#0D47A1]"></i>
+                <span>{{ matric || 'No ID' }}</span>
+              </div>
+              <div class="flex items-center gap-1">
+                <i class="pi pi-chart-line text-[#0D47A1]"></i>
+                <span>{{ level || 'Level' }}</span>
+              </div>
             </div>
           </div>
         </div>
-      </template>
+        
+        <div class="bg-[#F0F9FF] py-2 px-4 rounded-lg shadow-sm border border-[#E9F5FF] text-[#0D47A1] text-sm flex items-center">
+          <i class="pi pi-calendar mr-2"></i>
+          <span class="font-medium">{{ session || 'Current Session' }}</span>
+        </div>
+      </div>
+      
+      <!-- Program Details - Clean and minimal tabs -->
+      <div class="mb-8">
+        <div class="border-b border-gray-100 mb-4">
+          <button 
+            @click="activeTab = 'details'"
+            class="px-4 py-2 text-sm font-medium relative"
+            :class="activeTab === 'details' ? 'text-[#0D47A1]' : 'text-gray-400 hover:text-gray-600'"
+          >
+            Program Details
+            <div v-if="activeTab === 'details'" class="absolute bottom-0 left-0 w-full h-0.5 bg-[#0D47A1]"></div>
+          </button>
+          <button 
+            @click="activeTab = 'fees'"
+            class="px-4 py-2 text-sm font-medium relative"
+            :class="activeTab === 'fees' ? 'text-[#0D47A1]' : 'text-gray-400 hover:text-gray-600'"
+          >
+            Fee Details
+            <div v-if="activeTab === 'fees'" class="absolute bottom-0 left-0 w-full h-0.5 bg-[#0D47A1]"></div>
+          </button>
+        </div>
+        
+        <!-- Program Tab Content with clean layout -->
+        <div v-if="activeTab === 'details'" class="space-y-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="space-y-1">
+              <div class="text-xs text-gray-400">Faculty</div>
+              <div class="font-medium text-gray-800">{{ faculty || 'Not specified' }}</div>
+            </div>
+            
+            <div class="space-y-1">
+              <div class="text-xs text-gray-400">Department</div>
+              <div class="font-medium text-gray-800">{{ department || 'Not specified' }}</div>
+            </div>
+            
+            <div class="space-y-1">
+              <div class="text-xs text-gray-400">Programme</div>
+              <div class="font-medium text-gray-800">{{ programme || 'Not specified' }}</div>
+            </div>
+            
+            <div class="space-y-1">
+              <div class="text-xs text-gray-400">Email</div>
+              <div class="font-medium text-gray-800">{{ email || 'Not specified' }}</div>
+            </div>
+          </div>
+          
+          <div class="flex items-center gap-2 text-xs text-gray-400 mt-4">
+            <i class="pi pi-calendar"></i>
+            <span>Last updated: {{ date || 'Not available' }}</span>
+          </div>
+        </div>
+        
+        <!-- Fees Tab Content with elegant table -->
+        <div v-if="activeTab === 'fees'" class="space-y-4">
+          <!-- Fee summary statistics -->
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            <div class="bg-gradient-to-br from-[#F8FAFC] to-white p-4 rounded-lg border border-gray-100 shadow-sm">
+              <div class="text-sm text-gray-400 mb-1">Total Items</div>
+              <div class="text-xl font-bold text-gray-800">{{ feeItems?.length || 0 }}</div>
+            </div>
+            
+            <div class="bg-gradient-to-br from-[#F8FAFC] to-white p-4 rounded-lg border border-gray-100 shadow-sm">
+              <div class="text-sm text-gray-400 mb-1">Paid Items</div>
+              <div class="text-xl font-bold text-green-600">{{ getPaidItemsCount() }}</div>
+            </div>
+            
+            <div class="bg-gradient-to-br from-[#F8FAFC] to-white p-4 rounded-lg border border-gray-100 shadow-sm">
+              <div class="text-sm text-gray-400 mb-1">Pending Items</div>
+              <div class="text-xl font-bold text-amber-600">{{ getPendingItemsCount() }}</div>
+            </div>
+            
+            <div class="bg-gradient-to-br from-[#F8FAFC] to-white p-4 rounded-lg border border-gray-100 shadow-sm">
+              <div class="text-sm text-gray-400 mb-1">Total Amount</div>
+              <div class="text-xl font-bold text-[#0D47A1]">{{ getTotalAmount() }}</div>
+            </div>
+          </div>
+          
+          <!-- Clean, minimal fee table -->
+          <div class="bg-white rounded-lg overflow-hidden border border-gray-100">
+            <div class="overflow-x-auto">
+              <table class="w-full min-w-full text-left">
+                <thead>
+                  <tr class="border-b border-gray-100 bg-gray-50">
+                    <th class="py-3 px-4 text-xs font-medium text-gray-500">#</th>
+                    <th class="py-3 px-4 text-xs font-medium text-gray-500">Fee Item</th>
+                    <th class="py-3 px-4 text-xs font-medium text-gray-500">Amount</th>
+                    <th class="py-3 px-4 text-xs font-medium text-gray-500">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr 
+                    v-for="(item, index) in feeItems" 
+                    :key="index" 
+                    class="border-b border-gray-50 last:border-0 hover:bg-gray-50 transition-colors duration-150"
+                  >
+                    <td class="py-3 px-4 text-gray-500 text-sm">{{ index + 1 }}</td>
+                    <td class="py-3 px-4">
+                      <div class="flex items-center text-gray-800">
+                        <i class="pi pi-file text-[#0D47A1] mr-2"></i>
+                        <span>{{ item.itemTitle.title }}</span>
+                      </div>
+                    </td>
+                    <td class="py-3 px-4 font-medium text-gray-800">
+                      {{ formatCurrency(item.amount) }}
+                    </td>
+                    <td class="py-3 px-4">
+                      <span 
+                        :class="[
+                          'inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs',
+                          item.feesPayment?.cleared ? 'text-green-700 bg-green-50' : 'text-amber-700 bg-amber-50'
+                        ]"
+                      >
+                        <i class="pi" :class="item.feesPayment?.cleared ? 'pi-check-circle' : 'pi-clock'"></i>
+                        {{ item.feesPayment?.cleared ? 'Paid' : 'Pending' }}
+                      </span>
+                    </td>
+                  </tr>
+                  
+                  <!-- Empty state when no items -->
+                  <tr v-if="!feeItems || feeItems.length === 0">
+                    <td colspan="4" class="py-8 text-center text-gray-500">
+                      <div class="flex flex-col items-center">
+                        <i class="pi pi-file-excel text-gray-300 text-4xl mb-2"></i>
+                        <span>No fee items available</span>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-
-    <Divider
-      class="my-6 opacity-20"
-      style="height: 1px; background: linear-gradient(90deg, transparent, #0d47a1, transparent)"
-    />
-
-    <!-- Fees Information Section -->
-    <div
-      class="pt-4"
-      v-motion="{
-        initial: { opacity: 0, y: 20 },
-        enter: {
-          opacity: 1,
-          y: 0,
-          transition: {
-            delay: 0.5,
-            duration: 500,
-            type: 'spring',
-            stiffness: 80,
-          },
-        },
-      }"
-    >
-      <h2 class="text-xl font-semibold text-gray-700 mb-4 flex items-center">
-        <i class="pi pi-wallet mr-2 text-blue-500"></i>
-        Fee Payment Details
-      </h2>
-
-      <DataTable
-        :value="feeItems"
-        class="p-datatable-sm rounded-lg border border-gray-100 shadow-sm"
-        :loading="loading"
-        :pt="{
-          wrapper: { class: 'rounded-lg overflow-hidden' },
-          header: { class: 'bg-gray-50 border-b border-gray-100' },
-          bodyRow: {
-            class:
-              'hover:bg-blue-50/50 transition-colors duration-200 border-b border-gray-50 last:border-b-0',
-            style: 'animation: fadeIn 0.3s ease-out forwards',
-          },
-          loadingOverlay: { class: 'bg-white/80 backdrop-blur-sm' },
-          loadingIcon: { class: 'text-blue-500' },
-        }"
+    
+    <!-- Sleek footer -->
+    <div class="px-6 py-3 bg-gray-50 flex justify-between items-center text-sm border-t border-gray-100">
+      <span class="text-gray-500">Fee Data {{ date ? `• ${date}` : '' }}</span>
+      <button 
+        @click="$emit('refresh')" 
+        class="text-[#0D47A1] hover:text-[#90CAF9] flex items-center gap-1 transition-colors duration-200"
       >
-        <Column field="index" header="S/N" style="width: 10%">
-          <template #body="{ index }">
-            <div class="text-gray-500 font-medium">{{ index + 1 }}.</div>
-          </template>
-        </Column>
-        <Column field="itemTitle.title" header="Fee Item" style="width: 40%">
-          <template #body="{ data }">
-            <div class="flex items-center">
-              <i class="pi pi-file mr-2 text-blue-400"></i>
-              <span>{{ data.itemTitle.title }}</span>
-            </div>
-          </template>
-        </Column>
-        <Column field="amount" header="Amount" style="width: 20%">
-          <template #body="{ data }">
-            <div class="font-medium text-gray-700">
-              {{ formatCurrency(data.amount) }}
-            </div>
-          </template>
-        </Column>
-        <Column field="feePayment.cleared" header="Status" style="width: 30%">
-          <template #body="{ data }">
-            <Tag
-              :value="data ? 'Paid' : 'Pending'"
-              :severity="data ? 'success' : 'warning'"
-              class="text-xs font-semibold py-1 px-3 rounded-full"
-              :pt="{
-                root: ({ props }) => ({
-                  class: [
-                    'shadow-sm',
-                    props.severity === 'success' ? 'bg-green-100 text-green-800' : '',
-                    props.severity === 'warning' ? 'bg-amber-100 text-amber-800' : '',
-                  ],
-                }),
-              }"
-            />
-          </template>
-        </Column>
-      </DataTable>
+        <i class="pi pi-refresh"></i>
+        <span>Refresh</span>
+      </button>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import InputText from 'primevue/inputtext'
-import DataTable from 'primevue/datatable'
-import Column from 'primevue/column'
-import Tag from 'primevue/tag'
-import Divider from 'primevue/divider'
 
 const props = defineProps({
   name: String,
@@ -192,66 +215,83 @@ const props = defineProps({
   },
 })
 
+defineEmits(['refresh'])
+
+const activeTab = ref('fees')
+
+// Helper function to get initials from name
+const getInitials = (name: string | undefined) => {
+  if (!name) return 'S'
+  return name
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase())
+    .slice(0, 2)
+    .join('')
+}
+
+// Format currency helper
 const formatCurrency = (amount: number) => {
   return new Intl.NumberFormat('en-NG', {
     style: 'currency',
     currency: 'NGN',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
   }).format(amount)
 }
 
-const studentFields = computed(() => [
-  { id: 1, label: 'Name', value: props.name || 'Not available' },
-  { id: 2, label: 'Level', value: props.level || 'Not available' },
-  { id: 3, label: 'Matric Number', value: props.matric || 'Not available' },
-  { id: 4, label: 'Session', value: props.session || 'Not available' },
-  { id: 5, label: 'Faculty', value: props.faculty || 'Not available' },
-  { id: 6, label: 'Email', value: props.email || 'Not available' },
-  { id: 7, label: 'Department', value: props.department || 'Not available' },
-  { id: 8, label: 'Date', value: props.date || 'Not available' },
-  { id: 9, label: 'Programme', value: props.programme || 'Not available' },
-])
+// Fee statistics helpers
+const getPaidItemsCount = () => {
+  if (!props.feeItems) return 0
+  return props.feeItems.filter((item: any) => item.feesPayment?.cleared).length
+}
+
+const getPendingItemsCount = () => {
+  if (!props.feeItems) return 0
+  return props.feeItems.filter((item: any) => !item.feesPayment?.cleared).length
+}
+
+const getTotalAmount = () => {
+  if (!props.feeItems) return formatCurrency(0)
+  const total = props.feeItems.reduce((sum: number, item: any) => sum + (item.amount || 0), 0)
+  return formatCurrency(total)
+}
 </script>
 
 <style scoped>
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(5px);
+/* Clean table styles */
+table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+/* Subtle animation for status badges */
+[class*="bg-green-50"],
+[class*="bg-amber-50"] {
+  transition: all 0.2s ease;
+}
+
+[class*="bg-green-50"]:hover {
+  background-color: rgba(0, 170, 70, 0.15);
+}
+
+[class*="bg-amber-50"]:hover {
+  background-color: rgba(250, 160, 0, 0.15);
+}
+
+/* Hover effect for table rows */
+tr {
+  transition: background-color 0.15s ease;
+}
+
+/* Clean, proper spacing for mobile */
+@media (max-width: 640px) {
+  .p-6 {
+    padding: 1.25rem;
   }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-:deep(.p-datatable-tbody > tr) {
-  animation: fadeIn 0.4s ease-out forwards;
-  animation-delay: calc(var(--row-index) * 50ms);
-}
-
-:deep(.p-inputtext) {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-}
-
-:deep(.p-inputtext:hover) {
-  box-shadow:
-    0 1px 3px 0 rgb(0 0 0 / 0.1),
-    0 1px 2px -1px rgb(0 0 0 / 0.1);
-}
-
-:deep(.p-inputtext:focus) {
-  box-shadow: 0 0 0 3px rgb(59 130 246 / 0.2);
-}
-
-@media (max-width: 768px) {
-  :deep(.p-datatable) {
-    font-size: 0.875rem;
-  }
-
-  :deep(.p-column-title) {
-    font-size: 0.75rem;
+  
+  th, td {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
   }
 }
 </style>
