@@ -29,6 +29,7 @@ export const useStudentFee = createSharedComposable(() => {
       const response = await studentFeeRepository.getInformation(
         schoolFees.getFeeFor + '?user=' + student + '&session=' + session,
       )
+      console.log("THIS IS THE FEE RESPONSE: ", response.data)
       fee.value = response.data as {
         student: UserResponse['user']
         feeItems: FeeItem[]
@@ -56,7 +57,8 @@ export const useStudentFee = createSharedComposable(() => {
   async function downloadInvoice() {
     try {
       const response = await studentFeeRepository.downloadInvoice(
-        fee.value?.feePayment.invoiceUrl || '',
+        schoolFees.invoice + '?invoice=' + fee.value?.feePayment.transactionId,
+        fee.value?.feePayment.transactionId!,
       )
       return response
     } catch (error) {

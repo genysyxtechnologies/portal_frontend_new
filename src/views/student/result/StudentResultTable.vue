@@ -1,5 +1,5 @@
 <template>
-  <div class="academic-dashboard relative" ref="resultTableRef">
+  <div class="academic-dashboard w-full relative" ref="resultTableRef">
     <SpinningAnimation v-if="loading" :loading="loading" :head-title="'Academic Performance'"
       class="absolute inset-0" />
     <div class="profile-card animate-fade-in">

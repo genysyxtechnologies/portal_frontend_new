@@ -113,7 +113,9 @@ class ApiClient {
       }
     } catch (error: unknown) {
       const errorMessage = await processError(error)
-      toast.error(errorMessage)
+      if (!errorMessage.includes('Student') && !errorMessage.includes('student')) {
+        toast.error(errorMessage)
+      }
       return {
         success: false,
         data: (error as Error).message as T,

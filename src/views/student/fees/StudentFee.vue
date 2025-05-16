@@ -108,7 +108,7 @@
           <h3 class="text-gray-700 font-medium">Payment Progress</h3>
           <span class="text-sm font-medium text-blue-600">{{ calculatePaymentPercentage() }}%</span>
         </div>
-        <ProgressBar :value="calculatePaymentPercentage()" :showValue="false" :pt="{
+        <ProgressBar :value="Math.floor(fee?.feePayment?.amountPaid / fee?.feePayment?.invoiceAmount * 100)" :showValue="true" :pt="{
           root: { class: 'h-3 rounded-full overflow-hidden' },
           value: { class: 'bg-gradient-to-r from-[#0D47A1] to-[#90CAF9]' }
         }" />
@@ -260,10 +260,9 @@
 <script setup lang="ts">
 import { useStudentDashboard } from '@/services/student/useStudentDashboard'
 import { useStudentFee } from '@/services/student/useStudentFee'
-import { ref, onMounted, watch, computed } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import FeeData from './FeeData.vue'
 import ProgressBar from 'primevue/progressbar'
-import Button from 'primevue/button'
 
 const { user, getStudentInformation, getSessions, sessions } = useStudentDashboard()
 const { getStudentFee, fee, useFormattedDate, downloadInvoice, loading } = useStudentFee()

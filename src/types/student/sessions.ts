@@ -16,4 +16,5 @@ export interface Session {
   updatedTime: number
   programmeType: ProgrammeType
   semesters: Semester[]
+  currentSemesters: Semester[]
 }

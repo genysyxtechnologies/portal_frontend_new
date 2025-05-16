@@ -3,10 +3,9 @@ import StudentDashboardRepositories from './student.dashboard.repositories'
 
 class StudentFeeRepository extends StudentDashboardRepositories {
   // download payment invoice
-  async downloadInvoice(invoiceUrl: string) {
+  async downloadInvoice(invoiceUrl: string, fileName: string) {
     try {
-      const response = await apiClient.download(invoiceUrl, invoiceUrl.split('/').pop() || '')
-      console.log('THIS IS THE RESPONSE: ', response)
+      const response = await apiClient.downloads(invoiceUrl, fileName)
       return response
     } catch (error) {
       console.error(error)

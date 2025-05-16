@@ -39,7 +39,6 @@ export const useStudentDashboard = createSharedComposable(() => {
         session.getSessionsForPayment + '?user_id=' + user.value?.username,
       )
       sessions.value = response.data as Session[]
-      console.log('THIS IS THE STUDENT SESSION: ', response)
       return response.data as Session[]
     } catch (err) {
       console.error(err)

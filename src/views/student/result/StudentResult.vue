@@ -94,8 +94,7 @@ watch(
   async ([session, semester]) => {
     if (session && semester && user.value?.id) {
       console.log(user.value.username, session.id, semester.id)
-      await fetchStudentResult(user.value.username, session.id, semester.id)
-      console.log("THIS IS NOW THE RESULT: ", studentResult.value)
+      await fetchStudentResult(user.value?.username!, session.id, semester.id)
     }
   },
 )

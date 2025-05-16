@@ -134,7 +134,6 @@ export const useStudentCourses = createSharedComposable(() => {
               student,
         document === 1 ? 'course_form' : 'exam_card',
       )
-      console.log('THIS IS THE RESPONSE FOR THE DOWNLOADED COURSE FORM: ', response)
       return response
     } catch (error) {
       return error

@@ -14,12 +14,13 @@ export interface Semester {
 }
 
 export interface FeePayment {
-  amountPayed: number
+  amountPaid: number
   cleared: boolean
   paymentDate: number
   invoiceAmount: number
   id: number
   invoiceUrl: string
+  transactionId: string
 }
 
 export interface FeeItem {
