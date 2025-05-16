@@ -7,13 +7,10 @@
 </template>
 
 <script setup lang="ts">
-
 defineProps({
   emptyMessage: {
     type: String,
-    default: "No avalible courses"
-  }
+    default: 'No available courses',
+  },
 })
-
-
 </script>

@@ -41,7 +41,8 @@ const studentRoutes: RouteRecordRaw[] = [
       {
         path: 'course-registration',
         name: 'StudentCourseRegistration',
-        component: () => import('@/views/student/course_registration/StudentCourseRegistration.vue'),
+        component: () =>
+          import('@/views/student/course_registration/StudentCourseRegistration.vue'),
         meta: {
           title: 'Student Course Registration',
           icon: 'pi pi-book',

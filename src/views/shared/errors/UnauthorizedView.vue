@@ -44,4 +44,4 @@ p {
   background-color: var(--mantine-color-blue-6);
   color: white;
 }
-</style> 
+</style>

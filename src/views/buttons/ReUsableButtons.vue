@@ -1,20 +1,22 @@
 <template>
-  <But-ton :label="label" class="login-btn transform hover:scale-[1.02] transition-transform duration-300"
-    @click="$emit('on-click')" :disabled="disabled" />
+  <But-ton
+    :label="label"
+    class="login-btn transform hover:scale-[1.02] transition-transform duration-300"
+    @click="$emit('on-click')"
+    :disabled="disabled"
+  />
 </template>
 
 <script setup lang="ts">
-
 defineProps({
   label: String,
   disabled: {
     type: Boolean,
-    default: false
-  }
+    default: false,
+  },
 })
 
 defineEmits(['on-click'])
-
 </script>
 
 <style scoped>
@@ -32,7 +34,7 @@ defineEmits(['on-click'])
 }
 
 .login-btn:hover {
-  background-color: #1565C0;
+  background-color: #1565c0;
   box-shadow: 0 4px 12px rgba(13, 71, 161, 0.3);
 }
 </style>

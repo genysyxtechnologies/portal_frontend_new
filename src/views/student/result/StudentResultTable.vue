@@ -1,26 +1,37 @@
 <template>
-  <div class="flex w-full"> <!-- Enhanced Student Information Section -->
-    <div class="bg-[#fff] w-full rounded-xl overflow-hidden shadow-lg transition-all duration-300 hover:shadow-xl">
+  <div class="flex w-full">
+    <!-- Enhanced Student Information Section -->
+    <div
+      class="bg-[#fff] w-full rounded-xl overflow-hidden shadow-lg transition-all duration-300 hover:shadow-xl"
+    >
       <div class="p-8">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <!-- Left Column -->
           <div class="space-y-4">
-            <div class="bg-gray-50 p-4 rounded-lg transition-all duration-200 hover:bg-gray-100 hover:scale-[1.01]">
+            <div
+              class="bg-gray-50 p-4 rounded-lg transition-all duration-200 hover:bg-gray-100 hover:scale-[1.01]"
+            >
               <p class="text-sm text-gray-500 font-medium">Full Name</p>
               <p class="text-lg font-semibold text-gray-800">{{ student.name }}</p>
             </div>
 
-            <div class="bg-gray-50 p-4 rounded-lg transition-all duration-200 hover:bg-gray-100 hover:scale-[1.01]">
+            <div
+              class="bg-gray-50 p-4 rounded-lg transition-all duration-200 hover:bg-gray-100 hover:scale-[1.01]"
+            >
               <p class="text-sm text-gray-500 font-medium">Matric Number</p>
               <p class="text-lg font-semibold text-gray-800">{{ student.matricNumber }}</p>
             </div>
 
-            <div class="bg-gray-50 p-4 rounded-lg transition-all duration-200 hover:bg-gray-100 hover:scale-[1.01]">
+            <div
+              class="bg-gray-50 p-4 rounded-lg transition-all duration-200 hover:bg-gray-100 hover:scale-[1.01]"
+            >
               <p class="text-sm text-gray-500 font-medium">Faculty</p>
               <p class="text-lg font-semibold text-gray-800">{{ student.faculty }}</p>
             </div>
 
-            <div class="bg-gray-50 p-4 rounded-lg transition-all duration-200 hover:bg-gray-100 hover:scale-[1.01]">
+            <div
+              class="bg-gray-50 p-4 rounded-lg transition-all duration-200 hover:bg-gray-100 hover:scale-[1.01]"
+            >
               <p class="text-sm text-gray-500 font-medium">Department</p>
               <p class="text-lg font-semibold text-gray-800">{{ student.department }}</p>
             </div>
@@ -28,22 +39,30 @@
 
           <!-- Right Column -->
           <div class="space-y-4">
-            <div class="bg-gray-50 p-4 rounded-lg transition-all duration-200 hover:bg-gray-100 hover:scale-[1.01]">
+            <div
+              class="bg-gray-50 p-4 rounded-lg transition-all duration-200 hover:bg-gray-100 hover:scale-[1.01]"
+            >
               <p class="text-sm text-gray-500 font-medium">Programme</p>
               <p class="text-lg font-semibold text-gray-800">{{ student.programme }}</p>
             </div>
 
-            <div class="bg-gray-50 p-4 rounded-lg transition-all duration-200 hover:bg-gray-100 hover:scale-[1.01]">
+            <div
+              class="bg-gray-50 p-4 rounded-lg transition-all duration-200 hover:bg-gray-100 hover:scale-[1.01]"
+            >
               <p class="text-sm text-gray-500 font-medium">Level</p>
               <p class="text-lg font-semibold text-gray-800">{{ student.level }}</p>
             </div>
 
-            <div class="bg-gray-50 p-4 rounded-lg transition-all duration-200 hover:bg-gray-100 hover:scale-[1.01]">
+            <div
+              class="bg-gray-50 p-4 rounded-lg transition-all duration-200 hover:bg-gray-100 hover:scale-[1.01]"
+            >
               <p class="text-sm text-gray-500 font-medium">Academic Session</p>
               <p class="text-lg font-semibold text-gray-800">{{ student.session }}</p>
             </div>
 
-            <div class="bg-gray-50 p-4 rounded-lg transition-all duration-200 hover:bg-gray-100 hover:scale-[1.01]">
+            <div
+              class="bg-gray-50 p-4 rounded-lg transition-all duration-200 hover:bg-gray-100 hover:scale-[1.01]"
+            >
               <p class="text-sm text-gray-500 font-medium">Registration Date</p>
               <p class="text-lg font-semibold text-gray-800">{{ student.date }}</p>
             </div>
@@ -55,30 +74,29 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref } from 'vue'
 
 interface Student {
-  name: string;
-  matricNumber: string;
-  faculty: string;
-  department: string;
-  programme: string;
-  level: number;
-  session: string;
-  date: string;
+  name: string
+  matricNumber: string
+  faculty: string
+  department: string
+  programme: string
+  level: number
+  session: string
+  date: string
 }
 
 const student = ref<Student>({
-  name: "Najimuddeen Musa El-wakil",
-  matricNumber: "2022/AR/ARA/0002",
-  faculty: "Natural and Applied Sciences",
-  department: "Computer Science",
-  programme: "B.Sc Computer Science",
+  name: 'Najimuddeen Musa El-wakil',
+  matricNumber: '2022/AR/ARA/0002',
+  faculty: 'Natural and Applied Sciences',
+  department: 'Computer Science',
+  programme: 'B.Sc Computer Science',
   level: 200,
-  session: "2025/2026",
-  date: "25-04-2025, 17:05:21",
-});
-
+  session: '2025/2026',
+  date: '25-04-2025, 17:05:21',
+})
 </script>
 
 <style scoped>

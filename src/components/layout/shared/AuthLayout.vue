@@ -5,8 +5,7 @@
 </template>
 
 <script setup lang="ts">
-import StudentDashboard from '@/views/student/StudentDashboard.vue';
-
+import StudentDashboard from '@/views/student/StudentDashboard.vue'
 </script>
 
 <style scoped>
@@ -15,7 +14,7 @@ import StudentDashboard from '@/views/student/StudentDashboard.vue';
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #E9F5FF;
+  background: #e9f5ff;
   padding: 2rem;
 }
 

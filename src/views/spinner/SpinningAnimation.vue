@@ -1,8 +1,10 @@
 <template>
   <div>
     <transition name="fade">
-      <div v-if="loading"
-        class="absolute inset-0 bg-white bg-opacity-80 z-50 flex items-center justify-center rounded-lg">
+      <div
+        v-if="loading"
+        class="absolute inset-0 bg-white bg-opacity-80 z-50 flex items-center justify-center rounded-lg"
+      >
         <div class="loading-content text-center">
           <div class="spinner"></div>
           <p class="mt-4 text-lg font-medium text-gray-700">{{ headTitle }}</p>
@@ -23,7 +25,6 @@
   </div>
 </template>
 
-
 <script setup lang="ts">
 defineProps({
   loading: {
@@ -32,15 +33,14 @@ defineProps({
   },
   headTitle: {
     type: String,
-    default: 'Loading your information...'
+    default: 'Loading your information...',
   },
 
   subTitle: {
     type: String,
-    default: 'Please wait while we prepare your form'
-  }
+    default: 'Please wait while we prepare your form',
+  },
 })
-
 </script>
 <style scoped>
 .spinner {
@@ -72,10 +72,7 @@ defineProps({
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(90deg,
-      transparent,
-      rgba(255, 255, 255, 0.6),
-      transparent);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
   animation: shimmer 1.5s infinite;
 }
 
@@ -92,7 +89,9 @@ defineProps({
 /* Transition effects */
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 0.3s ease, transform 0.3s ease;
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
 }
 
 .fade-enter-from,
@@ -106,6 +105,8 @@ defineProps({
   background: white;
   padding: 2rem;
   border-radius: 0.5rem;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 </style>

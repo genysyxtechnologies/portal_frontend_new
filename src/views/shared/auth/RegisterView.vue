@@ -2,7 +2,9 @@
   <div class="register-container">
     <div class="card">
       <h1>Create an Account</h1>
-      <p class="subtitle">Join our school portal to access learning resources and stay connected.</p>
+      <p class="subtitle">
+        Join our school portal to access learning resources and stay connected.
+      </p>
 
       <form @submit.prevent="handleSubmit" class="register-form">
         <div class="form-group">
@@ -11,7 +13,7 @@
             id="firstName"
             v-model="formData.firstName"
             type="text"
-            :class="{'error-input': errors.firstName}"
+            :class="{ 'error-input': errors.firstName }"
             required
           />
           <small v-if="errors.firstName" class="error-message">{{ errors.firstName }}</small>
@@ -23,7 +25,7 @@
             id="lastName"
             v-model="formData.lastName"
             type="text"
-            :class="{'error-input': errors.lastName}"
+            :class="{ 'error-input': errors.lastName }"
             required
           />
           <small v-if="errors.lastName" class="error-message">{{ errors.lastName }}</small>
@@ -35,7 +37,7 @@
             id="email"
             v-model="formData.email"
             type="email"
-            :class="{'error-input': errors.email}"
+            :class="{ 'error-input': errors.email }"
             required
           />
           <small v-if="errors.email" class="error-message">{{ errors.email }}</small>
@@ -48,7 +50,7 @@
               id="password"
               v-model="formData.password"
               :type="showPassword ? 'text' : 'password'"
-              :class="{'error-input': errors.password}"
+              :class="{ 'error-input': errors.password }"
               required
             />
             <button type="button" class="toggle-password" @click="togglePassword">
@@ -56,7 +58,10 @@
             </button>
           </div>
           <small v-if="errors.password" class="error-message">{{ errors.password }}</small>
-          <small class="password-hint">Password must be at least 8 characters with a mix of letters, numbers, and symbols.</small>
+          <small class="password-hint"
+            >Password must be at least 8 characters with a mix of letters, numbers, and
+            symbols.</small
+          >
         </div>
 
         <div class="form-group">
@@ -66,20 +71,27 @@
               id="confirmPassword"
               v-model="formData.confirmPassword"
               :type="showConfirmPassword ? 'text' : 'password'"
-              :class="{'error-input': errors.confirmPassword}"
+              :class="{ 'error-input': errors.confirmPassword }"
               required
             />
             <button type="button" class="toggle-password" @click="toggleConfirmPassword">
               <i :class="showConfirmPassword ? 'pi pi-eye-slash' : 'pi pi-eye'"></i>
             </button>
           </div>
-          <small v-if="errors.confirmPassword" class="error-message">{{ errors.confirmPassword }}</small>
+          <small v-if="errors.confirmPassword" class="error-message">{{
+            errors.confirmPassword
+          }}</small>
         </div>
 
         <div class="form-group checkbox-group">
           <input id="termsAgreement" v-model="formData.termsAgreement" type="checkbox" required />
-          <label for="termsAgreement">I agree to the <a href="#" @click.prevent="showTerms">Terms of Service</a> and <a href="#" @click.prevent="showPrivacyPolicy">Privacy Policy</a></label>
-          <small v-if="errors.termsAgreement" class="error-message">{{ errors.termsAgreement }}</small>
+          <label for="termsAgreement"
+            >I agree to the <a href="#" @click.prevent="showTerms">Terms of Service</a> and
+            <a href="#" @click.prevent="showPrivacyPolicy">Privacy Policy</a></label
+          >
+          <small v-if="errors.termsAgreement" class="error-message">{{
+            errors.termsAgreement
+          }}</small>
         </div>
 
         <button type="submit" class="btn-submit" :disabled="isSubmitting">
@@ -101,15 +113,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref, reactive } from 'vue'
+import { useRouter } from 'vue-router'
 
-const router = useRouter();
-const apiError = ref('');
-const isSubmitting = ref(false);
-const showPassword = ref(false);
-const showConfirmPassword = ref(false);
-
+const router = useRouter()
+const apiError = ref('')
+const isSubmitting = ref(false)
+const showPassword = ref(false)
+const showConfirmPassword = ref(false)
 
 const formData = reactive({
   firstName: '',
@@ -117,8 +128,8 @@ const formData = reactive({
   email: '',
   password: '',
   confirmPassword: '',
-  termsAgreement: false
-});
+  termsAgreement: false,
+})
 
 const errors = reactive({
   firstName: '',
@@ -126,85 +137,85 @@ const errors = reactive({
   email: '',
   password: '',
   confirmPassword: '',
-  termsAgreement: ''
-});
+  termsAgreement: '',
+})
 
 const togglePassword = () => {
-  showPassword.value = !showPassword.value;
-};
+  showPassword.value = !showPassword.value
+}
 
 const toggleConfirmPassword = () => {
-  showConfirmPassword.value = !showConfirmPassword.value;
-};
+  showConfirmPassword.value = !showConfirmPassword.value
+}
 
 const validateForm = () => {
-  let isValid = true;
+  let isValid = true
 
   // Reset errors
-  Object.keys(errors).forEach(key => {
-    errors[key as keyof typeof errors] = '';
-  });
+  Object.keys(errors).forEach((key) => {
+    errors[key as keyof typeof errors] = ''
+  })
 
   // Validate first name
   if (!formData.firstName.trim()) {
-    errors.firstName = 'First name is required';
-    isValid = false;
+    errors.firstName = 'First name is required'
+    isValid = false
   }
 
   // Validate last name
   if (!formData.lastName.trim()) {
-    errors.lastName = 'Last name is required';
-    isValid = false;
+    errors.lastName = 'Last name is required'
+    isValid = false
   }
 
   // Validate email
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
   if (!formData.email.trim()) {
-    errors.email = 'Email is required';
-    isValid = false;
+    errors.email = 'Email is required'
+    isValid = false
   } else if (!emailRegex.test(formData.email)) {
-    errors.email = 'Please enter a valid email address';
-    isValid = false;
+    errors.email = 'Please enter a valid email address'
+    isValid = false
   }
 
   // Validate password
-  const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
+  const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/
   if (!formData.password) {
-    errors.password = 'Password is required';
-    isValid = false;
+    errors.password = 'Password is required'
+    isValid = false
   } else if (!passwordRegex.test(formData.password)) {
-    errors.password = 'Password must be at least 8 characters with letters, numbers, and symbols';
-    isValid = false;
+    errors.password = 'Password must be at least 8 characters with letters, numbers, and symbols'
+    isValid = false
   }
 
   // Validate confirm password
   if (!formData.confirmPassword) {
-    errors.confirmPassword = 'Please confirm your password';
-    isValid = false;
+    errors.confirmPassword = 'Please confirm your password'
+    isValid = false
   } else if (formData.password !== formData.confirmPassword) {
-    errors.confirmPassword = 'Passwords do not match';
-    isValid = false;
+    errors.confirmPassword = 'Passwords do not match'
+    isValid = false
   }
 
   // Validate terms agreement
   if (!formData.termsAgreement) {
-    errors.termsAgreement = 'You must agree to the terms to continue';
-    isValid = false;
+    errors.termsAgreement = 'You must agree to the terms to continue'
+    isValid = false
   }
 
-  return isValid;
-};
+  return isValid
+}
 
 const handleSubmit = async () => {
   // Reset API error
-  apiError.value = '';
+  apiError.value = ''
 
   // Validate form
   if (!validateForm()) {
-    return;
+    return
   }
 
-  isSubmitting.value = true;
+  isSubmitting.value = true
 
   try {
     // Here you would typically make an API call to register the user
@@ -216,32 +227,31 @@ const handleSubmit = async () => {
     // });
 
     // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-  
+    await new Promise((resolve) => setTimeout(resolve, 1000))
 
     // Redirect to verify email page or login
-    router.push('/auth/verify-email');
+    router.push('/auth/verify-email')
   } catch (error) {
     // Handle API errors
     if (error instanceof Error) {
-      apiError.value = error.message || 'Registration failed. Please try again.';
+      apiError.value = error.message || 'Registration failed. Please try again.'
     } else {
-      apiError.value = 'An unexpected error occurred. Please try again.';
+      apiError.value = 'An unexpected error occurred. Please try again.'
     }
   } finally {
-    isSubmitting.value = false;
+    isSubmitting.value = false
   }
-};
+}
 
 const showTerms = () => {
   // Logic to show terms of service modal or page
-  console.log('Show Terms of Service');
-};
+  console.log('Show Terms of Service')
+}
 
 const showPrivacyPolicy = () => {
   // Logic to show privacy policy modal or page
-  console.log('Show Privacy Policy');
-};
+  console.log('Show Privacy Policy')
+}
 </script>
 
 <style scoped>
@@ -291,9 +301,9 @@ label {
   color: #555;
 }
 
-input[type="text"],
-input[type="email"],
-input[type="password"] {
+input[type='text'],
+input[type='email'],
+input[type='password'] {
   padding: 0.75rem;
   border: 1px solid #ddd;
   border-radius: 6px;
@@ -301,9 +311,9 @@ input[type="password"] {
   transition: border-color 0.3s;
 }
 
-input[type="text"]:focus,
-input[type="email"]:focus,
-input[type="password"]:focus {
+input[type='text']:focus,
+input[type='email']:focus,
+input[type='password']:focus {
   border-color: #4c9aff;
   outline: none;
   box-shadow: 0 0 0 3px rgba(76, 154, 255, 0.1);
@@ -424,9 +434,9 @@ input[type="password"]:focus {
     gap: 1rem;
   }
 
-  input[type="text"],
-  input[type="email"],
-  input[type="password"] {
+  input[type='text'],
+  input[type='email'],
+  input[type='password'] {
     padding: 0.65rem;
   }
 

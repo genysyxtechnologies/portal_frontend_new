@@ -2,16 +2,18 @@
   <div class="forgot-password-container">
     <div class="card">
       <h1>Forgot Password</h1>
-      <p class="subtitle">Enter your email address and we'll send you a link to reset your password.</p>
+      <p class="subtitle">
+        Enter your email address and we'll send you a link to reset your password.
+      </p>
 
       <form @submit.prevent="handleSubmit" class="forgot-password-form">
         <div class="form-group">
           <label for="email">Email</label>
-          <input 
-            id="email" 
-            v-model="email" 
-            type="email" 
-            :class="{'error-input': emailError}"
+          <input
+            id="email"
+            v-model="email"
+            type="email"
+            :class="{ 'error-input': emailError }"
             required
             placeholder="Enter your email address"
           />
@@ -43,64 +45,64 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref } from 'vue'
 
-const email = ref('');
-const emailError = ref('');
-const apiError = ref('');
-const successMessage = ref('');
-const isSubmitting = ref(false);
+const email = ref('')
+const emailError = ref('')
+const apiError = ref('')
+const successMessage = ref('')
+const isSubmitting = ref(false)
 
 const validateEmail = () => {
-  emailError.value = '';
-  
+  emailError.value = ''
+
   if (!email.value.trim()) {
-    emailError.value = 'Email is required';
-    return false;
+    emailError.value = 'Email is required'
+    return false
   }
-  
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
   if (!emailRegex.test(email.value)) {
-    emailError.value = 'Please enter a valid email address';
-    return false;
+    emailError.value = 'Please enter a valid email address'
+    return false
   }
-  
-  return true;
-};
+
+  return true
+}
 
 const handleSubmit = async () => {
   // Reset messages
-  apiError.value = '';
-  successMessage.value = '';
-  
+  apiError.value = ''
+  successMessage.value = ''
+
   // Validate email
   if (!validateEmail()) {
-    return;
+    return
   }
-  
-  isSubmitting.value = true;
-  
+
+  isSubmitting.value = true
+
   try {
     // Here you would normally make an API call to request password reset
     // const response = await authService.forgotPassword(email.value);
-    
+
     // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
+    await new Promise((resolve) => setTimeout(resolve, 1000))
+
     // Show success message
-    successMessage.value = 'Password reset instructions have been sent to your email.';
-    email.value = ''; // Clear the form
+    successMessage.value = 'Password reset instructions have been sent to your email.'
+    email.value = '' // Clear the form
   } catch (error) {
     // Handle API errors
     if (error instanceof Error) {
-      apiError.value = error.message || 'Failed to send reset link. Please try again.';
+      apiError.value = error.message || 'Failed to send reset link. Please try again.'
     } else {
-      apiError.value = 'An unexpected error occurred. Please try again.';
+      apiError.value = 'An unexpected error occurred. Please try again.'
     }
   } finally {
-    isSubmitting.value = false;
+    isSubmitting.value = false
   }
-};
+}
 </script>
 
 <style scoped>
@@ -150,7 +152,7 @@ label {
   color: #555;
 }
 
-input[type="email"] {
+input[type='email'] {
   padding: 0.75rem;
   border: 1px solid #ddd;
   border-radius: 6px;
@@ -158,13 +160,13 @@ input[type="email"] {
   transition: border-color 0.3s;
 }
 
-input[type="email"]:focus {
+input[type='email']:focus {
   border-color: #4c9aff;
   outline: none;
   box-shadow: 0 0 0 3px rgba(76, 154, 255, 0.1);
 }
 
-input[type="email"]::placeholder {
+input[type='email']::placeholder {
   color: #aaa;
 }
 
@@ -249,11 +251,11 @@ input[type="email"]::placeholder {
   .card {
     padding: 1.5rem;
   }
-  
-  input[type="email"] {
+
+  input[type='email'] {
     padding: 0.65rem;
   }
-  
+
   .btn-submit {
     padding: 0.75rem;
   }

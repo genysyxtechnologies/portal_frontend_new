@@ -6,21 +6,22 @@ const processError = async (error: any) => {
     //user is not signed in
     if (error.response.status === 401) {
       if (error.config.url === '/authenticate') {
-          message = 'Invalid username or password is not incorrect'
+        message = 'Invalid username or password is not incorrect'
       } else if (error.config.url === '/refresh-token') {
         window.location.reload()
       } else {
-          message = 'Session expired, login required';
+        message = 'Session expired, login required'
       }
-
-    } else if (error.response.status === 500 ) { // unauthorized access
+    } else if (error.response.status === 500) {
+      // unauthorized access
       message = 'An error has occurred. Contact the support team'
-    } else if (error.response.status === 403) { // unauthorized access
+    } else if (error.response.status === 403) {
+      // unauthorized access
       message = 'Access denied. reload if message persist'
-    } else if(error.response.status === 500){
+    } else if (error.response.status === 500) {
       message = "Ongoing maintenance, we'll be right back!"
     }
-      // The request was made and the server responded with a status code
+    // The request was made and the server responded with a status code
     // that falls out of the range of 2xx
     else if (error.response.data.message) {
       message = error.response.data.message
@@ -31,26 +32,24 @@ const processError = async (error: any) => {
       if (error.response.data instanceof Blob) {
         // convert to blob
         message = await toJson(error.response.data)
-      }
-      else
-        message = error.response.data;
+      } else message = error.response.data
     }
     // viewInstance.message = "An error has occurred";
   } else if (error.request) {
-    message = "Error! server is not responding"
-    console.log(error.request);
+    message = 'Error! server is not responding'
+    console.log(error.request)
   } else {
     // Something happened in setting up the request that triggered an Error
-    message = error.message;
+    message = error.message
   }
 
   return message
 }
 
-const toJson = async (err: any) =>  {
+const toJson = async (err: any) => {
   // eslint
   const r = await err.text()
-  const parsed = JSON.parse(r);
+  const parsed = JSON.parse(r)
   // check
   if (parsed.error) {
     return parsed.error
@@ -59,6 +58,4 @@ const toJson = async (err: any) =>  {
   }
 }
 
-export {
-  processError
-}
+export { processError }

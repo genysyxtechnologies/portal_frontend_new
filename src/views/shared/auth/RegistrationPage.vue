@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import ReUsableButtons from '@/views/buttons/ReUsableButtons.vue';
-
+import ReUsableButtons from '@/views/buttons/ReUsableButtons.vue'
 </script>
 
 <template>
   <div
-    class="flex flex-col p-6 sm:p-12 bg-white gap-8 rounded-xl justify-center shadow-2xl transform transition-all duration-700 hover:shadow-3xl hover:-translate-y-1">
+    class="flex flex-col p-6 sm:p-12 bg-white gap-8 rounded-xl justify-center shadow-2xl transform transition-all duration-700 hover:shadow-3xl hover:-translate-y-1"
+  >
     <div class="p-4 sm:p-8 flex flex-col gap-8">
       <div class="flex flex-col items-center space-y-2">
-        <h1 class="welcome animate-fade-in" style="line-height: 65px;">Apply</h1>
+        <h1 class="welcome animate-fade-in" style="line-height: 65px">Apply</h1>
         <h3 class="sub-welcome animate-fade-in delay-100">Start your application below</h3>
       </div>
 
@@ -42,15 +42,15 @@ import ReUsableButtons from '@/views/buttons/ReUsableButtons.vue';
         <div class="flex flex-col gap-6">
           <div class="flex flex-col space-y-4">
             <ReUsableButtons :label="'Apply'" @on-click="$emit('on-click')" />
-
           </div>
 
           <div class="flex flex-col text-center space-y-1">
             <span class="text-[#BFBFBF]">Already have an account?</span>
             <div class="flex self-center items-center gap-2">
               <span
-              @click="$emit('on-switch')"
-                class="text-[#0D47A1] font-medium hover:text-[#1565C0] cursor-pointer transition-colors duration-300">
+                @click="$emit('on-switch')"
+                class="text-[#0D47A1] font-medium hover:text-[#1565C0] cursor-pointer transition-colors duration-300"
+              >
                 Login here
               </span>
               <span class="flex">
@@ -83,10 +83,9 @@ import ReUsableButtons from '@/views/buttons/ReUsableButtons.vue';
   color: #434343;
 }
 
-
 .input-field {
   padding: 12px 16px;
-  border: 1px solid #E0E0E0;
+  border: 1px solid #e0e0e0;
   border-radius: 8px;
   transition: all 0.3s ease;
   width: 100%;

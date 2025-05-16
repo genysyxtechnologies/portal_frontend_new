@@ -11,65 +11,65 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, computed } from 'vue';
-import { logoService, LogoType } from '@/services/logoService';
+import { ref, onMounted, onUnmounted, computed } from 'vue'
+import { logoService, LogoType } from '@/services/logoService'
 
 defineOptions({
-  name: 'AppLogo'
-});
+  name: 'AppLogo',
+})
 
 const props = defineProps({
   alt: {
     type: String,
-    default: 'School Portal Logo'
+    default: 'School Portal Logo',
   },
   size: {
     type: String,
     default: 'medium', // small, medium, large
-    validator: (value: string) => ['small', 'medium', 'large'].includes(value)
+    validator: (value: string) => ['small', 'medium', 'large'].includes(value),
   },
   type: {
     type: String,
     default: LogoType.FULL,
-    validator: (value: string) => Object.values(LogoType).includes(value as LogoType)
+    validator: (value: string) => Object.values(LogoType).includes(value as LogoType),
   },
   fallback: {
     type: String,
-    default: ''
-  }
-});
+    default: '',
+  },
+})
 
-const logoUrl = ref<string>('');
-const loading = ref<boolean>(true);
-const error = ref<boolean>(false);
+const logoUrl = ref<string>('')
+const loading = ref<boolean>(true)
+const error = ref<boolean>(false)
 
-const sizeClass = computed(() => `app-logo-${props.size}`);
+const sizeClass = computed(() => `app-logo-${props.size}`)
 
 const fetchLogo = async () => {
-  loading.value = true;
-  error.value = false;
-  
+  loading.value = true
+  error.value = false
+
   try {
-    logoUrl.value = await logoService.fetchLogo(props.type as LogoType);
+    logoUrl.value = await logoService.fetchLogo(props.type as LogoType)
   } catch (err) {
-    console.error('Failed to fetch logo:', err);
-    error.value = true;
-    
+    console.error('Failed to fetch logo:', err)
+    error.value = true
+
     // Use fallback if provided, otherwise use the default fallback
-    logoUrl.value = props.fallback || logoService.getFallbackUrl(props.type as LogoType);
+    logoUrl.value = props.fallback || logoService.getFallbackUrl(props.type as LogoType)
   } finally {
-    loading.value = false;
+    loading.value = false
   }
-};
+}
 
 onMounted(() => {
-  fetchLogo();
-});
+  fetchLogo()
+})
 
 // No need to clean up as logoService handles cache management
 onUnmounted(() => {
   // We don't revoke URLs here as they're managed by the logoService cache
-});
+})
 </script>
 
 <style scoped>

@@ -3,7 +3,7 @@ export interface User {
   user: {
     id: string
     name: string
-    username: string,
+    username: string
     email: string
     roles: string[]
     avatar?: string

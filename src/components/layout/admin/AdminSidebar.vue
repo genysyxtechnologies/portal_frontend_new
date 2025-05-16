@@ -14,7 +14,11 @@
           <div v-if="!collapsed" class="p-menu-category-label">{{ item.label }}</div>
           <ul class="p-menu-list">
             <li v-for="(menuItem, idx) in item.items" :key="idx" class="p-menu-item">
-              <router-link :to="menuItem.to" class="p-menu-link" :class="{ active: isActive(menuItem.to) }">
+              <router-link
+                :to="menuItem.to"
+                class="p-menu-link"
+                :class="{ active: isActive(menuItem.to) }"
+              >
                 <i class="p-menu-icon" :class="menuItem.icon"></i>
                 <span v-if="!collapsed" class="p-menu-text">{{ menuItem.label }}</span>
               </router-link>
@@ -27,20 +31,20 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
-import { useRoute } from 'vue-router';
+import { computed } from 'vue'
+import { useRoute } from 'vue-router'
 
 defineProps<{
-  collapsed: boolean;
-}>();
+  collapsed: boolean
+}>()
 
-defineEmits(['toggle-sidebar']);
+defineEmits(['toggle-sidebar'])
 
-const route = useRoute();
+const route = useRoute()
 
 const isActive = (path: string) => {
-  return route.path.startsWith(path);
-};
+  return route.path.startsWith(path)
+}
 
 const menuItems = computed(() => [
   {
@@ -48,15 +52,15 @@ const menuItems = computed(() => [
     items: [
       { label: 'Dashboard', icon: 'pi pi-home', to: '/admin/dashboard' },
       { label: 'Analytics', icon: 'pi pi-chart-bar', to: '/admin/analytics' },
-    ]
+    ],
   },
   {
     label: 'User Management',
     items: [
       { label: 'Users', icon: 'pi pi-users', to: '/admin/user-management/users' },
       { label: 'Roles', icon: 'pi pi-id-card', to: '/admin/user-management/roles' },
-      { label: 'Permissions', icon: 'pi pi-lock', to: '/admin/user-management/permissions' }
-    ]
+      { label: 'Permissions', icon: 'pi pi-lock', to: '/admin/user-management/permissions' },
+    ],
   },
   {
     label: 'Academic',
@@ -64,16 +68,16 @@ const menuItems = computed(() => [
       { label: 'Departments', icon: 'pi pi-sitemap', to: '/admin/academic/departments' },
       { label: 'Programs', icon: 'pi pi-book', to: '/admin/academic/programs' },
       { label: 'Courses', icon: 'pi pi-list', to: '/admin/academic/courses' },
-    ]
+    ],
   },
   {
     label: 'System',
     items: [
       { label: 'Settings', icon: 'pi pi-cog', to: '/admin/settings' },
       { label: 'Logs', icon: 'pi pi-history', to: '/admin/logs' },
-    ]
-  }
-]);
+    ],
+  },
+])
 </script>
 
 <style scoped>
@@ -212,11 +216,11 @@ const menuItems = computed(() => [
     transform: translateX(-100%);
     box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
   }
-  
+
   .p-sidebar.p-sidebar-mobile-visible {
     transform: translateX(0);
   }
-  
+
   .p-sidebar-collapsed {
     transform: translateX(-100%);
   }

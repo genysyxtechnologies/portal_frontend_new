@@ -1,5 +1,5 @@
-import type { RouteRecordRaw } from 'vue-router';
-import StaffLayout from '@/components/layout/staff/StaffLayout.vue';
+import type { RouteRecordRaw } from 'vue-router'
+import StaffLayout from '@/components/layout/staff/StaffLayout.vue'
 
 const staffRoutes: RouteRecordRaw[] = [
   {
@@ -7,15 +7,15 @@ const staffRoutes: RouteRecordRaw[] = [
     component: StaffLayout,
     meta: {
       requiresAuth: true,
-      roles: ['staff', 'admin']
+      roles: ['staff', 'admin'],
     },
     children: [
       {
         path: '',
-        redirect: '/staff/dashboard'
+        redirect: '/staff/dashboard',
       },
-    ]
-  }
-];
+    ],
+  },
+]
 
-export default staffRoutes;
+export default staffRoutes

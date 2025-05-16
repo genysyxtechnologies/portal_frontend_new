@@ -1,7 +1,7 @@
-import { reactive } from 'vue';
+import { reactive } from 'vue'
 
 // Define permission types
-export type Permission = 
+export type Permission =
   // Admin permissions
   | 'manage:users'
   | 'manage:roles'
@@ -11,7 +11,7 @@ export type Permission =
   | 'view:logs'
   | 'manage:settings'
   | 'manage:academic_calendar'
-  
+
   // Staff permissions
   | 'view:students'
   | 'manage:attendance'
@@ -20,7 +20,7 @@ export type Permission =
   | 'create:announcements'
   | 'view:academic_records'
   | 'manage:advisees'
-  
+
   // Student permissions
   | 'view:courses'
   | 'register:courses'
@@ -30,14 +30,14 @@ export type Permission =
   | 'view:fees'
   | 'make:payments'
   | 'apply:scholarships'
-  
+
   // Shared permissions
   | 'manage:profile'
   | 'view:announcements'
-  | 'use:messaging';
+  | 'use:messaging'
 
 // Define user roles
-export type Role = 'admin' | 'staff' | 'student' | 'guest';
+export type Role = 'admin' | 'staff' | 'student' | 'guest'
 
 // Define permission sets for each role
 export const rolePermissions: Record<Role, Permission[]> = {
@@ -51,7 +51,7 @@ export const rolePermissions: Record<Role, Permission[]> = {
     'view:logs',
     'manage:settings',
     'manage:academic_calendar',
-    
+
     // Admin also has staff permissions
     'view:students',
     'manage:attendance',
@@ -60,13 +60,13 @@ export const rolePermissions: Record<Role, Permission[]> = {
     'create:announcements',
     'view:academic_records',
     'manage:advisees',
-    
+
     // Shared permissions
     'manage:profile',
     'view:announcements',
-    'use:messaging'
+    'use:messaging',
   ],
-  
+
   staff: [
     // Staff-specific permissions
     'view:students',
@@ -76,13 +76,13 @@ export const rolePermissions: Record<Role, Permission[]> = {
     'create:announcements',
     'view:academic_records',
     'manage:advisees',
-    
+
     // Shared permissions
     'manage:profile',
     'view:announcements',
-    'use:messaging'
+    'use:messaging',
   ],
-  
+
   student: [
     // Student-specific permissions
     'view:courses',
@@ -93,54 +93,54 @@ export const rolePermissions: Record<Role, Permission[]> = {
     'view:fees',
     'make:payments',
     'apply:scholarships',
-    
+
     // Shared permissions
     'manage:profile',
     'view:announcements',
-    'use:messaging'
+    'use:messaging',
   ],
-  
+
   guest: [
     // Minimal permissions for guests
-    'view:announcements'
-  ]
-};
+    'view:announcements',
+  ],
+}
 
 // Helper function to check if a role has a specific permission
 export function hasPermission(role: Role, permission: Permission): boolean {
-  return rolePermissions[role]?.includes(permission) || false;
+  return rolePermissions[role]?.includes(permission) || false
 }
 
 // Current user role (to be set from authentication)
 export const userRole = reactive<{
-  current: Array<Role>;
-  permissions: Permission[];
+  current: Array<Role>
+  permissions: Permission[]
 }>({
   current: ['guest'],
-  permissions: [...rolePermissions.guest]
-});
+  permissions: [...rolePermissions.guest],
+})
 
 // Set the user role and update permissions
 export function setUserRole(roles: Array<Role>): void {
-  userRole.current = roles;
-  userRole.permissions = [...roles.flatMap(e => rolePermissions[e])];
+  userRole.current = roles
+  userRole.permissions = [...roles.flatMap((e) => rolePermissions[e])]
 }
 
 // Check if the current user has a specific permission
 export function currentUserHasPermission(permission: Permission): boolean {
-  return userRole.permissions.includes(permission);
+  return userRole.permissions.includes(permission)
 }
 
 // Check if the current user has any of the specified permissions
 export function currentUserHasAnyPermission(permissions: Permission[]): boolean {
-  return permissions.some(permission => userRole.permissions.includes(permission));
+  return permissions.some((permission) => userRole.permissions.includes(permission))
 }
 
 // Check if the current user has all of the specified permissions
 export function currentUserHasAllPermissions(permissions: Permission[]): boolean {
-  return permissions.every(permission => userRole.permissions.includes(permission));
+  return permissions.every((permission) => userRole.permissions.includes(permission))
 }
 
 export function anyContains(base: Array<string>, target: Array<string>): boolean {
-  return target.some(role => base.includes(role));
+  return target.some((role) => base.includes(role))
 }

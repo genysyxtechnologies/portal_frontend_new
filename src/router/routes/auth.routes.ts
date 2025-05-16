@@ -1,17 +1,17 @@
-import type { RouteRecordRaw } from 'vue-router';
-import AuthLayout from '@/components/layout/shared/AuthLayout.vue';
+import type { RouteRecordRaw } from 'vue-router'
+import AuthLayout from '@/components/layout/shared/AuthLayout.vue'
 
 const authRoutes: RouteRecordRaw[] = [
   {
     path: '/auth',
     component: AuthLayout,
     meta: {
-      requiresAuth: false
+      requiresAuth: false,
     },
     children: [
       {
         path: '',
-        redirect: '/'
+        redirect: '/',
       },
       {
         path: 'login',
@@ -19,8 +19,8 @@ const authRoutes: RouteRecordRaw[] = [
         component: () => import('@/views/shared/auth/LoginView.vue'),
         meta: {
           title: 'Login',
-          icon: 'pi pi-sign-in'
-        }
+          icon: 'pi pi-sign-in',
+        },
       },
       {
         path: 'register',
@@ -28,8 +28,8 @@ const authRoutes: RouteRecordRaw[] = [
         component: () => import('@/views/shared/auth/RegisterView.vue'),
         meta: {
           title: 'Register',
-          icon: 'pi pi-user-plus'
-        }
+          icon: 'pi pi-user-plus',
+        },
       },
       {
         path: 'forgot-password',
@@ -37,8 +37,8 @@ const authRoutes: RouteRecordRaw[] = [
         component: () => import('@/views/shared/auth/ForgotPasswordView.vue'),
         meta: {
           title: 'Forgot Password',
-          icon: 'pi pi-lock'
-        }
+          icon: 'pi pi-lock',
+        },
       },
       {
         path: 'reset-password',
@@ -46,8 +46,8 @@ const authRoutes: RouteRecordRaw[] = [
         component: () => import('@/views/shared/auth/ResetPasswordView.vue'),
         meta: {
           title: 'Reset Password',
-          icon: 'pi pi-lock'
-        }
+          icon: 'pi pi-lock',
+        },
       },
       {
         path: 'verify-email',
@@ -55,8 +55,8 @@ const authRoutes: RouteRecordRaw[] = [
         component: () => import('@/views/shared/auth/VerifyEmailView.vue'),
         meta: {
           title: 'Verify Email',
-          icon: 'pi pi-envelope'
-        }
+          icon: 'pi pi-envelope',
+        },
       },
       {
         path: 'forbidden',
@@ -64,11 +64,11 @@ const authRoutes: RouteRecordRaw[] = [
         component: () => import('@/views/shared/errors/ForbiddenView.vue'),
         meta: {
           title: 'Access Denied',
-          icon: 'pi pi-ban'
-        }
-      }
-    ]
-  }
-];
+          icon: 'pi pi-ban',
+        },
+      },
+    ],
+  },
+]
 
-export default authRoutes;
+export default authRoutes

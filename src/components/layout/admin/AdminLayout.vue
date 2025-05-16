@@ -14,16 +14,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
-import AdminSidebar from './AdminSidebar.vue';
-import AdminHeader from './AdminHeader.vue';
-import AdminFooter from './AdminFooter.vue';
+import { ref } from 'vue'
+import AdminSidebar from './AdminSidebar.vue'
+import AdminHeader from './AdminHeader.vue'
+import AdminFooter from './AdminFooter.vue'
 
-const sidebarCollapsed = ref(false);
+const sidebarCollapsed = ref(false)
 
 const toggleSidebar = () => {
-  sidebarCollapsed.value = !sidebarCollapsed.value;
-};
+  sidebarCollapsed.value = !sidebarCollapsed.value
+}
 </script>
 
 <style scoped>
@@ -60,7 +60,7 @@ const toggleSidebar = () => {
   .p-main {
     margin-left: 0;
   }
-  
+
   .p-main-expanded {
     margin-left: 0;
   }

@@ -27,47 +27,51 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue';
-import Select from 'primevue/select';
+import { ref, watch } from 'vue'
+import Select from 'primevue/select'
 
 interface AcademicSession {
-  id: number | string;
-  name: string;
-  semesters: Semester[];
+  id: number | string
+  name: string
+  semesters: Semester[]
 }
 
 interface Semester {
-  id: number | string;
-  title: string;
+  id: number | string
+  title: string
 }
 
 const props = defineProps<{
-  sessions: AcademicSession[];
-  selectedSession: AcademicSession | null;
-  selectedSemester: Semester | null;
-}>();
+  sessions: AcademicSession[]
+  selectedSession: AcademicSession | null
+  selectedSemester: Semester | null
+}>()
 
 const emit = defineEmits<{
-  (e: 'update:selectedSession', value: AcademicSession | null): void;
-  (e: 'update:selectedSemester', value: Semester | null): void;
-}>();
+  (e: 'update:selectedSession', value: AcademicSession | null): void
+  (e: 'update:selectedSemester', value: Semester | null): void
+}>()
 
-const semesters = ref<Semester[]>([]);
+const semesters = ref<Semester[]>([])
 
 // Handle session change
 const handleSessionChange = (session: AcademicSession | null) => {
-  semesters.value = session?.semesters || [];
-  emit('update:selectedSession', session);
-  emit('update:selectedSemester', null); // Reset semester when session changes
-};
+  semesters.value = session?.semesters || []
+  emit('update:selectedSession', session)
+  emit('update:selectedSemester', null) // Reset semester when session changes
+}
 
 // Handle semester change
 const handleSemesterChange = (semester: Semester | null) => {
-  emit('update:selectedSemester', semester);
-};
+  emit('update:selectedSemester', semester)
+}
 
 // Watch for external changes to selectedSession
-watch(() => props.selectedSession, (session) => {
-  semesters.value = session?.semesters || [];
-}, { immediate: true });
+watch(
+  () => props.selectedSession,
+  (session) => {
+    semesters.value = session?.semesters || []
+  },
+  { immediate: true },
+)
 </script>

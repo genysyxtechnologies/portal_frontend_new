@@ -87,21 +87,21 @@ body {
 }
 
 .head-title{
-font-family: 'Inter';
-font-style: normal;
-font-weight: 600;
-font-size: 30px;
-line-height: 36px;
-color: #000000;
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 600;
+  font-size: 30px;
+  line-height: 36px;
+  color: #000000;
 }
 
 .sub-title{
-font-family: 'Inter';
-font-style: normal;
-font-weight: 500;
-font-size: 25px;
-line-height: 36px;
-color: #2D2D2D;
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 500;
+  font-size: 25px;
+  line-height: 36px;
+  color: #2D2D2D;
 }
 
 .primary-bg{
@@ -113,15 +113,14 @@ color: #2D2D2D;
 }
 
 .labels{
-font-family: 'Inter';
-font-style: normal;
-font-weight: 400;
-font-size: 15px;
-line-height: 18px;
-color: #BFBFBF;
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 15px;
+  line-height: 18px;
+  color: #BFBFBF;
 }
 
 .ring-input{
   border: #90CAF9;
 }
-

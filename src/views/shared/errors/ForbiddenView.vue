@@ -6,8 +6,8 @@
       </div>
       <h1>Access Denied</h1>
       <p class="message">
-        You don't have permission to access this page. If you believe this is an error, 
-        please contact your administrator.
+        You don't have permission to access this page. If you believe this is an error, please
+        contact your administrator.
       </p>
       <div class="action-buttons">
         <router-link to="/" class="btn-home">
@@ -24,11 +24,11 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue';
+import { onMounted } from 'vue'
 
 onMounted(() => {
-  document.title = 'Access Denied | School Portal';
-});
+  document.title = 'Access Denied | School Portal'
+})
 </script>
 
 <style scoped>
@@ -115,20 +115,20 @@ h1 {
   .forbidden-content {
     padding: 2rem;
   }
-  
+
   .action-buttons {
     flex-direction: column;
     gap: 0.75rem;
   }
-  
+
   .icon-container i {
     font-size: 4rem;
   }
-  
+
   h1 {
     font-size: 1.75rem;
   }
-  
+
   .message {
     font-size: 1rem;
   }

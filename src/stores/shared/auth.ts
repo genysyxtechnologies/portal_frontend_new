@@ -18,10 +18,10 @@ export const useAuthStore = defineStore('auth', () => {
 
   // Getters
   const isAuthenticated = computed(() => !!user.value)
-  const userRole = computed(() => user.value?.roles || ['guest'])
-  const userFullName = computed(() => user.value?.name || '')
-  const userEmail = computed(() => user.value?.email || '')
-  const userAvatar = computed(() => user.value?.avatar || '/assets/default-avatar.png')
+  const userRole = computed(() => user.value?.user?.roles || ['guest'])
+  const userFullName = computed(() => user.value?.user?.name || '')
+  const userEmail = computed(() => user.value?.user?.email || '')
+  const userAvatar = computed(() => user.value?.user?.avatar || '/assets/default-avatar.png')
 
   // Actions
   async function initialize() {
@@ -47,7 +47,7 @@ export const useAuthStore = defineStore('auth', () => {
         const response = await authService.getCurrentUser()
         console.log(response)
         if (response.success && response.data) {
-          user.value = response.data
+          user.value = response.data as unknown as User
           setUserRole(response.data.user.roles as Array<Role>)
           return response.data
         } else {

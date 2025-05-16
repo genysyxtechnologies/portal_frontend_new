@@ -13,7 +13,6 @@ export const useStudentDashboard = createSharedComposable(() => {
   const loading = ref(false)
   const error = ref<string | null>(null)
 
-
   // fetch user information
   async function getStudentInformation() {
     loading.value = true

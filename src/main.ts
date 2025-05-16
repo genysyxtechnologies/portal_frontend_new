@@ -1,5 +1,5 @@
 import './assets/main.css'
-import "vue-toast-notification/dist/theme-bootstrap.css";
+import 'vue-toast-notification/dist/theme-bootstrap.css'
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import { MotionPlugin } from '@vueuse/motion'
@@ -8,7 +8,7 @@ import router from './router'
 import PrimeVue from 'primevue/config'
 import { themeConfig } from './themes'
 import 'primeicons/primeicons.css'
-import ToastPlugin from "vue-toast-notification";
+import ToastPlugin from 'vue-toast-notification'
 import AutoComplete from 'primevue/autocomplete'
 import Accordion from 'primevue/accordion'
 import AccordionTab from 'primevue/accordiontab'
@@ -111,9 +111,8 @@ import ToggleButton from 'primevue/togglebutton'
 import Tree from 'primevue/tree'
 import TreeSelect from 'primevue/treeselect'
 import TreeTable from 'primevue/treetable'
-import Toast from 'primevue/toast';
+import Toast from 'primevue/toast'
 import ToastService from 'primevue/toastservice'
-
 
 const app = createApp(App)
 
@@ -233,12 +232,12 @@ const pinia = createPinia()
 app.use(pinia)
 app.use(router)
 app.use(ToastPlugin, {
-  position: "top",
-});
+  position: 'top',
+})
 
 import { useAuthStore } from '@/stores/shared/auth.ts'
 const authStore = useAuthStore()
 
-authStore.initialize().then(r => {})
+authStore.initialize().then((r) => {})
 
 app.mount('#app')

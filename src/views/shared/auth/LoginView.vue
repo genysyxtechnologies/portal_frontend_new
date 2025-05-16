@@ -1,14 +1,23 @@
 <template>
   <div
-    class="h-screen bg-gradient-to-br from-[#90CAF9] to-[#64B5F6] w-full flex items-center justify-center p-5 overflow-hidden">
-    <div class="grid grid-cols-1 lg:grid-cols-2 w-full lg:w-3/4 h-full">
+    class="h-screen w-full flex items-center justify-center p-5 overflow-hidden"
+    :style="{ 
+      background: `linear-gradient(to bottom right, var(--primary-light-color), var(--primary-dark-color))` 
+    }"
+  >
+    <div class="grid grid-cols-1 lg:grid-cols-2 w-full lg:w-7/8 h-full">
       <!-- Left hand side -->
       <div
-        class="hidden lg:flex flex-col items-center justify-center gap-8 left-text transform transition-all duration-1000 ease-in-out">
+        class="hidden lg:flex flex-col items-center justify-center gap-8 left-text transform transition-all duration-1000 ease-in-out"
+      >
         <div
-          class="bg-white w-1/2 rounded-full flex items-center justify-center p-2 shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-105">
-          <img :src="image1" alt="Logo"
-            class="image1 rounded-t-full scale-70 transition-transform duration-700 hover:scale-90" />
+          class="bg-white w-1/2 rounded-full flex items-center justify-center p-2 shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-105"
+        >
+          <img
+            :src="image1"
+            alt="Logo"
+            class="image1 rounded-t-full scale-70 transition-transform duration-700 hover:scale-90"
+          />
         </div>
         <div class="text-center space-y-2">
           <div class="animate-fade-in-up delay-100">Integrity, Innovation</div>
@@ -77,7 +86,7 @@ onMounted(() => {
   font-size: 40px;
   line-height: 48px;
   text-align: center;
-  color: #0d47a1;
+  color: var(--primary-dark-color);
 }
 
 .welcome {
@@ -86,7 +95,7 @@ onMounted(() => {
   font-size: 40px;
   line-height: 48px;
   text-align: center;
-  color: #0d47a1;
+  color: var(--primary-dark-color);
 }
 
 .sub-welcome {
@@ -107,8 +116,8 @@ onMounted(() => {
 }
 
 .input-field:focus {
-  border-color: #0d47a1;
-  box-shadow: 0 0 0 2px rgba(13, 71, 161, 0.2);
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(var(--primary-color-rgb), 0.2);
   outline: none;
 }
 

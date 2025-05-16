@@ -1,25 +1,26 @@
 <template>
   <header class="navbar">
     <router-link to="/" class="sidebar-toggle sidebar-toggle">
-      <i class="pi pi-arrow-left"></i>
+      <tooltip title="Logout">
+        <i class="pi pi-arrow-left"></i>
+      </tooltip>
     </router-link>
     <div class="current-date">{{ currentDate }}</div>
   </header>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
-
+import { computed } from 'vue'
 
 const currentDate = computed(() => {
-  const date = new Date();
+  const date = new Date()
   return date.toLocaleDateString('en-US', {
     weekday: 'short',
     day: 'numeric',
     month: 'short',
-    year: 'numeric'
-  });
-});
+    year: 'numeric',
+  })
+})
 </script>
 <style scoped>
 .navbar {
@@ -28,13 +29,12 @@ const currentDate = computed(() => {
   z-index: 50;
   background: white;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  padding: 1rem 1.5rem;
+  padding: 0.5rem 1.5rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
   border-radius: 0.5rem;
-  margin: 0.5rem;
-  margin-left: 38px;
+  margin: 1rem 0.5rem 0.5rem 38px;
 }
 
 .sidebar-toggle {
@@ -42,7 +42,7 @@ const currentDate = computed(() => {
   border: none;
   cursor: pointer;
   font-size: 1.2rem;
-  color: #0D47A1;
+  color: #0d47a1;
   padding: 0.5rem;
 }
 

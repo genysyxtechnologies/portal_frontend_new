@@ -30,7 +30,6 @@ const baseRoutes = [
     },
   },
 
-
   {
     path: '/forbidden',
     name: 'Forbidden',

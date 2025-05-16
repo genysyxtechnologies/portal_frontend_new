@@ -4,7 +4,7 @@
     <p>We're currently performing scheduled maintenance to improve our services.</p>
     <p class="maintenance-message">Please check back later. We apologize for any inconvenience.</p>
     <div class="maintenance-icon">
-      <i class="pi pi-cog" style="font-size: 4rem; color: var(--mantine-color-blue-6);"></i>
+      <i class="pi pi-cog" style="font-size: 4rem; color: var(--mantine-color-blue-6)"></i>
     </div>
   </div>
 </template>
@@ -53,4 +53,4 @@ p {
     transform: rotate(360deg);
   }
 }
-</style> 
+</style>

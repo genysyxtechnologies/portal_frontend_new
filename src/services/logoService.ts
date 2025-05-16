@@ -1,19 +1,19 @@
-import axios from 'axios';
+import axios from 'axios'
 
 /**
  * Logo types supported by the application
  */
 export enum LogoType {
-  FULL = 'full',       // Full logo with text and icon
-  ICON = 'icon',       // Icon only
-  TEXT = 'text',       // Text only
-  MONOCHROME = 'mono'  // Monochrome version
+  FULL = 'full', // Full logo with text and icon
+  ICON = 'icon', // Icon only
+  TEXT = 'text', // Text only
+  MONOCHROME = 'mono', // Monochrome version
 }
 
 /**
  * Cached logo URLs to avoid repeated API calls
  */
-const logoCache = new Map<string, string>();
+const logoCache = new Map<string, string>()
 
 /**
  * Service for handling logo operations throughout the application
@@ -25,27 +25,27 @@ export const logoService = {
    * @returns Promise with the URL to the logo
    */
   async fetchLogo(type: LogoType = LogoType.FULL): Promise<string> {
-    const cacheKey = `logo-${type}`;
+    const cacheKey = `logo-${type}`
 
     // Check if we have a cached version
     if (logoCache.has(cacheKey)) {
-      return logoCache.get(cacheKey)!;
+      return logoCache.get(cacheKey)!
     }
 
     try {
       const response = await appClient.get(`/api/global/logo/${type}`, {
-        responseType: 'blob'
-      });
+        responseType: 'blob',
+      })
 
-      const logoUrl = URL.createObjectURL(response.data);
+      const logoUrl = URL.createObjectURL(response.data)
 
       // Cache the URL
-      logoCache.set(cacheKey, logoUrl);
+      logoCache.set(cacheKey, logoUrl)
 
-      return logoUrl;
+      return logoUrl
     } catch (error) {
-      console.error(`Failed to fetch ${type} logo:`, error);
-      throw error;
+      console.error(`Failed to fetch ${type} logo:`, error)
+      throw error
     }
   },
 
@@ -57,18 +57,18 @@ export const logoService = {
   async getLogoDataUrl(type: LogoType = LogoType.FULL): Promise<string> {
     try {
       const response = await axios.get(`/api/global/logo/${type}`, {
-        responseType: 'blob'
-      });
+        responseType: 'blob',
+      })
 
       return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onloadend = () => resolve(reader.result as string);
-        reader.onerror = reject;
-        reader.readAsDataURL(response.data);
-      });
+        const reader = new FileReader()
+        reader.onloadend = () => resolve(reader.result as string)
+        reader.onerror = reject
+        reader.readAsDataURL(response.data)
+      })
     } catch (error) {
-      console.error(`Failed to get ${type} logo data URL:`, error);
-      throw error;
+      console.error(`Failed to get ${type} logo data URL:`, error)
+      throw error
     }
   },
 
@@ -78,15 +78,15 @@ export const logoService = {
    */
   clearCache(type?: LogoType): void {
     if (type) {
-      const cacheKey = `logo-${type}`;
+      const cacheKey = `logo-${type}`
       if (logoCache.has(cacheKey)) {
-        URL.revokeObjectURL(logoCache.get(cacheKey)!);
-        logoCache.delete(cacheKey);
+        URL.revokeObjectURL(logoCache.get(cacheKey)!)
+        logoCache.delete(cacheKey)
       }
     } else {
       // Clear all cached logos
-      logoCache.forEach(url => URL.revokeObjectURL(url));
-      logoCache.clear();
+      logoCache.forEach((url) => URL.revokeObjectURL(url))
+      logoCache.clear()
     }
   },
 
@@ -98,15 +98,15 @@ export const logoService = {
   getFallbackUrl(type: LogoType = LogoType.FULL): string {
     switch (type) {
       case LogoType.FULL:
-        return '/fallback/logo-full.png';
+        return '/fallback/logo-full.png'
       case LogoType.ICON:
-        return '/fallback/logo-icon.png';
+        return '/fallback/logo-icon.png'
       case LogoType.TEXT:
-        return '/fallback/logo-text.png';
+        return '/fallback/logo-text.png'
       case LogoType.MONOCHROME:
-        return '/fallback/logo-mono.png';
+        return '/fallback/logo-mono.png'
       default:
-        return '/fallback/logo-full.png';
+        return '/fallback/logo-full.png'
     }
-  }
-};
+  },
+}

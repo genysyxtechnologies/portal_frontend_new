@@ -11,43 +11,41 @@
           placeholder="Select Session"
           class="card w-[300px]"
           :pt="{
-            root: { class: 'transition-all duration-300 hover:shadow-md' }
+            root: { class: 'transition-all duration-300 hover:shadow-md' },
           }"
         />
       </div>
     </div>
 
     <!-- Animated Content Area -->
-    <transition
-      name="fade-zoom"
-      mode="out-in"
-    >
-      <div v-if="!selectedSession"
-           class="bg-white flex items-center justify-center h-[60vh] rounded-xl p-6 overflow-hidden"
-           v-motion="{
-             initial: {
-               opacity: 0,
-               y: 20,
-               scale: 0.95
-             },
-             enter: {
-               opacity: 1,
-               y: 0,
-               scale: 1,
-               transition: {
-                 duration: 500,
-                 type: 'spring',
-                 damping: 15
-               }
-             },
-             leave: {
-               opacity: 0,
-               scale: 0.9,
-               transition: {
-                 duration: 250
-               }
-             }
-           }"
+    <transition name="fade-zoom" mode="out-in">
+      <div
+        v-if="!selectedSession"
+        class="bg-white flex items-center justify-center h-[60vh] rounded-xl p-6 overflow-hidden"
+        v-motion="{
+          initial: {
+            opacity: 0,
+            y: 20,
+            scale: 0.95,
+          },
+          enter: {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            transition: {
+              duration: 500,
+              type: 'spring',
+              damping: 15,
+            },
+          },
+          leave: {
+            opacity: 0,
+            scale: 0.9,
+            transition: {
+              duration: 250,
+            },
+          },
+        }"
       >
         <div class="flex flex-col gap-4 items-center text-center">
           <div class="relative">
@@ -62,7 +60,7 @@
                 initial: {
                   opacity: 0,
                   scale: 0.8,
-                  rotate: -10
+                  rotate: -10,
                 },
                 enter: {
                   opacity: 1,
@@ -71,12 +69,17 @@
                   transition: {
                     delay: 200,
                     duration: 600,
-                    type: 'spring'
-                  }
-                }
+                    type: 'spring',
+                  },
+                },
               }"
             >
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="1.5"
+                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+              />
             </svg>
 
             <!-- Pulsing animation circle -->
@@ -89,9 +92,9 @@
                   transition: {
                     duration: 2000,
                     repeat: Infinity,
-                    repeatType: 'reverse'
-                  }
-                }
+                    repeatType: 'reverse',
+                  },
+                },
               }"
             ></div>
           </div>
@@ -105,9 +108,9 @@
                 y: 0,
                 transition: {
                   delay: 300,
-                  duration: 400
-                }
-              }
+                  duration: 400,
+                },
+              },
             }"
           >
             No session selected
@@ -122,9 +125,9 @@
                 y: 0,
                 transition: {
                   delay: 400,
-                  duration: 400
-                }
-              }
+                  duration: 400,
+                },
+              },
             }"
           >
             Select a session/semester above to view your fee details
@@ -141,9 +144,9 @@
                 transition: {
                   delay: 500,
                   duration: 500,
-                  type: 'spring'
-                }
-              }
+                  type: 'spring',
+                },
+              },
             }"
           >
             <span>Choose from the dropdown</span>
@@ -154,7 +157,12 @@
               viewBox="0 0 24 24"
               stroke="currentColor"
             >
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M13 7l5 5m0 0l-5 5m5-5H6"
+              />
             </svg>
           </div>
         </div>
@@ -205,7 +213,7 @@ watch(
     if (value) {
       await getStudentFee(user.value?.username!, value.id)
     }
-  }
+  },
 )
 </script>
 
@@ -216,7 +224,8 @@ watch(
 }
 
 @keyframes bounce-horizontal {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateX(0);
   }
   50% {

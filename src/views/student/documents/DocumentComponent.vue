@@ -7,7 +7,7 @@
         class="flex items-center justify-between py-4 px-6 rounded-lg transition-all duration-300 ease-out"
         :class="{
           'border-b border-gray-100': index !== items.length - 1,
-          'hover:bg-gray-50 hover:scale-[1.01]': true
+          'hover:bg-gray-50 hover:scale-[1.01]': true,
         }"
         :style="{ transitionDelay: `${index * 50}ms` }"
       >
@@ -17,24 +17,29 @@
               :src="item.icon"
               alt="icon"
               class="w-10 h-10 object-contain transition-all duration-300 group-hover:scale-110"
-            >
-            <div class="absolute inset-0 bg-primary-500 opacity-0 rounded-full scale-50 transition-all duration-300 group-hover:opacity-10 group-hover:scale-100"></div>
+            />
+            <div
+              class="absolute inset-0 bg-primary-500 opacity-0 rounded-full scale-50 transition-all duration-300 group-hover:opacity-10 group-hover:scale-100"
+            ></div>
           </div>
-          <span class="text-gray-700 font-medium group-hover:text-primary-600 transition-colors duration-300">
+          <span
+            class="text-gray-700 font-medium group-hover:text-primary-600 transition-colors duration-300"
+          >
             {{ item.label }}
           </span>
         </div>
 
         <button
           class="p-2 rounded-full transition-all duration-300 hover:bg-primary-100 hover:shadow-sm relative overflow-hidden download-btn cursor-pointer"
-
         >
           <img
             :src="item.downloadIcon"
             alt="download"
             class="w-6 h-6 transition-transform duration-300 hover:scale-110"
-          >
-          <span class="absolute inset-0 bg-primary-500 opacity-0 rounded-full transition-all duration-300 download-ripple"></span>
+          />
+          <span
+            class="absolute inset-0 bg-primary-500 opacity-0 rounded-full transition-all duration-300 download-ripple"
+          ></span>
         </button>
       </li>
     </transition-group>
@@ -42,36 +47,32 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
-import image1 from '../../../assets/images/student/documents/image1.png';
-import image2 from '../../../assets/images/student/documents/image2.png';
-
-
+import { ref } from 'vue'
+import image1 from '../../../assets/images/student/documents/image1.png'
+import image2 from '../../../assets/images/student/documents/image2.png'
 
 const items = ref([
   {
-    label: "Admission Letter",
+    label: 'Admission Letter',
     icon: image1,
     downloadIcon: image2,
   },
   {
-    label: "Screening Fee Invoice",
+    label: 'Screening Fee Invoice',
     icon: image1,
     downloadIcon: image2,
   },
   {
-    label: "Screening Fee Receipt",
+    label: 'Screening Fee Receipt',
     icon: image1,
     downloadIcon: image2,
   },
   {
-    label: "Third Semester Registration Guideline",
+    label: 'Third Semester Registration Guideline',
     icon: image1,
     downloadIcon: image2,
   },
-]);
-
-
+])
 </script>
 
 <style scoped>

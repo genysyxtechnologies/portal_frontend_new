@@ -3,15 +3,23 @@
     class="flex flex-col p-6 sm:p-12 bg-white gap-8 rounded-xl justify-center shadow-2xl transform transition-all duration-700 hover:shadow-3xl hover:-translate-y-1 relative overflow-hidden"
   >
     <!-- Background floating elements -->
-    <div class="absolute -top-20 -left-20 w-40 h-40 rounded-full bg-blue-50 opacity-70 animate-float-1"></div>
-    <div class="absolute -bottom-10 -right-10 w-32 h-32 rounded-full bg-blue-100 opacity-50 animate-float-2"></div>
-    <div class="absolute top-1/4 right-1/4 w-16 h-16 rounded-full bg-blue-200 opacity-30 animate-float-3"></div>
+    <div
+      class="absolute -top-20 -left-20 w-40 h-40 rounded-full bg-blue-50 opacity-70 animate-float-1"
+    ></div>
+    <div
+      class="absolute -bottom-10 -right-10 w-32 h-32 rounded-full bg-blue-100 opacity-50 animate-float-2"
+    ></div>
+    <div
+      class="absolute top-1/4 right-1/4 w-16 h-16 rounded-full bg-blue-200 opacity-30 animate-float-3"
+    ></div>
 
     <Toa-st class="z-10" />
     <div class="p-4 sm:p-8 flex flex-col gap-12 z-10">
       <div class="flex flex-col items-center space-y-2">
         <h1 class="welcome animate-text-focus-in">Welcome back</h1>
-        <h3 class="sub-welcome animate-tracking-in-expand delay-100">Login to your account below</h3>
+        <h3 class="sub-welcome animate-tracking-in-expand delay-100">
+          Login to your account below
+        </h3>
       </div>
 
       <div class="flex flex-col gap-6 animate-fade-in-delayed">
@@ -25,7 +33,7 @@
                   class="w-full"
                   :class="{
                     'p-invalid': usernameError || invalidCredentials,
-                    'shake-animation': usernameError || invalidCredentials
+                    'shake-animation': usernameError || invalidCredentials,
                   }"
                   @input="resetErrors"
                 />
@@ -43,13 +51,13 @@
             <div class="relative w-full">
               <FloatLabel>
                 <InputText
-                :type="isPassword ? 'password' : 'text'"
+                  :type="isPassword ? 'password' : 'text'"
                   v-model="credentials.password"
                   id="password"
                   class="w-full"
                   :class="{
                     'p-invalid': passwordError || invalidCredentials,
-                    'shake-animation': passwordError || invalidCredentials
+                    'shake-animation': passwordError || invalidCredentials,
                   }"
                   @input="resetErrors"
                 />
@@ -109,8 +117,8 @@
       >
         <div class="animate-checkmark">
           <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
-            <circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none"/>
-            <path class="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+            <circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none" />
+            <path class="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
           </svg>
         </div>
         <h3 class="mt-4 text-xl font-semibold text-[#0D47A1] animate-fade-in">Login Successful!</h3>
@@ -128,7 +136,16 @@ import { anyContains } from '@/utils/permissions/roles.ts'
 import { useRouter } from 'vue-router'
 import FloatLabel from 'primevue/floatlabel'
 
-const { handleUserLogin, credentials, message, usernameError, passwordError, isLoading, isPassword, handlePasswordChange } = useAuth()
+const {
+  handleUserLogin,
+  credentials,
+  message,
+  usernameError,
+  passwordError,
+  isLoading,
+  isPassword,
+  handlePasswordChange,
+} = useAuth()
 const router = useRouter()
 
 const loginSuccess = ref(false)
@@ -237,11 +254,24 @@ const login = async () => {
   color: #ef4444;
 }
 
-
 @keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  10%, 30%, 50%, 70%, 90% { transform: translateX(-6px); }
-  20%, 40%, 60%, 80% { transform: translateX(6px); }
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
+    transform: translateX(-6px);
+  }
+  20%,
+  40%,
+  60%,
+  80% {
+    transform: translateX(6px);
+  }
 }
 
 .shake-animation {
@@ -249,21 +279,39 @@ const login = async () => {
 }
 
 @keyframes float-1 {
-  0% { transform: translate(0, 0) rotate(0deg); }
-  50% { transform: translate(20px, 20px) rotate(180deg); }
-  100% { transform: translate(0, 0) rotate(360deg); }
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  50% {
+    transform: translate(20px, 20px) rotate(180deg);
+  }
+  100% {
+    transform: translate(0, 0) rotate(360deg);
+  }
 }
 
 @keyframes float-2 {
-  0% { transform: translate(0, 0) rotate(0deg); }
-  50% { transform: translate(-15px, -15px) rotate(-180deg); }
-  100% { transform: translate(0, 0) rotate(-360deg); }
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  50% {
+    transform: translate(-15px, -15px) rotate(-180deg);
+  }
+  100% {
+    transform: translate(0, 0) rotate(-360deg);
+  }
 }
 
 @keyframes float-3 {
-  0% { transform: translate(0, 0) scale(1); }
-  50% { transform: translate(10px, -10px) scale(1.2); }
-  100% { transform: translate(0, 0) scale(1); }
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(10px, -10px) scale(1.2);
+  }
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
 }
 
 .animate-float-1 {
@@ -280,7 +328,7 @@ const login = async () => {
 
 /* Text animations */
 .animate-text-focus-in {
-  animation: text-focus-in 1s cubic-bezier(0.550, 0.085, 0.680, 0.530) both;
+  animation: text-focus-in 1s cubic-bezier(0.55, 0.085, 0.68, 0.53) both;
 }
 
 @keyframes text-focus-in {
@@ -297,7 +345,7 @@ const login = async () => {
 }
 
 .animate-tracking-in-expand {
-  animation: tracking-in-expand 0.7s cubic-bezier(0.215, 0.610, 0.355, 1.000) both;
+  animation: tracking-in-expand 0.7s cubic-bezier(0.215, 0.61, 0.355, 1) both;
 }
 
 @keyframes tracking-in-expand {
@@ -315,7 +363,7 @@ const login = async () => {
 }
 
 .animate-fade-in-delayed {
-  animation: fade-in 1.2s cubic-bezier(0.390, 0.575, 0.565, 1.000) both;
+  animation: fade-in 1.2s cubic-bezier(0.39, 0.575, 0.565, 1) both;
   animation-delay: 0.3s;
 }
 
@@ -341,7 +389,7 @@ const login = async () => {
   stroke-dashoffset: 166;
   stroke-width: 2;
   stroke-miterlimit: 10;
-  stroke: #0D47A1;
+  stroke: #0d47a1;
   fill: none;
   animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
 }
@@ -352,7 +400,7 @@ const login = async () => {
   stroke-dashoffset: 48;
   stroke-width: 3;
   stroke-miterlimit: 10;
-  stroke: #0D47A1;
+  stroke: #0d47a1;
   animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards;
 }
 
@@ -367,7 +415,8 @@ const login = async () => {
 }
 
 @keyframes scale {
-  0%, 100% {
+  0%,
+  100% {
     transform: none;
   }
   50% {

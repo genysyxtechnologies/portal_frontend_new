@@ -14,7 +14,11 @@
           <div v-if="!collapsed" class="p-menu-category-label">{{ item.label }}</div>
           <ul class="p-menu-list">
             <li v-for="(menuItem, idx) in item.items" :key="idx" class="p-menu-item">
-              <router-link :to="menuItem.to" class="p-menu-link" :class="{ active: isActive(menuItem.to) }">
+              <router-link
+                :to="menuItem.to"
+                class="p-menu-link"
+                :class="{ active: isActive(menuItem.to) }"
+              >
                 <i class="p-menu-icon" :class="menuItem.icon"></i>
                 <span v-if="!collapsed" class="p-menu-text">{{ menuItem.label }}</span>
               </router-link>
@@ -27,22 +31,22 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
-import { useRoute } from 'vue-router';
-import AppLogo from "@/components/shared/AppLogo.vue";
+import { computed } from 'vue'
+import { useRoute } from 'vue-router'
+import AppLogo from '@/components/shared/AppLogo.vue'
 // import AppLogo from '@/components/common/Logo.vue';
 
 defineProps<{
-  collapsed: boolean;
-}>();
+  collapsed: boolean
+}>()
 
-defineEmits(['toggle-sidebar']);
+defineEmits(['toggle-sidebar'])
 
-const route = useRoute();
+const route = useRoute()
 
 const isActive = (path: string) => {
-  return route.path.startsWith(path);
-};
+  return route.path.startsWith(path)
+}
 
 const menuItems = computed(() => [
   {
@@ -50,7 +54,7 @@ const menuItems = computed(() => [
     items: [
       { label: 'Dashboard', icon: 'pi pi-home', to: '/staff/dashboard' },
       { label: 'Calendar', icon: 'pi pi-calendar', to: '/staff/calendar' },
-    ]
+    ],
   },
   {
     label: 'Academic',
@@ -58,32 +62,32 @@ const menuItems = computed(() => [
       { label: 'My Courses', icon: 'pi pi-book', to: '/staff/courses' },
       { label: 'Assignments', icon: 'pi pi-file', to: '/staff/assignments' },
       { label: 'Grading', icon: 'pi pi-check-square', to: '/staff/grading' },
-      { label: 'Attendance', icon: 'pi pi-list', to: '/staff/attendance' }
-    ]
+      { label: 'Attendance', icon: 'pi pi-list', to: '/staff/attendance' },
+    ],
   },
   {
     label: 'Students',
     items: [
       { label: 'Student List', icon: 'pi pi-users', to: '/staff/students' },
       { label: 'Academic Records', icon: 'pi pi-chart-line', to: '/staff/academic-records' },
-      { label: 'Advisees', icon: 'pi pi-user-plus', to: '/staff/advisees' }
-    ]
+      { label: 'Advisees', icon: 'pi pi-user-plus', to: '/staff/advisees' },
+    ],
   },
   {
     label: 'Communication',
     items: [
       { label: 'Announcements', icon: 'pi pi-bell', to: '/staff/announcements' },
       { label: 'Messages', icon: 'pi pi-envelope', to: '/staff/messages' },
-    ]
+    ],
   },
   {
     label: 'Personal',
     items: [
       { label: 'Profile', icon: 'pi pi-user', to: '/staff/profile' },
       { label: 'Settings', icon: 'pi pi-cog', to: '/staff/settings' },
-    ]
-  }
-]);
+    ],
+  },
+])
 </script>
 
 <style scoped>

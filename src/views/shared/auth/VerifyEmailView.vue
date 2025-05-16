@@ -10,10 +10,10 @@
       <div v-else-if="verified" class="success-state">
         <i class="pi pi-check-circle"></i>
         <h1>Email Verified!</h1>
-        <p class="subtitle">Your email has been successfully verified. You can now access all features of the portal.</p>
-        <router-link to="/" class="btn-primary">
-          Sign In
-        </router-link>
+        <p class="subtitle">
+          Your email has been successfully verified. You can now access all features of the portal.
+        </p>
+        <router-link to="/" class="btn-primary"> Sign In </router-link>
       </div>
 
       <div v-else-if="verificationError" class="error-state">
@@ -22,9 +22,7 @@
         <p class="subtitle">{{ verificationError }}</p>
 
         <div class="action-buttons">
-          <router-link to="/auth/register" class="btn-secondary">
-            Register Again
-          </router-link>
+          <router-link to="/auth/register" class="btn-secondary"> Register Again </router-link>
           <button @click="resendVerification" class="btn-primary" :disabled="resendLoading">
             <span v-if="!resendLoading">Resend Verification</span>
             <i v-else class="pi pi-spin pi-spinner"></i>
@@ -45,10 +43,15 @@
       <div v-else class="awaiting-verification">
         <i class="pi pi-envelope"></i>
         <h1>Verify Your Email</h1>
-        <p class="subtitle">We've sent a verification link to your email address. Please click the link in the email to verify your account.</p>
-        
+        <p class="subtitle">
+          We've sent a verification link to your email address. Please click the link in the email
+          to verify your account.
+        </p>
+
         <div class="email-info">
-          <p class="prompt">Don't see the email? Check your spam folder or request a new verification email.</p>
+          <p class="prompt">
+            Don't see the email? Check your spam folder or request a new verification email.
+          </p>
           <button @click="resendVerification" class="btn-primary" :disabled="resendLoading">
             <span v-if="!resendLoading">Resend Verification Email</span>
             <i v-else class="pi pi-spin pi-spinner"></i>
@@ -70,87 +73,87 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import { useRoute } from 'vue-router';
+import { ref, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
 
-const route = useRoute();
-const token = ref(route.query.token as string);
+const route = useRoute()
+const token = ref(route.query.token as string)
 
-const loading = ref(true);
-const verified = ref(false);
-const verificationError = ref('');
-const resendLoading = ref(false);
-const resendSuccess = ref(false);
-const resendError = ref('');
+const loading = ref(true)
+const verified = ref(false)
+const verificationError = ref('')
+const resendLoading = ref(false)
+const resendSuccess = ref(false)
+const resendError = ref('')
 
 onMounted(() => {
   if (token.value) {
-    verifyEmail();
+    verifyEmail()
   } else {
     // If no token is provided, we are in the awaiting verification state
-    loading.value = false;
+    loading.value = false
   }
-});
+})
 
 const verifyEmail = async () => {
-  loading.value = true;
-  
+  loading.value = true
+
   try {
     // This would be an API call to verify the email token
     // const response = await authService.verifyEmail(token.value);
-    
+
     // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
+    await new Promise((resolve) => setTimeout(resolve, 1500))
+
     // For demo purposes, simulate success
-    verified.value = true;
+    verified.value = true
   } catch (error) {
     // Handle verification error
-    let errorMessage = 'Verification failed. The link may have expired or is invalid.';
+    let errorMessage = 'Verification failed. The link may have expired or is invalid.'
     if (error instanceof Error) {
-      errorMessage = error.message || errorMessage;
+      errorMessage = error.message || errorMessage
     }
-    verificationError.value = errorMessage;
+    verificationError.value = errorMessage
   } finally {
-    loading.value = false;
+    loading.value = false
   }
-};
+}
 
 const resendVerification = async () => {
-  resendLoading.value = true;
-  resendSuccess.value = false;
-  resendError.value = '';
-  
+  resendLoading.value = true
+  resendSuccess.value = false
+  resendError.value = ''
+
   try {
     // This would be an API call to resend verification email
     // const response = await authService.resendVerificationEmail(userEmail);
-    
+
     // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
+    await new Promise((resolve) => setTimeout(resolve, 1000))
+
     // For demo purposes, simulate success
-    resendSuccess.value = true;
-    
+    resendSuccess.value = true
+
     // Clear success message after a few seconds
     setTimeout(() => {
-      resendSuccess.value = false;
-    }, 5000);
+      resendSuccess.value = false
+    }, 5000)
   } catch (error) {
     // Handle resend error
-    let errorMessage = 'Failed to resend verification email. Please try again.';
+    let errorMessage = 'Failed to resend verification email. Please try again.'
     if (error instanceof Error) {
-      errorMessage = error.message || errorMessage;
+      errorMessage = error.message || errorMessage
     }
-    resendError.value = errorMessage;
-    
+    resendError.value = errorMessage
+
     // Clear error message after a few seconds
     setTimeout(() => {
-      resendError.value = '';
-    }, 5000);
+      resendError.value = ''
+    }, 5000)
   } finally {
-    resendLoading.value = false;
+    resendLoading.value = false
   }
-};
+}
 </script>
 
 <style scoped>
@@ -307,17 +310,17 @@ h2 {
   .card {
     padding: 1.5rem;
   }
-  
+
   .btn-primary,
   .btn-secondary {
     padding: 0.65rem 1.25rem;
   }
-  
+
   .action-buttons {
     flex-direction: column;
     gap: 0.75rem;
   }
-  
+
   .loading-state i,
   .success-state i,
   .error-state i,

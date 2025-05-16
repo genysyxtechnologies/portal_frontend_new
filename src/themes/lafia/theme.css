@@ -1,11 +1,13 @@
 :root {
   /* Lafia Brand Colors */
-  --primary-color: #0a3d62;  /* Lafia blue */
+  --primary-color: #0a3d62; /* Lafia blue */
+  --primary-color-rgb: 10, 61, 98; /* RGB values for primary color */
   --primary-dark-color: #08304c;
+  --primary-dark-color-rgb: 8, 48, 76; /* RGB values for primary dark */
   --primary-light-color: #4f7a94;
-
+  --primary-light-color-rgb: 79, 122, 148; /* RGB values for primary light */
   /* Secondary Colors */
-  --secondary-color: #e84118;  /* Lafia red/orange */
+  --secondary-color: #e84118; /* Lafia red/orange */
   --secondary-dark-color: #c23515;
   --secondary-light-color: #ed6e50;
 

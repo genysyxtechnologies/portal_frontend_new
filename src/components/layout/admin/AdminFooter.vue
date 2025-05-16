@@ -12,20 +12,20 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed } from 'vue'
 
-const currentYear = computed(() => new Date().getFullYear());
+const currentYear = computed(() => new Date().getFullYear())
 const schoolName = computed(() => {
-  const school = import.meta.env.VITE_SCHOOL || 'default';
-  
+  const school = import.meta.env.VITE_SCHOOL || 'default'
+
   const schools = {
     fpn: 'Federal Polytechnic Nasarawa',
     lafia: 'Federal University of Lafia',
-    default: 'School Portal'
-  };
-  
-  return schools[school as keyof typeof schools] || schools.default;
-});
+    default: 'School Portal',
+  }
+
+  return schools[school as keyof typeof schools] || schools.default
+})
 </script>
 
 <style scoped>
@@ -45,7 +45,8 @@ const schoolName = computed(() => {
   gap: 1rem;
 }
 
-.p-copyright, .p-version {
+.p-copyright,
+.p-version {
   margin: 0;
 }
 

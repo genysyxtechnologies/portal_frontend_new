@@ -9,7 +9,10 @@
           <i class="pi pi-exclamation-circle"></i>
           <div>
             <h3>Invalid or Expired Link</h3>
-            <p>This password reset link is invalid or has expired. Please request a new password reset link.</p>
+            <p>
+              This password reset link is invalid or has expired. Please request a new password
+              reset link.
+            </p>
             <router-link to="/auth/forgot-password" class="btn-request-new">
               Request New Link
             </router-link>
@@ -24,7 +27,7 @@
                 id="password"
                 v-model="formData.password"
                 :type="showPassword ? 'text' : 'password'"
-                :class="{'error-input': errors.password}"
+                :class="{ 'error-input': errors.password }"
                 required
               />
               <button type="button" class="toggle-password" @click="togglePassword">
@@ -32,7 +35,10 @@
               </button>
             </div>
             <small v-if="errors.password" class="error-message">{{ errors.password }}</small>
-            <small class="password-hint">Password must be at least 8 characters with a mix of letters, numbers, and symbols.</small>
+            <small class="password-hint"
+              >Password must be at least 8 characters with a mix of letters, numbers, and
+              symbols.</small
+            >
           </div>
 
           <div class="form-group">
@@ -42,14 +48,16 @@
                 id="confirmPassword"
                 v-model="formData.confirmPassword"
                 :type="showConfirmPassword ? 'text' : 'password'"
-                :class="{'error-input': errors.confirmPassword}"
+                :class="{ 'error-input': errors.confirmPassword }"
                 required
               />
               <button type="button" class="toggle-password" @click="toggleConfirmPassword">
                 <i :class="showConfirmPassword ? 'pi pi-eye-slash' : 'pi pi-eye'"></i>
               </button>
             </div>
-            <small v-if="errors.confirmPassword" class="error-message">{{ errors.confirmPassword }}</small>
+            <small v-if="errors.confirmPassword" class="error-message">{{
+              errors.confirmPassword
+            }}</small>
           </div>
 
           <button type="submit" class="btn-submit" :disabled="isSubmitting">
@@ -66,10 +74,11 @@
             <i class="pi pi-check-circle"></i>
             <div>
               <h3>Password Reset Successful</h3>
-              <p>Your password has been successfully reset. You can now log in with your new password.</p>
-              <router-link to="/" class="btn-login">
-                Go to Login
-              </router-link>
+              <p>
+                Your password has been successfully reset. You can now log in with your new
+                password.
+              </p>
+              <router-link to="/" class="btn-login"> Go to Login </router-link>
             </div>
           </div>
         </template>
@@ -83,38 +92,38 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue';
-import { useRoute } from 'vue-router';
+import { ref, reactive, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
 
-const route = useRoute();
-const token = ref(route.query.token as string);
-const isValid = ref(true);
-const apiError = ref('');
-const success = ref(false);
-const isSubmitting = ref(false);
-const showPassword = ref(false);
-const showConfirmPassword = ref(false);
+const route = useRoute()
+const token = ref(route.query.token as string)
+const isValid = ref(true)
+const apiError = ref('')
+const success = ref(false)
+const isSubmitting = ref(false)
+const showPassword = ref(false)
+const showConfirmPassword = ref(false)
 
 const formData = reactive({
   password: '',
-  confirmPassword: ''
-});
+  confirmPassword: '',
+})
 
 const errors = reactive({
   password: '',
-  confirmPassword: ''
-});
+  confirmPassword: '',
+})
 
 onMounted(() => {
   // Check if token exists in URL
   if (!token.value) {
-    isValid.value = false;
-    return;
+    isValid.value = false
+    return
   }
 
   // Validate token with API - this would be implemented in a real app
-  validateToken();
-});
+  validateToken()
+})
 
 const validateToken = async () => {
   try {
@@ -123,59 +132,59 @@ const validateToken = async () => {
 
     // For demo purposes, we'll simulate a valid token
     // In a real app, set isValid based on API response
-    isValid.value = true;
+    isValid.value = true
   } catch (error) {
-    isValid.value = false;
+    isValid.value = false
   }
-};
+}
 
 const togglePassword = () => {
-  showPassword.value = !showPassword.value;
-};
+  showPassword.value = !showPassword.value
+}
 
 const toggleConfirmPassword = () => {
-  showConfirmPassword.value = !showConfirmPassword.value;
-};
+  showConfirmPassword.value = !showConfirmPassword.value
+}
 
 const validateForm = () => {
-  let isValid = true;
+  let isValid = true
 
   // Reset errors
-  errors.password = '';
-  errors.confirmPassword = '';
+  errors.password = ''
+  errors.confirmPassword = ''
 
   // Validate password
-  const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
+  const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/
   if (!formData.password) {
-    errors.password = 'Password is required';
-    isValid = false;
+    errors.password = 'Password is required'
+    isValid = false
   } else if (!passwordRegex.test(formData.password)) {
-    errors.password = 'Password must be at least 8 characters with letters, numbers, and symbols';
-    isValid = false;
+    errors.password = 'Password must be at least 8 characters with letters, numbers, and symbols'
+    isValid = false
   }
 
   // Validate confirm password
   if (!formData.confirmPassword) {
-    errors.confirmPassword = 'Please confirm your password';
-    isValid = false;
+    errors.confirmPassword = 'Please confirm your password'
+    isValid = false
   } else if (formData.password !== formData.confirmPassword) {
-    errors.confirmPassword = 'Passwords do not match';
-    isValid = false;
+    errors.confirmPassword = 'Passwords do not match'
+    isValid = false
   }
 
-  return isValid;
-};
+  return isValid
+}
 
 const handleSubmit = async () => {
   // Reset API error
-  apiError.value = '';
+  apiError.value = ''
 
   // Validate form
   if (!validateForm()) {
-    return;
+    return
   }
 
-  isSubmitting.value = true;
+  isSubmitting.value = true
 
   try {
     // Here you would normally make an API call to reset the password
@@ -185,21 +194,21 @@ const handleSubmit = async () => {
     // });
 
     // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 1000))
 
     // Show success message
-    success.value = true;
+    success.value = true
   } catch (error) {
     // Handle API errors
     if (error instanceof Error) {
-      apiError.value = error.message || 'Failed to reset password. Please try again.';
+      apiError.value = error.message || 'Failed to reset password. Please try again.'
     } else {
-      apiError.value = 'An unexpected error occurred. Please try again.';
+      apiError.value = 'An unexpected error occurred. Please try again.'
     }
   } finally {
-    isSubmitting.value = false;
+    isSubmitting.value = false
   }
-};
+}
 </script>
 
 <style scoped>
@@ -249,8 +258,8 @@ label {
   color: #555;
 }
 
-input[type="password"],
-input[type="text"] {
+input[type='password'],
+input[type='text'] {
   padding: 0.75rem;
   border: 1px solid #ddd;
   border-radius: 6px;
@@ -258,8 +267,8 @@ input[type="text"] {
   transition: border-color 0.3s;
 }
 
-input[type="password"]:focus,
-input[type="text"]:focus {
+input[type='password']:focus,
+input[type='text']:focus {
   border-color: #4c9aff;
   outline: none;
   box-shadow: 0 0 0 3px rgba(76, 154, 255, 0.1);
@@ -408,8 +417,8 @@ input[type="text"]:focus {
     padding: 1.5rem;
   }
 
-  input[type="password"],
-  input[type="text"] {
+  input[type='password'],
+  input[type='text'] {
     padding: 0.65rem;
   }
 

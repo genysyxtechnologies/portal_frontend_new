@@ -104,7 +104,10 @@ export const useStudentCourses = createSharedComposable(() => {
     document: number,
   ) => {
     headTitle.value = document === 1 ? 'Downloading Course Form' : 'Downloading Exam Card'
-    subTitle.value = document === 1 ? 'Please wait while we download your course form' : 'Please wait while we download your exam card'
+    subTitle.value =
+      document === 1
+        ? 'Please wait while we download your course form'
+        : 'Please wait while we download your exam card'
     /**
      * handle download courseform (.pdf)
      * @param {number} student student id

@@ -1,11 +1,13 @@
 :root {
   /* FPN Brand Colors */
-  --primary-color: #005e54;  /* FPN green */
+  --primary-color: #005e54; /* FPN green */
+  --primary-color-rgb: 0, 94, 84; /* RGB values for primary color */
   --primary-dark-color: #004a42;
+  --primary-dark-color-rgb: 0, 74, 66; /* RGB values for primary dark */
   --primary-light-color: #4d8c85;
-
+  --primary-light-color-rgb: 77, 140, 133; /* RGB values for primary light */
   /* Secondary Colors */
-  --secondary-color: #bf9000;  /* FPN gold/yellow */
+  --secondary-color: #bf9000; /* FPN gold/yellow */
   --secondary-dark-color: #9c7600;
   --secondary-light-color: #d4ad4c;
 

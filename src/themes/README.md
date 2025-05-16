@@ -37,6 +37,7 @@ To add support for a new school:
 The theme is determined by the `VITE_SCHOOL` environment variable. If this variable is not set or its value doesn't match any of the configured themes, the system will fall back to the default theme.
 
 Example `.env` settings:
+
 ```
 VITE_SCHOOL=fpn    # Use FPN theme
 VITE_SCHOOL=lafia  # Use Lafia theme

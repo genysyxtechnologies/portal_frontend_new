@@ -15,12 +15,22 @@
         </span>
       </div>
       <div class="p-header-actions">
-        <Button icon="pi pi-bell" class="p-button-rounded p-button-text p-button-plain" badge="3" badgeClass="p-badge-danger" />
-        <Button icon="pi pi-envelope" class="p-button-rounded p-button-text p-button-plain" badge="5" badgeClass="p-badge-info" />
+        <Button
+          icon="pi pi-bell"
+          class="p-button-rounded p-button-text p-button-plain"
+          badge="3"
+          badgeClass="p-badge-danger"
+        />
+        <Button
+          icon="pi pi-envelope"
+          class="p-button-rounded p-button-text p-button-plain"
+          badge="5"
+          badgeClass="p-badge-info"
+        />
         <Menu ref="userMenu" :model="userMenuItems" :popup="true" />
         <Button @click="toggleUserMenu" class="p-button-text p-button-plain p-user-button">
           <div class="p-avatar-wrapper">
-<!--            <img src="@/assets/avatar-placeholder.svg" alt="User Avatar" class="p-avatar-image" />-->
+            <!--            <img src="@/assets/avatar-placeholder.svg" alt="User Avatar" class="p-avatar-image" />-->
           </div>
           <span class="p-user-name">Admin User</span>
           <i class="pi pi-angle-down"></i>
@@ -31,46 +41,48 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-import { useRoute } from 'vue-router';
-import Breadcrumb from 'primevue/breadcrumb';
-import InputText from 'primevue/inputtext';
-import Button from 'primevue/button';
-import Menu from 'primevue/menu';
+import { ref, computed } from 'vue'
+import { useRoute } from 'vue-router'
+import Breadcrumb from 'primevue/breadcrumb'
+import InputText from 'primevue/inputtext'
+import Button from 'primevue/button'
+import Menu from 'primevue/menu'
 
-defineEmits(['toggle-sidebar']);
+defineEmits(['toggle-sidebar'])
 
-const route = useRoute();
-const userMenu = ref();
+const route = useRoute()
+const userMenu = ref()
 
 const toggleUserMenu = (event: Event) => {
-  userMenu.value.toggle(event);
-};
+  userMenu.value.toggle(event)
+}
 
 const pageTitle = computed(() => {
-  const routeName = route.name;
+  const routeName = route.name
   if (typeof routeName === 'string') {
-    return routeName.replace(/([A-Z])/g, ' $1').trim();
+    return routeName.replace(/([A-Z])/g, ' $1').trim()
   }
-  return 'Dashboard';
-});
+  return 'Dashboard'
+})
 
 const breadcrumbItems = computed(() => {
-  const items = [{ label: 'Home', to: '/admin/dashboard' }];
+  const items = [{ label: 'Home', to: '/admin/dashboard' }]
 
   if (route.matched.length > 1) {
-    route.matched.slice(1).forEach(match => {
+    route.matched.slice(1).forEach((match) => {
       if (match.name) {
         items.push({
-          label: String(match.name).replace(/([A-Z])/g, ' $1').trim(),
-          to: match.path
-        });
+          label: String(match.name)
+            .replace(/([A-Z])/g, ' $1')
+            .trim(),
+          to: match.path,
+        })
       }
-    });
+    })
   }
 
-  return items;
-});
+  return items
+})
 
 const userMenuItems = [
   {
@@ -78,26 +90,26 @@ const userMenuItems = [
     icon: 'pi pi-user',
     command: () => {
       // Handle profile click
-    }
+    },
   },
   {
     label: 'Settings',
     icon: 'pi pi-cog',
     command: () => {
       // Handle settings click
-    }
+    },
   },
   {
-    separator: true
+    separator: true,
   },
   {
     label: 'Logout',
     icon: 'pi pi-sign-out',
     command: () => {
       // Handle logout
-    }
-  }
-];
+    },
+  },
+]
 </script>
 
 <style scoped>
