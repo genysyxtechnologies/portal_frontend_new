@@ -1,481 +1,98 @@
 <template>
-  <div class="academic-dashboard relative">
-    <SpinningAnimation v-if="loading" :loading="loading" :head-title="'Academic Performance'"
-      class="absolute inset-0" />
-    <div class="profile-card animate-fade-in">
-      <div class="profile-header">
-        <div class="profile-avatar">
-          <i class="pi pi-user text-4xl text-white"></i>
-        </div>
-        <div class="profile-info">
-          <h1 class="profile-name">{{ name }}</h1>
-          <p class="profile-id">{{ username }}</p>
-        </div>
-      </div>
-
-      <div class="profile-grid">
-        <div v-for="(item, index) in profileItems" :key="index" class="profile-item"
-          :style="{ 'transition-delay': `${index * 50}ms` }">
-          <div class="item-icon">
-            <i :class="item.icon"></i>
+  <Drawer v-model:visible="drawerVisible">
+    <div
+      class="sidebar bg-white h-[calc(100vh-32px)] fixed top-4 bottom-4 left-4 p-6 rounded-xl shadow-lg w-[280px] overflow-hidden transition-all duration-300">
+      <!-- Profile Section -->
+      <div class="profile-section animate-fade-in">
+        <div class="flex flex-col items-center text-center mb-6">
+          <div class="relative mb-4 group">
+            <img :src="profile" alt="Profile"
+              class="w-24 h-24 rounded-full object-cover border-4 border-[#0D47A1]/10 group-hover:border-[#0D47A1]/30 transition-all duration-300 ease-out" />
+            <span
+              class="absolute bottom-2 right-2 w-4 h-4 bg-green-500 rounded-full border-2 border-white animate-pulse"></span>
           </div>
-          <div>
-            <p class="item-label">{{ item.label }}</p>
-            <p class="item-value">{{ item.value }}</p>
-          </div>
+          <h1 class="font-bold text-xl text-gray-800 mb-1 transition-colors duration-200">
+            {{ username }}
+          </h1>
+          <h3 class="text-gray-500 text-sm mb-2 transition-colors duration-200">
+            {{ userID }}
+          </h3>
+          <h4 class="text-gray-400 text-xs flex items-center justify-center transition-colors duration-200">
+            <span>{{ currentDate }}</span>
+          </h4>
         </div>
       </div>
+
+      <Divider class="my-4 opacity-30 transition-all duration-500" style="height: 2px; background-color: #0d47a1" />
+
+      <!-- Navigation Menu -->
+      <ul class="menu-list space-y-1 overflow-y-auto max-h-[60vh] flex flex-col gap-2 pr-2">
+        <li v-for="(item, index) in items" :key="index" class="animate-slide-in" :style="`--delay: ${index * 0.05}s`">
+          <span @click="handleRoute(item.path)">
+            <div
+              class="menu-item flex items-center gap-3 p-3 rounded-lg transition-all duration-300 cursor-pointer hover:bg-[#0D47A1]/10 hover:text-[#0D47A1] hover:shadow-xs active:scale-[0.98]">
+              <img :src="item.icon" class="w-5 h-5 transition-all duration-300 group-hover:scale-110" />
+              <span class="font-medium text-sm transition-all duration-200">{{ item.title }}</span>
+              <span class="flex-1"></span>
+              <!--    <span v-if="isActive" class="w-2 h-2 bg-[#0D47A1] rounded-full animate-ping-slow"></span> -->
+            </div>
+          </span>
+        </li>
+      </ul>
     </div>
-
-    <div class="performance-section animate-fade-in" style="animation-delay: 100ms">
-      <div class="section-header">
-        <h2 class="section-title">
-          <i class="pi pi-table"></i> Academic Performance
-        </h2>
-        <div class="gpa-display">
-          <span class="gpa-label">Current GPA:</span>
-          <span class="gpa-value">{{ gpa }}</span>
-        </div>
-        <div class="gpa-display">
-          <span class="gpa-label">CGPA:</span>
-          <span class="gpa-value">{{ cgpa }}</span>
-        </div>
-      </div>
-
-
-      <div class="table-container">
-        <DataTable :value="results" class="p-datatable-striped academic-table" :paginator="true" :rows="10"
-          paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport"
-          currentPageReportTemplate="Showing {first} to {last} of {totalRecords} courses" responsiveLayout="scroll">
-          <Column field="course.courseCode" header="Course Code">
-            <template #body="{ data }">
-              <span class="course-code">{{ data.course.courseCode }}</span>
-            </template>
-          </Column>
-          <Column field="course.creditUnit" header="Unit">
-            <template #body="{ data }">
-              <span class="credit-badge">{{ data.course.creditUnit }}</span>
-            </template>
-          </Column>
-          <Column field="ca" header="CA">
-            <template #body="{ data }">
-              <span :class="['score', getScoreClass(data.ca)]">{{
-                formatScore(data.ca)
-                }}</span>
-              <span v-if="data.ca2" :class="['score', getScoreClass(data.ca2)]">{{
-                formatScore(data.ca2)
-                }}</span>
-            </template>
-          </Column>
-          <Column field="exam" header="Exam">
-            <template #body="{ data }">
-              <span :class="['score', getScoreClass(data.exam)]">{{
-                data.exam
-                }}</span>
-            </template>
-          </Column>
-          <Column field="total" header="Total">
-            <template #body="{ data }">
-              <span :class="['score', getScoreClass(data.total)]">{{
-                data.total
-                }}</span>
-            </template>
-          </Column>
-          <Column field="grade" header="Grade">
-            <template #body="{ data }">
-              <span :class="['grade-badge', getGradeClass(data.grade)]">{{
-                data.grade
-                }}</span>
-            </template>
-          </Column>
-          <Column header="Status">
-            <template #body="{ data }">
-              <span class="status-badge" :class="getStatusClass(data.total)">
-                {{ getStatusText(data.total) }}
-              </span>
-            </template>
-          </Column>
-        </DataTable>
-      </div>
-    </div>
-  </div>
+  </Drawer>
 </template>
 
 <script setup lang="ts">
-import { computed, ref, type PropType } from "vue";
-import DataTable from "primevue/datatable";
-import Column from "primevue/column";
-import type { StudentResult } from "@/types/student/result.information";
-import SpinningAnimation from "@/views/spinner/SpinningAnimation.vue";
+import { computed } from 'vue'
+import profile from '../../assets/images/student/profile.png'
+import { useStudentSideBar } from '@/services/student/useSidebar'
+import Divider from 'primevue/divider'
+import { useRouter } from 'vue-router'
 
+const $router = useRouter()
 
+const handleRoute = (path: string) => {
+  $router.push(path)
+  console.log('THIS IS THE PATH: ', $router.currentRoute)
+}
 
 const props = defineProps({
-  name: String,
-  username: String,
-  session: String,
-  currentDate: String,
-  department: Object,
-  level: String,
-  programme: String,
-  gpa: String,
-  cgpa: String,
-  loading: {
+  open: {
+    default: true,
     type: Boolean,
-    default: false,
   },
-
-  results: {
-    type: Array as PropType<StudentResult['results']>,
-    required: true,
+  username: {
+    type: String,
   },
-});
-
-
-const profileItems = computed(() => [
-  {
-    label: "Faculty",
-    value: props.department?.faculty.name,
-    icon: "pi pi-building",
+  userID: {
+    type: String,
   },
-  {
-    label: "Department",
-    value: props.department?.name,
-    icon: "pi pi-briefcase",
-  },
-  { label: "Programme", value: props.programme, icon: "pi pi-book" },
-  { label: "Level", value: props.level, icon: "pi pi-sort-numeric-up" },
-  {
-    label: "Academic Session",
-    value: props.session,
-    icon: "pi pi-calendar",
-  },
-  { label: "Date", value: props.currentDate, icon: "pi pi-clock" },
-]);
+})
 
-const formatScore = (score: null | number) => {
-  return score ? Number(score).toFixed(1) : '-';
-};
+const { items } = useStudentSideBar()
 
-const getScoreClass = (score: string | number) => {
-  const num = score === "-" ? 0 : Number(score);
-  if (num >= 70) return "score-excellent";
-  if (num >= 60) return "score-good";
-  if (num >= 50) return "score-average";
-  return "score-poor";
-};
+const currentDate = computed(() => {
+  const date = new Date()
+  return date.toLocaleDateString('en-US', {
+    weekday: 'short',
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  })
+})
 
-const getGradeClass = (grade: string) => {
-  if (grade === "A") return "grade-a";
-  if (grade === "B") return "grade-b";
-  if (grade === "C") return "grade-c";
-  return "grade-f";
-};
-
-const getStatusClass = (total: number) => {
-  if (total >= 70) return "status-passed";
-  if (total >= 50) return "status-passed";
-  return "status-failed";
-};
-
-const getStatusText = (total: number) => {
-  if (total >= 70) return "Excellent";
-  if (total >= 50) return "Passed";
-  return "Failed";
-};
+const drawerVisible = computed(() => {
+  return props.open
+})
 </script>
 
 <style scoped>
-/* Base Styles */
-.academic-dashboard {
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-  font-family: "Inter", system-ui, sans-serif;
-}
-
-/* Profile Card */
-.profile-card {
-  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
-  color: white;
-  border-radius: 1.25rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  overflow: hidden;
-  animation: fadeIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-}
-
-.profile-header {
-  display: flex;
-  align-items: center;
-  padding: 1.5rem;
-  gap: 1rem;
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.profile-avatar {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 4rem;
-  height: 4rem;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.2);
-}
-
-.profile-name {
-  font-size: 1.5rem;
-  font-weight: bold;
-}
-
-.profile-id {
-  color: #d1d5db;
-}
-
-.profile-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-
-  @media (min-width: 768px) {
-    grid-template-columns: repeat(3, 1fr);
-  }
-
-  gap: 0.125rem;
-  padding: 0.125rem;
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.profile-item {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 1rem;
-  background-color: rgba(255, 255, 255, 0.9);
-  color: #374151;
-  transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
-  opacity: 0;
-  transform: translateY(20px);
-  animation: fadeInUp 0.6s forwards;
-}
-
-.item-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
-  color: white;
-}
-
-.item-label {
-  font-size: 0.75rem;
-  color: #6b7280;
-}
-
-.item-value {
-  font-weight: 600;
-}
-
-/* Performance Section */
-.performance-section {
-  background-color: white;
-  border-radius: 1.25rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-}
-
-.section-header {
-  display: flex;
-  flex-direction: column;
-
-  @media (min-width: 768px) {
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  padding: 1.5rem;
-  border-bottom: 1px solid #f3f4f6;
-}
-
-.section-title {
-  font-size: 1.25rem;
-  font-weight: bold;
-  color: #374151;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.gpa-display {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
-
-  @media (min-width: 768px) {
-    margin-top: 0;
-  }
-}
-
-.gpa-label {
-  color: #6b7280;
-}
-
-.gpa-value {
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: #2563eb;
-}
-
-.table-container {
-  padding: 0.5rem;
-}
-
-/* Table Styles */
-:deep(.academic-table .p-datatable-header) {
-  background-color: transparent;
-  border: none;
-  color: #6b7280;
-  font-weight: 500;
-}
-
-:deep(.academic-table .p-datatable-thead > tr > th) {
-  background-color: #f9fafb;
-  color: #4b5563;
-  font-weight: 600;
-  border-bottom: 1px solid #e5e7eb;
-  text-transform: uppercase;
-  font-size: 0.75rem;
-  letter-spacing: 0.05rem;
-}
-
-:deep(.academic-table .p-datatable-tbody > tr) {
-  transition: all 0.2s ease;
-}
-
-:deep(.academic-table .p-datatable-tbody > tr:hover) {
-  background-color: #eff6ff;
-}
-
-:deep(.academic-table .p-datatable-tbody > tr > td) {
-  border-bottom: 1px solid #f3f4f6;
-  padding: 1rem;
-}
-
-.course-code {
-  font-family: "Monaco", monospace;
-  font-weight: bold;
-  color: #2563eb;
-}
-
-.credit-badge {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 2rem;
-  height: 2rem;
-  border-radius: 50%;
-  background-color: #e0f2fe;
-  color: #0369a1;
-  font-weight: bold;
-}
-
-.score {
-  font-weight: 600;
-}
-
-.score-excellent {
-  color: #16a34a;
-}
-
-.score-good {
-  color: #2563eb;
-}
-
-.score-average {
-  color: #d97706;
-}
-
-.score-poor {
-  color: #dc2626;
-}
-
-.grade-badge {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 2rem;
-  height: 2rem;
-  border-radius: 50%;
-  font-weight: bold;
-}
-
-.grade-a {
-  background-color: #d1fae5;
-  color: #065f46;
-}
-
-.grade-b {
-  background-color: #bfdbfe;
-  color: #1e40af;
-}
-
-.grade-c {
-  background-color: #fef08a;
-  color: #78350f;
-}
-
-.grade-f {
-  background-color: #fee2e2;
-  color: #991b1b;
-}
-
-.status-badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.25rem 0.75rem;
-  border-radius: 1rem;
-  font-size: 0.75rem;
-  font-weight: 500;
-}
-
-.status-passed {
-  background-color: #d1fae5;
-  color: #065f46;
-}
-
-.status-failed {
-  background-color: #fee2e2;
-  color: #991b1b;
-}
-
-/* Paginator Styles */
-:deep(.academic-table .p-paginator) {
-  background-color: transparent;
-  border-top: 1px solid #e5e7eb;
-  padding-top: 0.75rem;
-  padding-bottom: 0.75rem;
-  padding-left: 1.5rem;
-  padding-right: 1.5rem;
-}
-
-:deep(.academic-table .p-paginator .p-paginator-pages .p-paginator-page.p-highlight) {
-  background-color: #2563eb;
-  color: white;
-}
-
-:deep(.academic-table .p-paginator .p-paginator-pages .p-paginator-page:not(.p-highlight):hover) {
-  background-color: #eff6ff;
-  color: #2563eb;
-}
-
-/* Animations */
+/* Animation Keyframes */
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(-10px);
   }
 
   to {
@@ -484,212 +101,110 @@ const getStatusText = (total: number) => {
   }
 }
 
-@keyframes fadeInUp {
+@keyframes slideIn {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateX(-20px);
   }
 
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateX(0);
   }
 }
 
+@keyframes ping-slow {
+
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  50% {
+    transform: scale(1.5);
+    opacity: 0.5;
+  }
+}
+
+/* Animation Classes */
 .animate-fade-in {
   animation: fadeIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
+.animate-slide-in {
+  animation: slideIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) var(--delay) forwards;
+  opacity: 0;
+}
+
+.animate-ping-slow {
+  animation: ping-slow 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+/* Menu Item Hover Effects */
+.menu-item {
+  will-change: transform;
+  position: relative;
+  overflow: hidden;
+}
+
+.menu-item::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 3px;
+  background-color: #0d47a1;
+  transform: scaleY(0);
+  transform-origin: top;
+  transition: transform 0.3s ease-out;
+}
+
+.menu-item:hover::after {
+  transform: scaleY(1);
+}
+
+.menu-item:hover {
+  transform: translateX(4px);
+}
+
+/* Scrollbar Styling */
+.menu-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.menu-list::-webkit-scrollbar-track {
+  background: rgba(13, 71, 161, 0.05);
+  border-radius: 10px;
+}
+
+.menu-list::-webkit-scrollbar-thumb {
+  background: rgba(13, 71, 161, 0.2);
+  border-radius: 10px;
+}
+
+.menu-list::-webkit-scrollbar-thumb:hover {
+  background: rgba(13, 71, 161, 0.4);
+}
+
 /* Responsive Adjustments */
 @media (max-width: 768px) {
-  .profile-grid {
-    grid-template-columns: 1fr;
+  .sidebar {
+    width: 240px;
+    padding: 1.5rem;
+    transform: translateX(-100%);
+    z-index: 100;
   }
 
-  .profile-header {
-    flex-direction: column;
-    align-items: flex-start;
+  .sidebar.active {
+    transform: translateX(0);
   }
+}
 
-  .profile-avatar {
-    margin-bottom: 1rem;
-  }
-
-  :deep(.academic-table .p-datatable-thead) {
-    display: none;
-  }
-
-  :deep(.academic-table .p-datatable-tbody > tr > td) {
-    display: block;
-    padding-top: 0.75rem;
-    padding-bottom: 0.75rem;
-    text-align: right;
-  }
-
-  :deep(.academic-table .p-datatable-tbody > tr > td:before) {
-    content: attr(data-label);
-    float: left;
-    font-weight: 600;
-    color: #6b7280;
-  }
-
-  :deep(.academic-table .p-paginator) {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-  }
+.sidebar * {
+  transition-property: color, background-color, border-color, transform, opacity;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 200ms;
 }
 </style>
-
-
-
-
-
-
-
-
-
-
-<template>
-  <div class="flex flex-col gap-6">
-    <h1 class="head-title">Course Registration</h1>
-    <div
-      class="lg:col-span-7 bg-white rounded-xl shadow-sm overflow-hidden transition-all duration-300 hover:shadow-md">
-      <Ta-bs v-model:value="tabCount" class="h-full flex flex-col">
-        <TabList class="flex border-b border-gray-200">
-          <T-ab v-for="(tab, index) in tabs" :key="index" :value="index.toString()"
-            class="px-6 py-3 text-sm font-medium h-[5rem] relative transition-all duration-200" :class="{
-              'text-primary-500': tabCount === index.toString(),
-              'text-gray-500 hover:text-gray-700': tabCount !== index.toString(),
-            }">
-            {{ tab.label }}
-            <span v-if="tabCount === index.toString()"
-              class="absolute bottom-0 left-0 right-0 h-0.5 bg-primary-500 animate-underline"></span>
-          </T-ab>
-        </TabList>
-
-        <TabPanels class="flex-1 overflow-auto p-6">
-          <div name="fade-slide" mode="out-in">
-            <TabPanel v-for="(tab, index) in tabs" :key="index" :value="index.toString()" class="h-full">
-              <component :is="tab.component" :user="user" v-model:selectedSession="selectedSession"
-                v-model:selectedSemester="selectedSemester" :sessionOptions="sessions"
-                :academicSession="selectedSession?.name" :semesterOptions="semesters"
-                :registeredCourses="courses?.registeredCourses" :courseLoading="courseLoading"
-                @course-selected="handleRegistredCoursesCheckboxChange" @remove-selected="handleCourseRemovalCheckBox"
-                @register-selected="handleRegistration" :courseList="courses?.courseList!"
-                :currentDateAndTime="currentDateAndTime" :documents="documents"
-                v-model:selectedDocument="selectedDocument" @on-download="handleDownload" :headTitle="headTitle"
-                :subTitle="subTitle" :loading="courseLoading" />
-            </TabPanel>
-          </div>
-        </TabPanels>
-      </Ta-bs>
-    </div>
-  </div>
-</template>
-
-<script setup lang="ts">
-import { onMounted, ref, watch } from 'vue'
-import CourseRegistration from './CourseRegistration.vue'
-import CourseRegistrationForm from './CourseRegistrationForm.vue'
-import { useStudentCourses } from '@/services/student/useStudentCourses'
-import { useStudentDashboard } from '@/services/student/useStudentDashboard'
-import { getCurrentDateAndTime } from '@/utils/dateFormater'
-const currentDateAndTime = getCurrentDateAndTime()
-const {
-  fetchAllCoursesForStudent,
-  registerStudentCourse,
-  removeStudentCourse,
-  courses,
-  selectedSession,
-  selectedSemester,
-  loading: courseLoading,
-  documents,
-  selectedDocument,
-  tabCount,
-  downloadStudentCourseForm,
-  headTitle,
-  subTitle,
-} = useStudentCourses()
-const { user, getStudentInformation, getSessions, sessions } = useStudentDashboard()
-const semesters = ref([])
-
-// handle course selection
-const handleRegistredCoursesCheckboxChange = async (course: any) => {
-  await registerStudentCourse(
-    user.value?.username!,
-    course.id,
-    selectedSession.value!.id,
-    selectedSemester.value!.id,
-  )
-  console.log('Selected course:', course)
-}
-
-const handleCourseRemovalCheckBox = async (course: any) => {
-  await removeStudentCourse(
-    user.value?.username!,
-    course.id,
-    selectedSession.value!.id,
-    selectedSemester.value!.id,
-  )
-  console.log('Removed course:', course)
-}
-
-const handleDownload = async (document: number) => {
-  await downloadStudentCourseForm(
-    user.value?.id!,
-    selectedSession.value!.id,
-    selectedSemester.value!.id,
-    document,
-  )
-}
-
-// handle registration
-const handleRegistration = (courses: any) => {
-  console.log('Registering courses:', courses)
-}
-
-// load the sessions and semesters
-onMounted(async () => {
-  await getStudentInformation()
-  await getSessions()
-})
-
-
-// watch for session changes and update semester
-watch(
-  () => selectedSession.value,
-  (value) => {
-    if (selectedSemester.value) {
-      selectedSemester.value = null
-    }
-    semesters.value = value.currentSemesters
-  },
-)
-
-
-// watch for session and semester changes before uploading courses
-watch(
-  () => [selectedSession.value, selectedSemester.value],
-  async ([session, semester]) => {
-    if (session && semester && user.value) {
-      await fetchAllCoursesForStudent(user.value.username, session.id, semester.id)
-    }
-  },
-)
-
-const tabs = [
-  { label: 'Registration', component: CourseRegistration },
-  { label: 'Forms', component: CourseRegistrationForm },
-]
-
-
-// watch for selected documents (COURSE FORM, EXAM CARD)
-watch(
-  () => selectedDocument.value,
-  (value) => {
-    console.log('Selected document:', value)
-  },
-)
-
-</script>

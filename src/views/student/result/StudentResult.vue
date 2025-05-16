@@ -33,7 +33,7 @@
         <!-- Bio Data -->
 
         <div class="col-span-7 bg-[#fff] w-full rounded-xl flex justify-center">
-          <StudentResultTable :name="user?.name" :username="user?.username" :session="selectedSession?.name"
+          <StudentResultTable ref="resultTableRef" :name="user?.name" :username="user?.username" :session="selectedSession?.name"
             :current-date="currentDate" :department="user?.programme?.department" :level="studentResult?.level.title"
             :programme="user?.programme.name" :results="studentResult?.results" :loading="loading"
             :gpa="studentResult?.data.current.gpa" :cgpa="studentResult?.data.current.cgpa" />
@@ -55,8 +55,18 @@ import ReUsableButtons from '@/views/buttons/ReUsableButtons.vue'
 
 const currentDate = getCurrentDateAndTime()
 
+// Define a type for the StudentResultTable component with printTable method
+type StudentResultTableType = {
+  printTable: () => void
+}
+
+const resultTableRef = ref<StudentResultTableType | null>(null)
+
 const printResult = () => {
-  window.print()
+  // Call the printTable method from the StudentResultTable component
+  if (resultTableRef.value) {
+    resultTableRef.value.printTable()
+  }
 }
 
 const { user, getStudentInformation, getSessions, sessions } = useStudentDashboard()
