@@ -33,7 +33,7 @@
           :style="`--delay: ${index * 0.05}s`">
           <span @click="handleRoute(item.path)">
             <div
-              class="menu-item flex items-center gap-3 p-3 rounded-lg transition-all duration-300 cursor-pointer hover:bg-gradient-to-r hover:from-[#0D47A1]/5 hover:to-[#0D47A1]/15 hover:text-[#0D47A1] hover:shadow-md active:scale-[0.98]">
+              :class="['menu-item flex items-center gap-3 p-3 rounded-lg transition-all duration-300 cursor-pointer hover:bg-gradient-to-r hover:from-[#0D47A1]/5 hover:to-[#0D47A1]/15 hover:text-[#0D47A1] hover:shadow-md active:scale-[0.98]', $router.currentRoute.value.path === item.path ? 'active' : '']">
               <div class="menu-icon-wrapper">
                 <img :src="item.icon" class="menu-icon w-5 h-5 transition-all duration-300" />
               </div>
@@ -339,4 +339,29 @@ const drawerVisible = computed(() => {
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 200ms;
 }
+.menu-item.active {
+  border-left: 4px solid #0D47A1;
+  background: linear-gradient(90deg, rgba(13,71,161,0.10) 0%, rgba(13,71,161,0.04) 100%);
+  color: #0D47A1;
+  box-shadow: 0 8px 24px rgba(13,71,161,0.10);
+  transform: scale(1.03) translateX(2px);
+  font-weight: 600;
+  /* Add a subtle glow effect */
+  box-shadow: 0 0 0 2px rgba(13,71,161,0.08), 0 8px 24px rgba(13,71,161,0.10);
+}
+
+.menu-item.active .menu-icon-wrapper {
+  background-color: rgba(13,71,161,0.10);
+  transform: scale(1.12) rotate(-3deg);
+}
+
+.menu-item.active .menu-text {
+  color: #0D47A1;
+}
+
+.menu-item.active .menu-indicator {
+  background-color: #0D47A1;
+  box-shadow: 0 0 8px 2px rgba(13,71,161,0.15);
+}
+
 </style>
