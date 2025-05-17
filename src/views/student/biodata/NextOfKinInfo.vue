@@ -1,5 +1,5 @@
 <template>
-  <div class="container mx-auto p-8 bg-white rounded-lg shadow-md relative min-h-[500px]">
+  <div class="container mx-auto p-8 bg-white rounded-lg shadow-md relative h-full">
     <SpinningAnimation :loading="loading" />
 
     <transition name="fade">

@@ -82,6 +82,7 @@
               :label="'Login'"
               @on-click="login"
               :loading="isLoading"
+              :disabled="isLoading"
               class="hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300"
             />
             <span

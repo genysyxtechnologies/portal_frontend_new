@@ -4,11 +4,7 @@
     <div class="profile-image-container">
       <div class="profile-image-wrapper">
         <div class="profile-image-overlay"></div>
-        <img
-          :src="profile"
-          alt="profile"
-          class="profile-image"
-        />
+        <img :src="profile" alt="profile" class="profile-image" />
         <div class="profile-image-glow"></div>
       </div>
     </div>
@@ -21,6 +17,7 @@
         <div class="input-wrapper">
           <i class="pi pi-envelope input-icon"></i>
           <InputText
+            readonly="true"
             class="custom-input"
             :placeholder="firstInput || 'your.email@example.com'"
           />
@@ -34,6 +31,7 @@
         <div class="input-wrapper">
           <i class="pi pi-id-card input-icon"></i>
           <InputText
+            readonly="true"
             class="custom-input"
             :placeholder="secondInput || 'NSUK/2023/001'"
           />
@@ -47,6 +45,7 @@
         <div class="input-wrapper">
           <i class="pi pi-building input-icon"></i>
           <InputText
+            readonly="true"
             class="custom-input"
             :placeholder="thirdInput || 'Computer Science'"
           />
@@ -58,8 +57,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
-import InputText from "primevue/inputtext";
+import { ref } from 'vue'
+import InputText from 'primevue/inputtext'
 
 defineProps({
   firstInput: String,
@@ -68,11 +67,11 @@ defineProps({
   firstLabel: String,
   secondLabel: String,
   thirdLabel: String,
-});
+})
 
 const profile = ref(
-  "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8dXNlciUyMHByb2ZpbGV8ZW58MHx8MHx8fDA%3D&w=1000&q=80"
-);
+  'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8dXNlciUyMHByb2ZpbGV8ZW58MHx8MHx8fDA%3D&w=1000&q=80',
+)
 </script>
 
 <style scoped>
@@ -189,7 +188,7 @@ const profile = ref(
 }
 
 .input-label {
-  color: #90CAF9;
+  color: #90caf9;
   font-size: 0.85rem;
   font-weight: 600;
   letter-spacing: 0.5px;
@@ -208,7 +207,7 @@ const profile = ref(
   right: 0.75rem;
   top: 50%;
   transform: translateY(-50%);
-  color: #90CAF9;
+  color: #90caf9;
   transition: all 0.3s ease;
   z-index: 2;
 }
@@ -237,7 +236,7 @@ const profile = ref(
   left: 0;
   width: 0;
   height: 2px;
-  background: linear-gradient(90deg, #1976d2, #90CAF9);
+  background: linear-gradient(90deg, #1976d2, #90caf9);
   transition: width 0.3s ease;
 }
 
@@ -263,7 +262,8 @@ const profile = ref(
 }
 
 @keyframes float {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0);
   }
   50% {
@@ -298,12 +298,12 @@ const profile = ref(
   .user-information-card {
     padding: 2rem 1.5rem;
   }
-  
+
   .profile-image-wrapper {
     width: 7rem;
     height: 7rem;
   }
-  
+
   .custom-input {
     padding: 0.75rem 2.5rem 0.75rem 1rem;
   }

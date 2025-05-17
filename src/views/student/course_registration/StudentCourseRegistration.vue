@@ -48,8 +48,7 @@
           </T-ab>
         </TabList>
         <transition name="fade-slide" mode="out-in">
-        <TabPanels class="tab-panels">
-
+          <TabPanels class="tab-panels">
             <TabPanel
               v-for="(tab, index) in tabs"
               :key="index"
@@ -79,9 +78,8 @@
                 :loading="courseLoading"
               />
             </TabPanel>
-
-        </TabPanels>
-      </transition>
+          </TabPanels>
+        </transition>
       </Ta-bs>
     </div>
   </div>
@@ -155,7 +153,6 @@ onMounted(async () => {
   await getSessions()
 })
 
-
 // watch for session changes and update semester
 watch(
   () => selectedSession.value,
@@ -166,7 +163,6 @@ watch(
     semesters.value = value.currentSemesters
   },
 )
-
 
 // watch for session and semester changes before uploading courses
 watch(
@@ -185,12 +181,12 @@ const tabs = [
 
 // Computed properties for status indicators
 const hasActiveSession = computed(() => {
-  return selectedSession.value && selectedSemester.value;
-});
+  return selectedSession.value && selectedSemester.value
+})
 
 const hasRegisteredCourses = computed(() => {
-  return courses.value?.registeredCourses && courses.value.registeredCourses.length > 0;
-});
+  return courses.value?.registeredCourses && courses.value.registeredCourses.length > 0
+})
 
 // watch for selected documents (COURSE FORM, EXAM CARD)
 watch(
@@ -199,7 +195,6 @@ watch(
     console.log('Selected document:', value)
   },
 )
-
 </script>
 
 <style scoped>

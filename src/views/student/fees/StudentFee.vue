@@ -69,9 +69,10 @@
         </div>
         <div class="flex flex-col">
           <span class="text-2xl font-bold text-gray-800">
-            {{ formatCurrency(calculatePaidAmount()) }}
+            <!-- format the amount -->
+            {{ formatCurrency(fee?.feePayment?.amountPaid) || 0 }}
           </span>
-          <span class="text-sm text-gray-500">{{ calculatePaymentPercentage() }}% completed</span>
+          <span class="text-sm text-gray-500">{{ calculatePercentage(fee?.feePayment?.amountPaid, fee?.feePayment?.invoiceAmount) || 0 }}% completed</span>
         </div>
       </div>
 
@@ -106,9 +107,9 @@
       <div class="flex flex-col gap-2">
         <div class="flex justify-between items-center">
           <h3 class="text-gray-700 font-medium">Payment Progress</h3>
-          <span class="text-sm font-medium text-blue-600">{{ calculatePaymentPercentage() }}%</span>
+          <span class="text-sm font-medium text-blue-600">{{ calculatePercentage(fee?.feePayment?.amountPaid, fee?.feePayment?.invoiceAmount) || 0 }}%</span>
         </div>
-        <ProgressBar :value="Math.floor(fee?.feePayment?.amountPaid / fee?.feePayment?.invoiceAmount * 100)" :showValue="true" :pt="{
+        <ProgressBar :value="calculatePercentage(fee?.feePayment?.amountPaid, fee?.feePayment?.invoiceAmount)" :showValue="true" :pt="{
           root: { class: 'h-3 rounded-full overflow-hidden' },
           value: { class: 'bg-gradient-to-r from-[#0D47A1] to-[#90CAF9]' }
         }" />
@@ -303,7 +304,7 @@ function calculateOutstandingBalance() {
 function calculatePaymentPercentage() {
   const total = calculateTotalFees()
   if (total === 0) return 0
-  return Math.round((calculatePaidAmount() / total) * 100)
+  return Math.floor((calculatePaidAmount() / total) * 100)
 }
 
 function getFormattedDueDate() {
@@ -315,7 +316,13 @@ function getFormattedDueDate() {
   })
 }
 
+function calculatePercentage(amount: number, total: number) {
+  if (total === 0) return 0
+  return Math.floor((amount / total) * 100)
+}
+
 function formatCurrency(amount: number) {
+  if (!amount || amount === 0) return "₦" + 0
   return new Intl.NumberFormat('en-NG', {
     style: 'currency',
     currency: 'NGN',

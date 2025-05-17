@@ -1,210 +1,298 @@
 <template>
-  <Drawer v-model:visible="drawerVisible">
-    <div
-      class="sidebar bg-white h-[calc(100vh-32px)] fixed top-4 bottom-4 left-4 p-6 rounded-xl shadow-lg w-[280px] overflow-hidden transition-all duration-300">
-      <!-- Profile Section -->
-      <div class="profile-section animate-fade-in">
-        <div class="flex flex-col items-center text-center mb-6">
-          <div class="relative mb-4 group">
-            <img :src="profile" alt="Profile"
-              class="w-24 h-24 rounded-full object-cover border-4 border-[#0D47A1]/10 group-hover:border-[#0D47A1]/30 transition-all duration-300 ease-out" />
-            <span
-              class="absolute bottom-2 right-2 w-4 h-4 bg-green-500 rounded-full border-2 border-white animate-pulse"></span>
-          </div>
-          <h1 class="font-bold text-xl text-gray-800 mb-1 transition-colors duration-200">
-            {{ username }}
-          </h1>
-          <h3 class="text-gray-500 text-sm mb-2 transition-colors duration-200">
-            {{ userID }}
-          </h3>
-          <h4 class="text-gray-400 text-xs flex items-center justify-center transition-colors duration-200">
-            <span>{{ currentDate }}</span>
-          </h4>
+  <div class="flex flex-col gap-6">
+    <div class="flex items-center justify-between">
+      <h1 class="head-title text-2xl font-bold text-gray-800">Bio Data</h1>
+      <div class="flex items-center gap-4">
+        <ReUsableButtons
+          :disabled="loading || bioDataLoading || !user?.username"
+          :label="'Download'"
+          class="hover:scale-105 transition-transform"
+          @on-click="downloadStudentBiodata(user?.username!)"
+        />
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 min-h-[calc(100vh-180px)] gap-6">
+      <!-- User Information Card -->
+      <div
+        class="lg:col-span-5 bg-white rounded-xl shadow-sm transition-all duration-300 hover:shadow-md"
+      >
+        <div class="p-6 h-full">
+          <UserInformation
+            :first-label="'Name'"
+            :second-label="'Matric Number'"
+            :third-label="'Phone Number'"
+            :third-input="user?.phone"
+            :first-input="user?.name"
+            :second-input="user?.username"
+          />
         </div>
       </div>
 
-      <Divider class="my-4 opacity-30 transition-all duration-500" style="height: 2px; background-color: #0d47a1" />
+      <!-- Tabbed Bio Data Section -->
+      <div
+        class="lg:col-span-7 bg-white rounded-xl shadow-sm overflow-hidden transition-all duration-300 hover:shadow-md relative"
+      >
+        <SpinningAnimation
+          :loading="loading || bioDataLoading"
+          :head-title="headTitle"
+          :sub-title="subTitle"
+          style="
+            z-index: 9999;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            height: 100%;
+          "
+        />
+        <Ta-bs v-model:value="tabCount" class="h-full flex flex-col">
+          <TabList class="flex border-b border-gray-200">
+            <T-ab
+              v-for="(tab, index) in tabs"
+              :key="index"
+              :value="index.toString()"
+              class="px-6 py-3 text-sm font-medium h-[5rem] relative transition-all duration-200"
+              :class="{
+                'text-primary-500': tabCount === index.toString(),
+                'text-gray-500 hover:text-gray-700': tabCount !== index.toString(),
+              }"
+            >
+              {{ tab.label }}
+              <span
+                v-if="tabCount === index.toString()"
+                class="absolute bottom-0 left-0 right-0 h-0.5 bg-primary-500 animate-underline"
+              ></span>
+            </T-ab>
+          </TabList>
 
-      <!-- Navigation Menu -->
-      <ul class="menu-list space-y-1 overflow-y-auto max-h-[60vh] flex flex-col gap-2 pr-2">
-        <li v-for="(item, index) in items" :key="index" class="animate-slide-in" :style="`--delay: ${index * 0.05}s`">
-          <span @click="handleRoute(item.path)">
-            <div
-              class="menu-item flex items-center gap-3 p-3 rounded-lg transition-all duration-300 cursor-pointer hover:bg-[#0D47A1]/10 hover:text-[#0D47A1] hover:shadow-xs active:scale-[0.98]">
-              <img :src="item.icon" class="w-5 h-5 transition-all duration-300 group-hover:scale-110" />
-              <span class="font-medium text-sm transition-all duration-200">{{ item.title }}</span>
-              <span class="flex-1"></span>
-              <!--    <span v-if="isActive" class="w-2 h-2 bg-[#0D47A1] rounded-full animate-ping-slow"></span> -->
-            </div>
-          </span>
-        </li>
-      </ul>
+          <TabPanels class="flex-1 overflow-auto p-6">
+            <transition-group name="fade-slide" mode="out-in">
+              <TabPanel
+                v-for="(tab, index) in tabs"
+                :key="index"
+                :value="index.toString()"
+                class="h-full"
+              >
+                <component :is="tab.component" :user="user!" :loading="loading" />
+              </TabPanel>
+            </transition-group>
+          </TabPanels>
+        </Ta-bs>
+      </div>
     </div>
-  </Drawer>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
-import profile from '../../assets/images/student/profile.png'
-import { useStudentSideBar } from '@/services/student/useSidebar'
-import Divider from 'primevue/divider'
-import { useRouter } from 'vue-router'
+import UserInformation from '../dashboard/UserInformation.vue'
+import BioInfo from './BioInfo.vue'
+import HealthInfo from './HealthInfo.vue'
+import ReUsableButtons from '@/views/buttons/ReUsableButtons.vue'
+import NextOfKinInfo from './NextOfKinInfo.vue'
+/* import SponsorInformation from './SponsorInformation.vue'; */
+import { useStudentBioData } from '@/services/student/useStudentBioData'
+import { onMounted, watch } from 'vue'
+import { useStudentDashboard } from '@/services/student/useStudentDashboard'
+import SpinningAnimation from '@/views/spinner/SpinningAnimation.vue'
 
-const $router = useRouter()
+const {
+  tabCount,
+  downloadStudentBiodata,
+  headTitle,
+  subTitle,
+  loading: bioDataLoading,
+} = useStudentBioData()
+const { user, getStudentInformation, loading } = useStudentDashboard()
 
-const handleRoute = (path: string) => {
-  $router.push(path)
-  console.log('THIS IS THE PATH: ', $router.currentRoute)
-}
-
-const props = defineProps({
-  open: {
-    default: true,
-    type: Boolean,
-  },
-  username: {
-    type: String,
-  },
-  userID: {
-    type: String,
-  },
+onMounted(async () => {
+  await getStudentInformation()
 })
 
-const { items } = useStudentSideBar()
+const tabs = [
+  { label: 'Bio Info', component: BioInfo, user: user.value },
+  { label: 'Health Info', component: HealthInfo, user: user.value },
+  { label: 'Next Of Kin Info', component: NextOfKinInfo, user: user.value },
+  /*   { label: 'Sponsorship Info', component: SponsorInformation, user: user.value, loading: loading } */
+]
 
-const currentDate = computed(() => {
-  const date = new Date()
-  return date.toLocaleDateString('en-US', {
-    weekday: 'short',
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-  })
-})
-
-const drawerVisible = computed(() => {
-  return props.open
-})
+watch(
+  () => tabCount.value,
+  (value) => {
+    console.log(value)
+  },
+  { immediate: true },
+)
 </script>
 
 <style scoped>
-/* Animation Keyframes */
-@keyframes fadeIn {
+/* Animation for the tab underline */
+.animate-underline {
+  animation: underline-grow 0.3s ease-out;
+}
+
+@keyframes underline-grow {
   from {
-    opacity: 0;
-    transform: translateY(-10px);
+    transform: scaleX(0);
+    transform-origin: left;
   }
 
   to {
-    opacity: 1;
-    transform: translateY(0);
+    transform: scaleX(1);
   }
 }
 
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateX(-20px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
+/* Transition effects for tab content */
+.fade-slide-enter-active,
+.fade-slide-leave-active {
+  transition: all 0.3s ease;
 }
 
-@keyframes ping-slow {
-
-  0%,
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-
-  50% {
-    transform: scale(1.5);
-    opacity: 0.5;
-  }
-}
-
-/* Animation Classes */
-.animate-fade-in {
-  animation: fadeIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-}
-
-.animate-slide-in {
-  animation: slideIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) var(--delay) forwards;
+.fade-slide-enter-from {
   opacity: 0;
+  transform: translateX(20px);
 }
 
-.animate-ping-slow {
-  animation: ping-slow 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+.fade-slide-leave-to {
+  opacity: 0;
+  transform: translateX(-20px);
 }
 
-/* Menu Item Hover Effects */
-.menu-item {
-  will-change: transform;
+/* Tab styling */
+.tab {
+  position: relative;
+  cursor: pointer;
+  outline: none;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+  .grid-cols-12 {
+    grid-template-columns: 1fr;
+  }
+
+  .lg\:col-span-5,
+  .lg\:col-span-7 {
+    grid-column: span 1;
+  }
+}
+</style>
+
+
+
+
+
+<template>
+  <div>
+    <transition name="fade">
+      <div
+        v-if="loading"
+        class="absolute inset-0 bg-white bg-opacity-80 z-50 flex items-center justify-center rounded-lg"
+      >
+        <div class="loading-content text-center">
+          <div class="spinner"></div>
+          <p class="mt-4 text-lg font-medium text-gray-700">{{ headTitle }}</p>
+          <p class="text-sm text-gray-500">{{ subTitle }}</p>
+        </div>
+      </div>
+    </transition>
+
+    <!-- Skeleton loader -->
+    <transition name="fade">
+      <div v-if="loading" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div v-for="i in 12" :key="'skeleton-' + i" class="space-y-3">
+          <div class="h-5 bg-gray-200 rounded w-1/3 shimmer"></div>
+          <div class="h-12 bg-gray-100 rounded-md shimmer"></div>
+        </div>
+      </div>
+    </transition>
+  </div>
+</template>
+
+<script setup lang="ts">
+defineProps({
+  loading: {
+    type: Boolean,
+    default: false,
+  },
+  headTitle: {
+    type: String,
+    default: 'Loading your information...',
+  },
+
+  subTitle: {
+    type: String,
+    default: 'Please wait while we prepare your form',
+  },
+})
+</script>
+<style scoped>
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid rgba(59, 130, 246, 0.1);
+  border-radius: 50%;
+  border-top-color: #3b82f6;
+  animation: spin 1s linear infinite;
+  margin: 0 auto;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Shimmer effect for skeleton loader */
+.shimmer {
   position: relative;
   overflow: hidden;
 }
 
-.menu-item::after {
+.shimmer::after {
   content: '';
   position: absolute;
-  left: 0;
   top: 0;
-  height: 100%;
-  width: 3px;
-  background-color: #0d47a1;
-  transform: scaleY(0);
-  transform-origin: top;
-  transition: transform 0.3s ease-out;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+  animation: shimmer 1.5s infinite;
 }
 
-.menu-item:hover::after {
-  transform: scaleY(1);
-}
-
-.menu-item:hover {
-  transform: translateX(4px);
-}
-
-/* Scrollbar Styling */
-.menu-list::-webkit-scrollbar {
-  width: 4px;
-}
-
-.menu-list::-webkit-scrollbar-track {
-  background: rgba(13, 71, 161, 0.05);
-  border-radius: 10px;
-}
-
-.menu-list::-webkit-scrollbar-thumb {
-  background: rgba(13, 71, 161, 0.2);
-  border-radius: 10px;
-}
-
-.menu-list::-webkit-scrollbar-thumb:hover {
-  background: rgba(13, 71, 161, 0.4);
-}
-
-/* Responsive Adjustments */
-@media (max-width: 768px) {
-  .sidebar {
-    width: 240px;
-    padding: 1.5rem;
+@keyframes shimmer {
+  0% {
     transform: translateX(-100%);
-    z-index: 100;
   }
 
-  .sidebar.active {
-    transform: translateX(0);
+  100% {
+    transform: translateX(100%);
   }
 }
 
-.sidebar * {
-  transition-property: color, background-color, border-color, transform, opacity;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 200ms;
+/* Transition effects */
+.fade-enter-active,
+.fade-leave-active {
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+/* Loading content styling */
+.loading-content {
+  background: white;
+  padding: 2rem;
+  border-radius: 0.5rem;
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 </style>
+

@@ -14,7 +14,7 @@ class StudentCourseRepository extends StudentDashboardRepositories {
   }
 
   // download student course for registration
-  async downloadSstudentDocument(endpoint: string, fileName: string) {
+  async downloadstudentDocument(endpoint: string, fileName: string) {
     return apiClient.downloads(endpoint, fileName)
   }
 }

@@ -26,7 +26,7 @@ export const useStudentDocument = createSharedComposable(() => {
   // download student admission letter
   const downloadStudentAdmissionLetter = async (registrationNumber: string) => {
     try {
-      const response = await studentDocumentRepository.downloadSstudentDocument(
+      const response = await studentDocumentRepository.downloadstudentDocument(
         admission.getLetter + '?q=' + registrationNumber,
         'admission-letter',
       )
@@ -40,7 +40,7 @@ export const useStudentDocument = createSharedComposable(() => {
   // download student application summary
   const downloadStudentApplicationSummary = async (registrationNumber: string) => {
     try {
-      const response = await studentDocumentRepository.downloadSstudentDocument(
+      const response = await studentDocumentRepository.downloadstudentDocument(
         applicants.applicationSummary + '?applicant=' + registrationNumber,
         'application-summary',
       )
@@ -53,7 +53,7 @@ export const useStudentDocument = createSharedComposable(() => {
   // download student application fee invoice
   const downloadStudentFeeInvoice = async (registrationNumber: string) => {
     try {
-      const response = await studentDocumentRepository.downloadSstudentDocument(
+      const response = await studentDocumentRepository.downloadstudentDocument(
         applicants.screeningInvoice + '?applicant=' + registrationNumber,
         'screening-fee-invoice',
       )

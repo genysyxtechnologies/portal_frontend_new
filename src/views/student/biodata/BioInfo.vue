@@ -1,6 +1,6 @@
 <template>
-  <div class="container mx-auto p-8 bg-white rounded-lg shadow-md relative min-h-[500px]">
-    <SpinningAnimation :loading="loading" />
+  <div class="container mx-auto p-8 bg-white rounded-lg shadow-md relative h-full">
+ <!--    <SpinningAnimation :loading="loading" /> -->
 
     <transition name="fade">
       <div v-if="!loading" class="grid grid-cols-1 md:grid-cols-2 gap-6">

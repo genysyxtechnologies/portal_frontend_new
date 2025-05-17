@@ -9,6 +9,11 @@ class StudentDashboardRepositories {
       return Promise.reject(error)
     }
   }
+
+  // download student information
+  async downloadstudentDocument(endpoint: string, fileName: string) {
+    return apiClient.downloads(endpoint, fileName)
+  }
 }
 
 export default StudentDashboardRepositories

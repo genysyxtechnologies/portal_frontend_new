@@ -1,7 +1,7 @@
 <template>
   <But-ton
     :label="label"
-    class="login-btn transform hover:scale-[1.02] transition-transform duration-300"
+    class="login-btn transform hover:scale-[1.02] transition-transform duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
     @click="$emit('on-click')"
     :disabled="disabled"
   />
