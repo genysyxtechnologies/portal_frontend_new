@@ -7,22 +7,6 @@
       </div>
 
       <div class="selection-grid">
-        <div class="selection-item document-selection">
-          <label class="selection-label">
-            <i class="pi pi-file-pdf selection-icon"></i>
-            Document Type
-          </label>
-          <Sel-ect
-            :options="documents"
-            optionLabel="name"
-            :size="'large'"
-            placeholder="Select Document"
-            :modelValue="selectedDocument"
-            @update:modelValue="(value: string | null) => $emit('update:selectedDocument', value)"
-            class="custom-select"
-          />
-        </div>
-
         <div class="selection-item session-selection">
           <label class="selection-label">
             <i class="pi pi-calendar selection-icon"></i>
@@ -55,17 +39,25 @@
           />
         </div>
 
-        <div class="selection-item download-button-container">
+        <div class="selection-item document-buttons-container">
           <label class="selection-label">
-            <i class="pi pi-download selection-icon"></i>
-            Action
+            <i class="pi pi-file-pdf selection-icon"></i>
+            Document Type
           </label>
-          <ReUsableButtons
-            :label="'Download'"
-            class="download-button"
-            @on-click="emit('on-download', selectedDocument.value)"
-            :disabled="!selectedDocument || loading || !selectedSession || !selectedSemester"
-          />
+          <div class="document-buttons">
+            <ReUsableButtons
+              :label="'Course Form'"
+              class="document-button course-form-button"
+              @on-click="downloadCourseForm"
+              :disabled="loading || !selectedSession || !selectedSemester"
+            />
+            <ReUsableButtons
+              :label="'Exam Card'"
+              class="document-button exam-card-button"
+              @on-click="downloadExamCard"
+              :disabled="loading || !selectedSession || !selectedSemester"
+            />
+          </div>
         </div>
       </div>
     </div>
@@ -174,7 +166,7 @@
 
 <script setup lang="ts">
 import ReUsableButtons from '@/views/buttons/ReUsableButtons.vue'
-import { ref, watch, type PropType } from 'vue'
+import { computed, type PropType } from 'vue'
 
 import type { UserResponse } from '@/types/student/dashboard_information'
 import SpinningAnimation from '@/views/spinner/SpinningAnimation.vue'
@@ -273,24 +265,45 @@ const props = defineProps({
 const emit = defineEmits<{
   (e: 'update:selectedSession', value: string | null): void
   (e: 'update:selectedSemester', value: string | null): void
-  (e: 'update:selectedDocument', value: string | null): void
   (e: 'update:searchQuery', value: string): void
   (e: 'course-selected', course: Course): void
   (e: 'remove-selected', course: Course): void
   (e: 'register-selected', registeredCourses: Course[]): void
-  (e: 'on-download', value: string): void
+  (e: 'on-download', value: number): void
 }>()
 
-/* const documents = ref([
-  {
-    name: 'Course form',
-    value: 1
-  },
-  {
-    name: 'Exam card',
-    value: 2
+// Constants for document types
+const COURSE_FORM = 1
+const EXAM_CARD = 2
+
+// Download functions for the separate buttons
+const downloadCourseForm = () => {
+  emit('on-download', COURSE_FORM)
+}
+
+const downloadExamCard = () => {
+  emit('on-download', EXAM_CARD)
+}
+
+// Computed properties for placeholders and validation
+const sessionPlaceholder = computed(() => {
+  return props.sessionOptions && props.sessionOptions.length > 0 ? 'Select Session' : 'No Sessions Available'
+})
+
+const semesterPlaceholder = computed(() => {
+  return props.semesterOptions && props.semesterOptions.length > 0 ? 'Select Semester' : 'No Semesters Available'
+})
+
+const emptyStateMessage = computed(() => {
+  if (!props.selectedSession) {
+    return 'Please select an academic session to continue'
+  } else if (!props.selectedSemester) {
+    return 'Please select a semester to continue'
   }
-]) */
+  return 'No data available'
+})
+
+// No longer needed as we're using direct buttons instead of a dropdown
 </script>
 
 <style scoped>
@@ -358,10 +371,52 @@ const emit = defineEmits<{
   animation: fadeIn 0.5s ease-out forwards;
 }
 
-.document-selection { animation-delay: 0.1s; }
+.document-buttons-container { animation-delay: 0.1s; }
 .session-selection { animation-delay: 0.2s; }
 .semester-selection { animation-delay: 0.3s; }
-.download-button-container { animation-delay: 0.4s; }
+
+/* Document Buttons Container */
+.document-buttons {
+  display: flex;
+  gap: 1rem;
+  width: 100%;
+}
+
+/* Document Button Styling */
+.document-button {
+  flex: 1;
+  transition: all 0.3s ease;
+}
+
+:deep(.course-form-button) {
+  background-color: #0D47A1;
+  color: white;
+}
+
+:deep(.exam-card-button) {
+  background-color: #1976D2;
+  color: white;
+}
+
+:deep(.course-form-button:hover) {
+  background-color: #0A3882;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+:deep(.exam-card-button:hover) {
+  background-color: #1565C0;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+:deep(.document-button:disabled) {
+  background-color: #90CAF9;
+  color: #E1F5FE;
+  transform: none;
+  box-shadow: none;
+  cursor: not-allowed;
+}
 
 .selection-label {
   display: flex;

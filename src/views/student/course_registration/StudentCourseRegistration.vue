@@ -71,7 +71,6 @@
                 :courseList="courses?.courseList!"
                 :currentDateAndTime="currentDateAndTime"
                 :documents="documents"
-                v-model:selectedDocument="selectedDocument"
                 @on-download="handleDownload"
                 :headTitle="headTitle"
                 :subTitle="subTitle"
@@ -103,7 +102,6 @@ const {
   selectedSemester,
   loading: courseLoading,
   documents,
-  selectedDocument,
   tabCount,
   downloadStudentCourseForm,
   headTitle,
