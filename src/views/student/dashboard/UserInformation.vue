@@ -16,11 +16,7 @@
         <label class="input-label">{{ firstLabel }}</label>
         <div class="input-wrapper">
           <i class="pi pi-envelope input-icon"></i>
-          <InputText
-            readonly="true"
-            class="custom-input"
-            :placeholder="firstInput || 'your.email@example.com'"
-          />
+          <InputText readonly="true" class="custom-input" :placeholder="firstInput || 'Not Provided'" />
           <span class="input-focus-line"></span>
         </div>
       </div>
@@ -30,11 +26,7 @@
         <label class="input-label">{{ secondLabel }}</label>
         <div class="input-wrapper">
           <i class="pi pi-id-card input-icon"></i>
-          <InputText
-            readonly="true"
-            class="custom-input"
-            :placeholder="secondInput || 'NSUK/2023/001'"
-          />
+          <InputText readonly="true" class="custom-input" :placeholder="secondInput || 'Not Provided'" />
           <span class="input-focus-line"></span>
         </div>
       </div>
@@ -44,11 +36,7 @@
         <label class="input-label">{{ thirdLabel }}</label>
         <div class="input-wrapper">
           <i class="pi pi-building input-icon"></i>
-          <InputText
-            readonly="true"
-            class="custom-input"
-            :placeholder="thirdInput || 'Computer Science'"
-          />
+          <InputText readonly="true" class="custom-input" :placeholder="thirdInput || 'Not Provided'" />
           <span class="input-focus-line"></span>
         </div>
       </div>
@@ -240,7 +228,7 @@ const profile = ref(
   transition: width 0.3s ease;
 }
 
-.custom-input:focus ~ .input-focus-line {
+.custom-input:focus~.input-focus-line {
   width: 100%;
 }
 
@@ -255,6 +243,7 @@ const profile = ref(
     opacity: 0;
     transform: translateY(20px);
   }
+
   100% {
     opacity: 1;
     transform: translateY(0);
@@ -262,10 +251,12 @@ const profile = ref(
 }
 
 @keyframes float {
+
   0%,
   100% {
     transform: translateY(0);
   }
+
   50% {
     transform: translateY(-10px);
   }
@@ -276,6 +267,7 @@ const profile = ref(
     opacity: 0;
     transform: translateY(15px);
   }
+
   100% {
     opacity: 1;
     transform: translateY(0);
@@ -287,6 +279,7 @@ const profile = ref(
     opacity: 0.5;
     transform: scale(0.95);
   }
+
   100% {
     opacity: 0.8;
     transform: scale(1.05);
@@ -312,6 +305,7 @@ const profile = ref(
 
 <style>
 @keyframes float {
+
   0%,
   100% {
     transform: translateY(0);

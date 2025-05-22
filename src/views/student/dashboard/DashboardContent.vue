@@ -18,37 +18,15 @@
           </div>
         </div>
 
-        <div class="flex flex-col md:flex-row items-center gap-4">
-          <div class="w-full md:w-auto">
-            <Sel-ect
-              :size="'large'"
-              v-model="selectedSession"
-              :options="sessions"
-              optionLabel="name"
-              placeholder="Select Session"
-              class="w-full md:w-[180px]"
-              :pt="{
-                root: { class: 'bg-white/90 backdrop-blur-sm border-none rounded-lg shadow-sm' },
-                input: { class: 'font-medium text-gray-700' },
-              }"
-              disabled
-            />
+        <div class="flex items-center gap-4">
+          <div class="bg-white/15 backdrop-blur-lg py-2 px-4 rounded-lg flex items-center gap-2 transition-all duration-300 hover:bg-white/20">
+            <i class="pi pi-calendar text-white text-sm"></i>
+            <span class="text-white font-medium">{{ currentSession || 'Current Session' }}</span>
           </div>
-
-          <div class="w-full md:w-auto">
-            <Sel-ect
-              :size="'large'"
-              v-model="selectedSemester"
-              :options="semesters"
-              optionLabel="title"
-              placeholder="Select Semester"
-              class="w-full md:w-[180px]"
-              :pt="{
-                root: { class: 'bg-white/90 backdrop-blur-sm border-none rounded-lg shadow-sm' },
-                input: { class: 'font-medium text-gray-700' },
-              }"
-              disabled
-            />
+          
+          <div class="bg-white/15 backdrop-blur-lg py-2 px-4 rounded-lg flex items-center gap-2 transition-all duration-300 hover:bg-white/20">
+            <i class="pi pi-clock text-white text-sm"></i>
+            <span class="text-white font-medium">{{ currentSemester || 'Current Semester' }}</span>
           </div>
         </div>
       </div>
@@ -386,7 +364,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useStudentDashboard } from '@/services/student/useStudentDashboard'
 import SpinningAnimation from '@/views/spinner/SpinningAnimation.vue'
 import profile from '../../../assets/images/student/profile.png'
@@ -398,11 +376,8 @@ import { useStudentCourses } from '@/services/student/useStudentCourses'
 const { user, getStudentInformation, getSessions, sessions, loading } = useStudentDashboard()
 const { fetchStudentResult, studentResult } = useStudentResult()
 const { fetchAllCoursesForStudent, courses } = useStudentCourses()
-const selectedSession = ref()
-const selectedSemester = ref()
 const currentSession = ref<string>('')
 const currentSemester = ref<string>('')
-const semesters = ref([])
 
 onMounted(async () => {
   await getStudentInformation()
@@ -429,14 +404,7 @@ onMounted(async () => {
   }
 })
 
-watch(
-  () => selectedSession.value,
-  (value) => {
-    if (value && value.semesters) {
-      semesters.value = value.semesters
-    }
-  },
-)
+// Watch function removed as we no longer use select filters
 
 </script>
 

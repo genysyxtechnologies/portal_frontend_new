@@ -1,5 +1,6 @@
 <template>
-  <div class="bg-[#fff] flex flex-col gap-6 w-full p-8 rounded-xl shadow-sm transition-all duration-300 hover:shadow-md">
+  <div
+    class="bg-[#fff] flex flex-col gap-6 w-full p-8 rounded-xl shadow-sm transition-all duration-300 hover:shadow-md">
     <div class="flex items-center justify-between">
       <h1 class="head-title" style="font-size: 25px">Contact Information</h1>
       <div class="flex items-center gap-2">
@@ -10,36 +11,24 @@
 
     <!-- Input Section -->
     <div class="flex flex-col gap-4 transition-all duration-300" :class="{ 'opacity-95': !editMode }">
-      <div class="flex flex-col gap-2 transition-all duration-300 transform" :class="{ 'translate-y-0': editMode, 'translate-y-1': !editMode }">
+      <div class="flex flex-col gap-2 transition-all duration-300 transform"
+        :class="{ 'translate-y-0': editMode, 'translate-y-1': !editMode }">
         <span class="labels">Phone Number</span>
-        <InputText
-          v-model="phoneValue"
-          :readonly="!editMode"
-          :placeholder="phone"
+        <InputText v-model="phoneValue" :readonly="!editMode" :placeholder="phone"
           :class="{ 'cursor-not-allowed bg-gray-50': !editMode, 'border-blue-400 shadow-sm': editMode }"
-          class="transition-all duration-300"
-          style="border: 1px solid #90caf9"
-        />
+          class="transition-all duration-300" style="border: 1px solid #90caf9" />
       </div>
-      <div class="flex flex-col gap-2 transition-all duration-300 transform" :class="{ 'translate-y-0': editMode, 'translate-y-1': !editMode }">
+      <div class="flex flex-col gap-2 transition-all duration-300 transform"
+        :class="{ 'translate-y-0': editMode, 'translate-y-1': !editMode }">
         <span class="labels">Email</span>
-        <InputText
-          v-model="emailValue"
-          :readonly="!editMode"
-          :placeholder="email"
+        <InputText v-model="emailValue" :readonly="!editMode" :placeholder="email"
           :class="{ 'cursor-not-allowed bg-gray-50': !editMode, 'border-blue-400 shadow-sm': editMode }"
-          class="transition-all duration-300"
-          style="border: 1px solid #90caf9"
-        />
+          class="transition-all duration-300" style="border: 1px solid #90caf9" />
       </div>
     </div>
-    <ReUsableButtons
-      :label="'Save Changes'"
-      class="w-1/2 float-end self-end transform transition-all duration-300"
+    <ReUsableButtons   :loading="isLoading" :label="'Save Changes'" class="w-1/2 float-end self-end transform transition-all duration-300"
       :class="{ 'opacity-100 hover:scale-[1.02]': editMode, 'opacity-50 cursor-not-allowed': !editMode }"
-      :disabled="!editMode"
-      @on-click="saveChanges"
-    />
+      :disabled="!editMode" @on-click="saveChanges"/>
   </div>
 </template>
 
@@ -55,6 +44,10 @@ const props = defineProps({
   email: {
     type: String,
     default: 'Not Provided',
+  },
+  isLoading: {
+    type: Boolean,
+    default: false,
   },
 })
 
@@ -103,9 +96,17 @@ const saveChanges = () => {
 
 /* Subtle pulse animation for save button when in edit mode */
 @keyframes pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.02); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.02);
+  }
+
+  100% {
+    transform: scale(1);
+  }
 }
 
 .edit-mode-active {

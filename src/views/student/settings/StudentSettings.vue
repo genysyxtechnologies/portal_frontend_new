@@ -24,6 +24,7 @@
           :email="user?.email"
           :phone="user?.phone"
           @update-contact="updateContactInfo"
+          :isLoading="isLoading"
         />
         <StudentPassword :userId="user?.userId!" />
       </div>
@@ -40,7 +41,7 @@ import { useStudentDashboard } from '@/services/student/useStudentDashboard'
 import { onMounted } from 'vue'
 
 const { user, getStudentInformation } = useStudentDashboard()
-const { updateProfile } = useStudentSettings()
+const { updateProfile, isLoading } = useStudentSettings()
 
 // Function to handle contact information updates
 const updateContactInfo = async (contactData: { phone: string; email: string}) => {
