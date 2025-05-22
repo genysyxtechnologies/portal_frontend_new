@@ -31,7 +31,7 @@
       <ul class="menu-list space-y-1 overflow-y-auto max-h-[60vh] flex flex-col gap-2 pr-2">
         <li v-for="(item, index) in items" :key="index" class="animate-slide-in menu-item-container"
           :style="`--delay: ${index * 0.05}s`">
-          <span @click="handleRoute(item.path)">
+          <span @click="item.hasChildren ? toggleDropdown(index) : handleRoute(item.path)">
             <div
               :class="['menu-item flex items-center gap-3 p-3 rounded-lg transition-all duration-300 cursor-pointer hover:bg-gradient-to-r hover:from-[#0D47A1]/5 hover:to-[#0D47A1]/15 hover:text-[#0D47A1] hover:shadow-md active:scale-[0.98]', $router.currentRoute.value.path === item.path ? 'active' : '']">
               <div class="menu-icon-wrapper">
@@ -39,9 +39,21 @@
               </div>
               <span class="font-medium text-sm transition-all duration-200 menu-text">{{ item.title }}</span>
               <span class="flex-1"></span>
+              <div v-if="item.hasChildren" class="dropdown-icon">
+                <i :class="['pi', openDropdowns[index] ? 'pi-chevron-down' : 'pi-chevron-right', 'text-xs transition-transform duration-300']"></i>
+              </div>
               <div class="menu-indicator"></div>
             </div>
           </span>
+          <!-- Dropdown submenu -->
+          <div v-if="item.hasChildren && openDropdowns[index]" class="submenu pl-8 mt-1 overflow-hidden transition-all duration-300" style="margin-top: 20px;">
+            <div v-for="(child, childIndex) in item.children" :key="childIndex"
+              @click="handleRoute(child.path)"
+              :class="['submenu-item flex items-center p-2 rounded-lg transition-all duration-200 cursor-pointer hover:bg-gradient-to-r hover:from-[#0D47A1]/5 hover:to-[#0D47A1]/10 hover:text-[#0D47A1]', $router.currentRoute.value.path === child.path ? 'text-[#0D47A1] bg-[#0D47A1]/5' : 'text-gray-600']"
+              :style="`--index: ${childIndex}`">
+              <span class="text-sm font-medium">{{ child.title }}</span>
+            </div>
+          </div>
         </li>
       </ul>
     </div>
@@ -49,7 +61,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import profile from '../../assets/images/student/profile.png'
 import { useStudentSideBar } from '@/services/student/useSidebar'
 import Divider from 'primevue/divider'
@@ -59,7 +71,6 @@ const $router = useRouter()
 
 const handleRoute = (path: string) => {
   $router.push(path)
-  console.log('THIS IS THE PATH: ', $router.currentRoute)
 }
 
 const props = defineProps({
@@ -76,6 +87,14 @@ const props = defineProps({
 })
 
 const { items } = useStudentSideBar()
+
+// Track which dropdowns are open
+const openDropdowns = ref<Record<number, boolean>>({})
+
+// Toggle dropdown state
+const toggleDropdown = (index: number) => {
+  openDropdowns.value[index] = !openDropdowns.value[index]
+}
 
 const currentDate = computed(() => {
   const date = new Date()
@@ -208,6 +227,48 @@ const drawerVisible = computed(() => {
 .date-badge:hover {
   background-color: rgba(13, 71, 161, 0.15);
   transform: translateY(-2px);
+}
+
+/* Menu Item Styles */
+.menu-item {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Dropdown Styles */
+.submenu {
+  max-height: 0;
+  opacity: 0;
+  animation: expandSubmenu 0.3s ease forwards;
+}
+
+@keyframes expandSubmenu {
+  from {
+    max-height: 0;
+    opacity: 0;
+  }
+  to {
+    max-height: 200px;
+    opacity: 1;
+  }
+}
+
+.submenu-item {
+  margin-bottom: 2px;
+  opacity: 0;
+  animation: fadeInSubmenu 0.3s ease forwards;
+  animation-delay: calc(var(--index) * 0.05s);
+}
+
+@keyframes fadeInSubmenu {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 /* Menu Item Hover Effects */

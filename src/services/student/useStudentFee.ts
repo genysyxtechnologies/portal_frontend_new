@@ -2,7 +2,6 @@ import StudentFeeRepository from '@/repositories/student/student.fee.repository'
 import constant from '@/stores/constant'
 import { createSharedComposable } from '@vueuse/core'
 import { onMounted, ref } from 'vue'
-import authService from '../api/authService'
 import type { Level, UserResponse } from '@/types/student/dashboard_information'
 import { type Session } from '@/types/student/sessions'
 import type { FeeItem, FeePayment } from '@/types/student/fee.information'
@@ -29,7 +28,6 @@ export const useStudentFee = createSharedComposable(() => {
       const response = await studentFeeRepository.getInformation(
         schoolFees.getFeeFor + '?user=' + student + '&session=' + session,
       )
-      console.log("THIS IS THE FEE RESPONSE: ", response.data)
       fee.value = response.data as {
         student: UserResponse['user']
         feeItems: FeeItem[]
@@ -37,8 +35,7 @@ export const useStudentFee = createSharedComposable(() => {
         feePayment: FeePayment
       }
     } catch (err) {
-      console.error(err)
-      error.value = err instanceof Error ? err.message : 'Unknown error'
+      return err
     } finally {
       loading.value = false
     }
@@ -62,8 +59,7 @@ export const useStudentFee = createSharedComposable(() => {
       )
       return response
     } catch (error) {
-      console.error(error)
-      throw error
+      return error
     }
   }
 

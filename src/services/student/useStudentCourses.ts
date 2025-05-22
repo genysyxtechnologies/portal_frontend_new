@@ -39,12 +39,10 @@ export const useStudentCourses = createSharedComposable(() => {
           '&semester=' +
           semester,
       )
-      console.log('THIS IS THE MAIN RESPONSE OF', student, session, semester, response)
       courses.value = response.data as CourseData
       return response.data
     } catch (error) {
-      console.error(error)
-      throw error
+      return error
     } finally {
       loading.value = false
     }

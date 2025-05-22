@@ -19,11 +19,9 @@ export const useStudentDashboard = createSharedComposable(() => {
     error.value = null
     try {
       const response = await authService.getCurrentUser()
-      console.log('THIS IS THE MAIN RESPONSE: ', response)
       user.value = response.data.user
     } catch (err) {
-      console.error(err)
-      error.value = err instanceof Error ? err.message : 'Unknown error'
+      return err
     } finally {
       loading.value = false
     }
@@ -41,8 +39,7 @@ export const useStudentDashboard = createSharedComposable(() => {
       sessions.value = response.data as Session[]
       return response.data as Session[]
     } catch (err) {
-      console.error(err)
-      error.value = err instanceof Error ? err.message : 'Unknown error'
+      return err
     } finally {
       loading.value = false
     }
@@ -55,11 +52,9 @@ export const useStudentDashboard = createSharedComposable(() => {
     const dashboard = new StudentDashboardRepositories()
     try {
       const response = await dashboard.getInformation(users.dashboard)
-      console.log('THIS IS THE USER DASHBOARD: ', response)
       return response.data
     } catch (err) {
-      console.error(err)
-      error.value = err instanceof Error ? err.message : 'Unknown error'
+      return err
     } finally {
       loading.value = false
     }
@@ -70,15 +65,13 @@ export const useStudentDashboard = createSharedComposable(() => {
     loading.value = true
     error.value = null
     const dashboard = new StudentDashboardRepositories()
-    console.log(user.value?.programme.programmeType.id)
     try {
       const response = await dashboard.getInformation(
         session.current + '/' + parseInt(user.value?.programme.programmeType.id || '0'),
       )
       sessions.value = response.data as Session[]
     } catch (err) {
-      console.error(err)
-      error.value = err instanceof Error ? err.message : 'Unknown error'
+      return err
     } finally {
       loading.value = false
     }

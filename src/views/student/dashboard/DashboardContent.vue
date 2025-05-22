@@ -438,14 +438,6 @@ watch(
   },
 )
 
-watch(
-  () => [selectedSession.value, selectedSemester.value],
-  ([session, semester]) => {
-    if (session && semester) {
-      console.log(session.id, semester.id)
-    }
-  },
-)
 </script>
 
 <style scoped></style>

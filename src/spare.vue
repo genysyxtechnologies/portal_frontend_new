@@ -1,298 +1,462 @@
 <template>
-  <div class="flex flex-col gap-6">
-    <div class="flex items-center justify-between">
-      <h1 class="head-title text-2xl font-bold text-gray-800">Bio Data</h1>
-      <div class="flex items-center gap-4">
-        <ReUsableButtons
-          :disabled="loading || bioDataLoading || !user?.username"
-          :label="'Download'"
-          class="hover:scale-105 transition-transform"
-          @on-click="downloadStudentBiodata(user?.username!)"
-        />
-      </div>
-    </div>
-
-    <div class="grid grid-cols-1 lg:grid-cols-12 min-h-[calc(100vh-180px)] gap-6">
-      <!-- User Information Card -->
-      <div
-        class="lg:col-span-5 bg-white rounded-xl shadow-sm transition-all duration-300 hover:shadow-md"
-      >
-        <div class="p-6 h-full">
-          <UserInformation
-            :first-label="'Name'"
-            :second-label="'Matric Number'"
-            :third-label="'Phone Number'"
-            :third-input="user?.phone"
-            :first-input="user?.name"
-            :second-input="user?.username"
-          />
+  <Drawer v-model:visible="drawerVisible">
+    <div
+      class="sidebar bg-white h-[calc(100vh-32px)] fixed top-4 bottom-4 left-4 p-6 rounded-xl shadow-lg w-[280px] overflow-hidden transition-all duration-300">
+      <!-- Profile Section -->
+      <div class="profile-section animate-fade-in">
+        <div class="flex flex-col items-center text-center mb-6">
+          <div class="relative mb-4 group profile-image-container">
+            <div class="profile-image-glow"></div>
+            <img :src="profile" alt="Profile"
+              class="w-24 h-24 rounded-full object-cover border-4 border-[#0D47A1]/10 group-hover:border-[#0D47A1]/30 transition-all duration-300 ease-out z-10 relative" />
+            <span
+              class="absolute bottom-2 right-2 w-4 h-4 bg-green-500 rounded-full border-2 border-white animate-pulse z-20"></span>
+          </div>
+          <h1
+            class="font-bold text-xl text-gray-800 mb-1 transition-colors duration-200 hover:text-[#0D47A1] cursor-default">
+            {{ username }}
+          </h1>
+          <h3 class="text-gray-500 text-sm mb-2 transition-colors duration-200 hover:text-[#0D47A1]/70 cursor-default">
+            {{ userID }}
+          </h3>
+          <h4 class="text-gray-400 text-xs flex items-center justify-center transition-colors duration-200 date-badge">
+            <span>{{ currentDate }}</span>
+          </h4>
         </div>
       </div>
 
-      <!-- Tabbed Bio Data Section -->
-      <div
-        class="lg:col-span-7 bg-white rounded-xl shadow-sm overflow-hidden transition-all duration-300 hover:shadow-md relative"
-      >
-        <SpinningAnimation
-          :loading="loading || bioDataLoading"
-          :head-title="headTitle"
-          :sub-title="subTitle"
-          style="
-            z-index: 9999;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 100%;
-            height: 100%;
-          "
-        />
-        <Ta-bs v-model:value="tabCount" class="h-full flex flex-col">
-          <TabList class="flex border-b border-gray-200">
-            <T-ab
-              v-for="(tab, index) in tabs"
-              :key="index"
-              :value="index.toString()"
-              class="px-6 py-3 text-sm font-medium h-[5rem] relative transition-all duration-200"
-              :class="{
-                'text-primary-500': tabCount === index.toString(),
-                'text-gray-500 hover:text-gray-700': tabCount !== index.toString(),
-              }"
-            >
-              {{ tab.label }}
-              <span
-                v-if="tabCount === index.toString()"
-                class="absolute bottom-0 left-0 right-0 h-0.5 bg-primary-500 animate-underline"
-              ></span>
-            </T-ab>
-          </TabList>
+      <Divider class="my-4 opacity-30 transition-all duration-500" style="height: 2px; background-color: #0d47a1" />
 
-          <TabPanels class="flex-1 overflow-auto p-6">
-            <transition-group name="fade-slide" mode="out-in">
-              <TabPanel
-                v-for="(tab, index) in tabs"
-                :key="index"
-                :value="index.toString()"
-                class="h-full"
-              >
-                <component :is="tab.component" :user="user!" :loading="loading" />
-              </TabPanel>
-            </transition-group>
-          </TabPanels>
-        </Ta-bs>
-      </div>
+      <!-- Navigation Menu -->
+      <ul class="menu-list space-y-1 overflow-y-auto max-h-[60vh] flex flex-col gap-2 pr-2">
+        <li v-for="(item, index) in items" :key="index" class="animate-slide-in menu-item-container"
+          :style="`--delay: ${index * 0.05}s`">
+          <span @click="handleRoute(item.path)">
+            <div
+              :class="['menu-item flex items-center gap-3 p-3 rounded-lg transition-all duration-300 cursor-pointer hover:bg-gradient-to-r hover:from-[#0D47A1]/5 hover:to-[#0D47A1]/15 hover:text-[#0D47A1] hover:shadow-md active:scale-[0.98]', $router.currentRoute.value.path === item.path ? 'active' : '']">
+              <div class="menu-icon-wrapper">
+                <img :src="item.icon" class="menu-icon w-5 h-5 transition-all duration-300" />
+              </div>
+              <span class="font-medium text-sm transition-all duration-200 menu-text">{{ item.title }}</span>
+              <span class="flex-1"></span>
+              <div class="menu-indicator"></div>
+            </div>
+          </span>
+        </li>
+      </ul>
     </div>
-  </div>
+  </Drawer>
 </template>
 
 <script setup lang="ts">
-import UserInformation from '../dashboard/UserInformation.vue'
-import BioInfo from './BioInfo.vue'
-import HealthInfo from './HealthInfo.vue'
-import ReUsableButtons from '@/views/buttons/ReUsableButtons.vue'
-import NextOfKinInfo from './NextOfKinInfo.vue'
-/* import SponsorInformation from './SponsorInformation.vue'; */
-import { useStudentBioData } from '@/services/student/useStudentBioData'
-import { onMounted, watch } from 'vue'
-import { useStudentDashboard } from '@/services/student/useStudentDashboard'
-import SpinningAnimation from '@/views/spinner/SpinningAnimation.vue'
+import { computed } from 'vue'
+import profile from '../../assets/images/student/profile.png'
+import { useStudentSideBar } from '@/services/student/useSidebar'
+import Divider from 'primevue/divider'
+import { useRouter } from 'vue-router'
 
-const {
-  tabCount,
-  downloadStudentBiodata,
-  headTitle,
-  subTitle,
-  loading: bioDataLoading,
-} = useStudentBioData()
-const { user, getStudentInformation, loading } = useStudentDashboard()
+const $router = useRouter()
 
-onMounted(async () => {
-  await getStudentInformation()
-})
-
-const tabs = [
-  { label: 'Bio Info', component: BioInfo, user: user.value },
-  { label: 'Health Info', component: HealthInfo, user: user.value },
-  { label: 'Next Of Kin Info', component: NextOfKinInfo, user: user.value },
-  /*   { label: 'Sponsorship Info', component: SponsorInformation, user: user.value, loading: loading } */
-]
-
-watch(
-  () => tabCount.value,
-  (value) => {
-    console.log(value)
-  },
-  { immediate: true },
-)
-</script>
-
-<style scoped>
-/* Animation for the tab underline */
-.animate-underline {
-  animation: underline-grow 0.3s ease-out;
+const handleRoute = (path: string) => {
+  $router.push(path)
+  console.log('THIS IS THE PATH: ', $router.currentRoute)
 }
 
-@keyframes underline-grow {
-  from {
-    transform: scaleX(0);
-    transform-origin: left;
-  }
-
-  to {
-    transform: scaleX(1);
-  }
-}
-
-/* Transition effects for tab content */
-.fade-slide-enter-active,
-.fade-slide-leave-active {
-  transition: all 0.3s ease;
-}
-
-.fade-slide-enter-from {
-  opacity: 0;
-  transform: translateX(20px);
-}
-
-.fade-slide-leave-to {
-  opacity: 0;
-  transform: translateX(-20px);
-}
-
-/* Tab styling */
-.tab {
-  position: relative;
-  cursor: pointer;
-  outline: none;
-}
-
-/* Responsive adjustments */
-@media (max-width: 1024px) {
-  .grid-cols-12 {
-    grid-template-columns: 1fr;
-  }
-
-  .lg\:col-span-5,
-  .lg\:col-span-7 {
-    grid-column: span 1;
-  }
-}
-</style>
-
-
-
-
-
-<template>
-  <div>
-    <transition name="fade">
-      <div
-        v-if="loading"
-        class="absolute inset-0 bg-white bg-opacity-80 z-50 flex items-center justify-center rounded-lg"
-      >
-        <div class="loading-content text-center">
-          <div class="spinner"></div>
-          <p class="mt-4 text-lg font-medium text-gray-700">{{ headTitle }}</p>
-          <p class="text-sm text-gray-500">{{ subTitle }}</p>
-        </div>
-      </div>
-    </transition>
-
-    <!-- Skeleton loader -->
-    <transition name="fade">
-      <div v-if="loading" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div v-for="i in 12" :key="'skeleton-' + i" class="space-y-3">
-          <div class="h-5 bg-gray-200 rounded w-1/3 shimmer"></div>
-          <div class="h-12 bg-gray-100 rounded-md shimmer"></div>
-        </div>
-      </div>
-    </transition>
-  </div>
-</template>
-
-<script setup lang="ts">
-defineProps({
-  loading: {
+const props = defineProps({
+  open: {
+    default: true,
     type: Boolean,
-    default: false,
   },
-  headTitle: {
+  username: {
     type: String,
-    default: 'Loading your information...',
   },
-
-  subTitle: {
+  userID: {
     type: String,
-    default: 'Please wait while we prepare your form',
   },
 })
-</script>
-<style scoped>
-.spinner {
-  width: 50px;
-  height: 50px;
-  border: 4px solid rgba(59, 130, 246, 0.1);
-  border-radius: 50%;
-  border-top-color: #3b82f6;
-  animation: spin 1s linear infinite;
-  margin: 0 auto;
-}
 
-@keyframes spin {
+const { items } = useStudentSideBar()
+
+const currentDate = computed(() => {
+  const date = new Date()
+  return date.toLocaleDateString('en-US', {
+    weekday: 'short',
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  })
+})
+
+const drawerVisible = computed(() => {
+  return props.open
+})
+</script>
+
+<style scoped>
+/* Animation Keyframes */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
   to {
-    transform: rotate(360deg);
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
-/* Shimmer effect for skeleton loader */
-.shimmer {
-  position: relative;
-  overflow: hidden;
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
-.shimmer::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
-  animation: shimmer 1.5s infinite;
+@keyframes glowPulse {
+  0% {
+    opacity: 0.4;
+    transform: scale(0.95);
+  }
+
+  50% {
+    opacity: 0.6;
+    transform: scale(1.05);
+  }
+
+  100% {
+    opacity: 0.4;
+    transform: scale(0.95);
+  }
 }
 
 @keyframes shimmer {
   0% {
-    transform: translateX(-100%);
+    background-position: -200% 0;
   }
 
   100% {
-    transform: translateX(100%);
+    background-position: 200% 0;
   }
 }
 
-/* Transition effects */
-.fade-enter-active,
-.fade-leave-active {
-  transition:
-    opacity 0.3s ease,
-    transform 0.3s ease;
+@keyframes ping-slow {
+
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  50% {
+    transform: scale(1.5);
+    opacity: 0.5;
+  }
 }
 
-.fade-enter-from,
-.fade-leave-to {
+/* Animation Classes */
+.animate-fade-in {
+  animation: fadeIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.animate-slide-in {
+  animation: slideIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) var(--delay) forwards;
   opacity: 0;
-  transform: translateY(10px);
 }
 
-/* Loading content styling */
-.loading-content {
-  background: white;
-  padding: 2rem;
-  border-radius: 0.5rem;
-  box-shadow:
-    0 4px 6px -1px rgba(0, 0, 0, 0.1),
-    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+.animate-ping-slow {
+  animation: ping-slow 2s cubic-bezier(0, 0, 0.2, 1) infinite;
 }
+
+/* Profile Section Styles */
+.profile-image-container {
+  position: relative;
+  display: inline-block;
+  transition: all 0.5s ease;
+}
+
+.profile-image-container:hover {
+  transform: scale(1.05);
+}
+
+.profile-image-glow {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(13, 71, 161, 0.3) 0%, rgba(13, 71, 161, 0) 70%);
+  filter: blur(10px);
+  z-index: 1;
+  animation: glowPulse 3s ease-in-out infinite;
+}
+
+.date-badge {
+  background: linear-gradient(90deg, rgba(13, 71, 161, 0.1), rgba(13, 71, 161, 0.2), rgba(13, 71, 161, 0.1));
+  background-size: 200% 100%;
+  animation: shimmer 3s infinite linear;
+  padding: 4px 8px;
+  border-radius: 12px;
+  margin-top: 4px;
+  transition: all 0.3s ease;
+}
+
+.date-badge:hover {
+  background-color: rgba(13, 71, 161, 0.15);
+  transform: translateY(-2px);
+}
+
+/* Menu Item Hover Effects */
+.menu-item {
+  will-change: transform;
+  position: relative;
+  overflow: hidden;
+  border-left: 3px solid transparent;
+  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.menu-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(90deg, rgba(13, 71, 161, 0.05) 0%, rgba(13, 71, 161, 0) 100%);
+  transform: translateX(-100%);
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  z-index: -1;
+}
+
+.menu-item:hover {
+  border-left: 3px solid #0d47a1;
+  transform: translateX(4px);
+  box-shadow: 0 4px 12px rgba(13, 71, 161, 0.1);
+}
+
+.menu-item:hover::before {
+  transform: translateX(0);
+}
+
+.menu-icon-wrapper {
+  position: relative;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+  background-color: transparent;
+}
+
+.menu-item:hover .menu-icon-wrapper {
+  background-color: rgba(13, 71, 161, 0.1);
+  transform: rotate(5deg) scale(1.1);
+}
+
+.menu-text {
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.menu-text::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background-color: #0d47a1;
+  transition: width 0.3s ease;
+}
+
+.menu-item:hover .menu-text::after {
+  width: 100%;
+}
+
+.menu-indicator {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: transparent;
+  transition: all 0.3s ease;
+  margin-right: 4px;
+}
+
+.menu-item:hover .menu-indicator {
+  background-color: #0d47a1;
+  animation: ping-slow 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+/* Scrollbar Styling */
+.menu-list::-webkit-scrollbar {
+  width: 4px;
+  transition: width 0.3s ease;
+}
+
+.menu-list:hover::-webkit-scrollbar {
+  width: 6px;
+}
+
+.menu-list::-webkit-scrollbar-track {
+  background: rgba(13, 71, 161, 0.05);
+  border-radius: 10px;
+  box-shadow: inset 0 0 4px rgba(13, 71, 161, 0.05);
+}
+
+.menu-list::-webkit-scrollbar-thumb {
+  background: linear-gradient(to bottom, rgba(13, 71, 161, 0.2), rgba(13, 71, 161, 0.3));
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+.menu-list::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(to bottom, rgba(13, 71, 161, 0.3), rgba(13, 71, 161, 0.5));
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 240px;
+    padding: 1.5rem;
+    transform: translateX(-100%);
+    z-index: 100;
+  }
+
+  .sidebar.active {
+    transform: translateX(0);
+  }
+}
+
+.sidebar * {
+  transition-property: color, background-color, border-color, transform, opacity;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 200ms;
+}
+.menu-item.active {
+  border-left: 4px solid #0D47A1;
+  background: linear-gradient(90deg, rgba(13,71,161,0.10) 0%, rgba(13,71,161,0.04) 100%);
+  color: #0D47A1;
+  box-shadow: 0 8px 24px rgba(13,71,161,0.10);
+  transform: scale(1.03) translateX(2px);
+  font-weight: 600;
+  /* Add a subtle glow effect */
+  box-shadow: 0 0 0 2px rgba(13,71,161,0.08), 0 8px 24px rgba(13,71,161,0.10);
+}
+
+.menu-item.active .menu-icon-wrapper {
+  background-color: rgba(13,71,161,0.10);
+  transform: scale(1.12) rotate(-3deg);
+}
+
+.menu-item.active .menu-text {
+  color: #0D47A1;
+}
+
+.menu-item.active .menu-indicator {
+  background-color: #0D47A1;
+  box-shadow: 0 0 8px 2px rgba(13,71,161,0.15);
+}
+
 </style>
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import { createSharedComposable } from '@vueuse/core'
+import { ref } from 'vue'
+import image2 from '../../assets/images/student/sidebar/image2.png'
+import image3 from '../../assets/images/student/sidebar/image3.png'
+import image4 from '../../assets/images/student/sidebar/image4.png'
+import image5 from '../../assets/images/student/sidebar/image5.png'
+import image6 from '../../assets/images/student/sidebar/image6.png'
+import image7 from '../../assets/images/student/sidebar/image7.png'
+import image8 from '../../assets/images/student/sidebar/image8.png'
+import image9 from '../../assets/images/student/sidebar/image9.png'
+import image10 from '../../assets/images/student/sidebar/image10.png'
+
+export const useStudentSideBar = createSharedComposable(() => {
+  const items = ref([
+    {
+      title: 'Dashboard',
+      icon: image4,
+      path: '/student',
+    },
+    {
+      title: 'Fees',
+      icon: image2,
+      path: '/student/fees',
+      hasChildren: true,
+      children: [
+        {
+          title: 'School Fee',
+          path: '/student/fees',
+        },
+        {
+          title: 'Stand Alone',
+          path: '/student/fees/stand-alone',
+        }
+      ]
+    },
+    {
+      title: 'Bio Data',
+      icon: image3,
+      path: '/student/bio-data',
+    },
+    {
+      title: 'Course Registration',
+      icon: image4,
+      path: '/student/course-registration',
+    },
+    {
+      title: 'My Results',
+      icon: image5,
+      path: '/student/my-results',
+    },
+    {
+      title: 'My Accomodation',
+      icon: image6,
+      path: '/student/my-accomodation',
+    },
+    {
+      title: 'Change Programme',
+      icon: image7,
+      path: '/student/change-programme',
+    },
+    {
+      title: 'My Document',
+      icon: image8,
+      path: 'my-documents',
+    },
+    {
+      title: 'Self Service',
+      icon: image9,
+      path: '',
+    },
+    {
+      title: 'Settings',
+      icon: image10,
+      path: '',
+    },
+  ])
+
+  return { items }
+})

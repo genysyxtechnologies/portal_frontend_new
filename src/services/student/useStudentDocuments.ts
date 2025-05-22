@@ -15,11 +15,9 @@ export const useStudentDocument = createSharedComposable(() => {
       const response = await studentDocumentRepository.getInformation(
         portalDocument.all + '?page=' + page + '&size=' + size,
       )
-      console.log('THIS IS THE RESPONSE OF', response)
       return response.data
     } catch (error) {
-      console.error(error)
-      return null
+      return error
     }
   }
 
@@ -32,8 +30,7 @@ export const useStudentDocument = createSharedComposable(() => {
       )
       return response
     } catch (error) {
-      console.error(error)
-      return null
+      return error
     }
   }
 
@@ -46,8 +43,7 @@ export const useStudentDocument = createSharedComposable(() => {
       )
       return response
     } catch (error) {
-      console.error(error)
-      return null
+      return error
     }
   }
   // download student application fee invoice
@@ -59,8 +55,7 @@ export const useStudentDocument = createSharedComposable(() => {
       )
       return response
     } catch (error) {
-      console.error(error)
-      return null
+      return error
     }
   }
 

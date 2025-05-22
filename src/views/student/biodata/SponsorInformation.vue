@@ -204,7 +204,6 @@ const toggleEdit = (field: keyof EditableFields) => {
 }
 
 const handleSave = () => {
-  console.log('Saving data:', formData.value)
   ;(Object.keys(editableFields.value) as Array<keyof EditableFields>).forEach((key) => {
     editableFields.value[key] = false
   })

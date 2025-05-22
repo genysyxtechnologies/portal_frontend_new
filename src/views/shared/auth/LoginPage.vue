@@ -189,7 +189,7 @@ const login = async () => {
       }, 1500)
     }
   } catch (error) {
-    console.error(error)
+    return error
   }
 }
 </script>

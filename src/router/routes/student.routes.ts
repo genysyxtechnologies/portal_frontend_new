@@ -1,5 +1,6 @@
 import StudentDashboard from '@/views/student/StudentDashboard.vue'
 import type { RouteRecordRaw } from 'vue-router'
+
 const studentRoutes: RouteRecordRaw[] = [
   {
     path: '/student',
@@ -23,7 +24,25 @@ const studentRoutes: RouteRecordRaw[] = [
         name: 'StudentFee',
         component: () => import('@/views/student/fees/StudentFee.vue'),
         meta: {
-          title: 'Student Fees',
+          title: 'School Fees',
+          icon: 'pi pi-money-bill',
+        },
+      },
+      {
+        path: 'stand-alone-fee',
+        name: 'StandAloneFess',
+        component: () => import('@/views/student/fees/StandAloneFee.vue'),
+        meta: {
+          title: 'School Fees',
+          icon: 'pi pi-money-bill',
+        },
+      },
+      {
+        path: 'fees/stand-alone',
+        name: 'StandAloneFee',
+        component: () => import('@/views/student/fees/StandAloneFee.vue'),
+        meta: {
+          title: 'Stand Alone Fees',
           icon: 'pi pi-money-bill',
         },
       },
@@ -80,6 +99,24 @@ const studentRoutes: RouteRecordRaw[] = [
         meta: {
           title: 'Student Documents',
           icon: 'pi pi-book',
+        },
+      },
+      {
+        path: 'self-service',
+        name: 'StudentSelfService',
+        component: () => import('@/views/student/self_service/StudentSelfService.vue'),
+        meta: {
+          title: 'Student Self Service',
+          icon: 'pi pi-book',
+        },
+      },
+      {
+        path: 'student-settings',
+        name: 'StudentSettings',
+        component: () => import('@/views/student/settings/StudentSettings.vue'),
+        meta: {
+          title: 'Student Settings',
+          icon: 'pi pi-cog',
         },
       },
     ],

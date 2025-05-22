@@ -37,7 +37,6 @@ export const useAuthStore = defineStore('auth', () => {
       try {
         setUserRole(JSON.parse(r))
       } catch (e: unknown) {
-        console.log(e)
         setUserRole([])
       }
     }
@@ -45,19 +44,17 @@ export const useAuthStore = defineStore('auth', () => {
     try {
       if (authService.isAuthenticated()) {
         const response = await authService.getCurrentUser()
-        console.log(response)
         if (response.success && response.data) {
           user.value = response.data as unknown as User
           setUserRole(response.data.user.roles as Array<Role>)
           return response.data
         } else {
-          console.log('Logount called')
+          logout()
           // Token is invalid, clear auth state
           logout()
         }
       }
     } catch (err) {
-      console.error('Failed to initialize auth:', err)
       logout()
     } finally {
       loading.value = false

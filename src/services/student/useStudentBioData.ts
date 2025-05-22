@@ -22,13 +22,12 @@ export const useStudentBioData = createSharedComposable(() => {
     const editingValues = sessionStorage.getItem('biodataValues')
     const parsedEditingValues = JSON.parse(editingValues || '{}')
     try {
-      const response = await studentBiodataRepository.updateBiodata(
+      await studentBiodataRepository.updateBiodata(
         constant.studentInformation.updateInformation,
         parsedEditingValues,
       )
-      console.log(response)
     } catch (error) {
-      console.error(error)
+      return error
     }
   }
 
@@ -39,11 +38,10 @@ export const useStudentBioData = createSharedComposable(() => {
     subTitle.value = 'Please wait while we prepare your form'
     try {
       loading.value = true
-      const response = await studentBiodataRepository.downloadstudentDocument(
+      await studentBiodataRepository.downloadstudentDocument(
         constant.studentInformation.download + '?student=' + student,
         'student-information.pdf',
       )
-      console.log('THIS IS NOW THE RESPONSE: ', response)
     } catch (error) {
       return error
     } finally {

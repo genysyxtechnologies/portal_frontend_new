@@ -245,12 +245,10 @@ const handleSubmit = async () => {
 
 const showTerms = () => {
   // Logic to show terms of service modal or page
-  console.log('Show Terms of Service')
 }
 
 const showPrivacyPolicy = () => {
   // Logic to show privacy policy modal or page
-  console.log('Show Privacy Policy')
 }
 </script>
 

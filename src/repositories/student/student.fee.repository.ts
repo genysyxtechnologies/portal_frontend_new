@@ -8,8 +8,7 @@ class StudentFeeRepository extends StudentDashboardRepositories {
       const response = await apiClient.downloads(invoiceUrl, fileName)
       return response
     } catch (error) {
-      console.error(error)
-      throw error
+      return error
     }
   }
 }

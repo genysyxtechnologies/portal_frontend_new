@@ -120,7 +120,6 @@ const handleRegistredCoursesCheckboxChange = async (course: any) => {
     selectedSession.value!.id,
     selectedSemester.value!.id,
   )
-  console.log('Selected course:', course)
 }
 
 const handleCourseRemovalCheckBox = async (course: any) => {
@@ -130,7 +129,6 @@ const handleCourseRemovalCheckBox = async (course: any) => {
     selectedSession.value!.id,
     selectedSemester.value!.id,
   )
-  console.log('Removed course:', course)
 }
 
 const handleDownload = async (document: number) => {
@@ -143,9 +141,7 @@ const handleDownload = async (document: number) => {
 }
 
 // handle registration
-const handleRegistration = (courses: any) => {
-  console.log('Registering courses:', courses)
-}
+const handleRegistration = (courses: any) => {}
 
 // load the sessions and semesters
 onMounted(async () => {
@@ -188,13 +184,6 @@ const hasRegisteredCourses = computed(() => {
   return courses.value?.registeredCourses && courses.value.registeredCourses.length > 0
 })
 
-// watch for selected documents (COURSE FORM, EXAM CARD)
-watch(
-  () => selectedDocument.value,
-  (value) => {
-    console.log('Selected document:', value)
-  },
-)
 </script>
 
 <style scoped>

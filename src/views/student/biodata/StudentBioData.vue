@@ -43,7 +43,7 @@
         <div class="card-header px-6 py-4 border-b border-gray-100">
           <h2 class="text-lg font-semibold text-gray-800">Bio Data Information</h2>
         </div>
-        
+
         <SpinningAnimation
           :loading="loading || bioDataLoading"
           :head-title="headTitle"
@@ -142,13 +142,6 @@ const getTabIcon = (index: number) => {
   return icons[index] || 'fas fa-circle'
 }
 
-watch(
-  () => tabCount.value,
-  (value) => {
-    console.log(value)
-  },
-  { immediate: true },
-)
 </script>
 
 <style scoped>

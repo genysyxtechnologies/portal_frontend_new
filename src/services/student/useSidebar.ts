@@ -3,7 +3,6 @@ import { ref } from 'vue'
 import image2 from '../../assets/images/student/sidebar/image2.png'
 import image3 from '../../assets/images/student/sidebar/image3.png'
 import image4 from '../../assets/images/student/sidebar/image4.png'
-import image5 from '../../assets/images/student/sidebar/image5.png'
 import image6 from '../../assets/images/student/sidebar/image6.png'
 import image7 from '../../assets/images/student/sidebar/image7.png'
 import image8 from '../../assets/images/student/sidebar/image8.png'
@@ -21,6 +20,17 @@ export const useStudentSideBar = createSharedComposable(() => {
       title: 'Fees',
       icon: image2,
       path: '/student/fees',
+      hasChildren: true,
+      children: [
+        {
+          title: 'School Fee',
+          path: '/student/fees',
+        },
+        {
+          title: 'Stand Alone',
+          path: '/student/stand-alone-fee',
+        },
+      ],
     },
     {
       title: 'Bio Data',
@@ -28,14 +38,20 @@ export const useStudentSideBar = createSharedComposable(() => {
       path: '/student/bio-data',
     },
     {
-      title: 'Course Registration',
+      title: 'Academics',
       icon: image4,
-      path: '/student/course-registration',
-    },
-    {
-      title: 'My Results',
-      icon: image5,
-      path: '/student/my-results',
+      path: '/student/academics',
+      hasChildren: true,
+      children: [
+        {
+          title: 'Course Registration',
+          path: '/student/course-registration',
+        },
+        {
+          title: 'My Results',
+          path: '/student/my-results',
+        },
+      ],
     },
     {
       title: 'My Accomodation',
@@ -55,12 +71,12 @@ export const useStudentSideBar = createSharedComposable(() => {
     {
       title: 'Self Service',
       icon: image9,
-      path: '',
+      path: '/student/self-service',
     },
     {
       title: 'Settings',
       icon: image10,
-      path: '',
+      path: '/student/student-settings',
     },
   ])
 

@@ -1,5 +1,4 @@
 const processError = async (error: any) => {
-  console.log(error)
   let message = ''
   // console.log(error.response)
   if (error.response) {
@@ -37,7 +36,6 @@ const processError = async (error: any) => {
     // viewInstance.message = "An error has occurred";
   } else if (error.request) {
     message = 'Error! server is not responding'
-    console.log(error.request)
   } else {
     // Something happened in setting up the request that triggered an Error
     message = error.message
