@@ -2,6 +2,7 @@ import { createSharedComposable } from '@vueuse/core'
 import { ref } from 'vue'
 import StudentBiodataRepository from '@/repositories/student/student.biodata.repository'
 import constant from '@/stores/constant'
+import type { CountryResponse } from '@/types/student/dashboard_information'
 
 export const useStudentBioData = createSharedComposable(() => {
   const studentBiodataRepository = new StudentBiodataRepository()
@@ -10,6 +11,7 @@ export const useStudentBioData = createSharedComposable(() => {
   const headTitle = ref<string>('Loading your information...')
   const subTitle = ref<string>('Please wait while we prepare your form')
   const loading = ref<boolean>(false)
+  const countries = ref<CountryResponse[] | null>(null)
 
   // HANDLE BIO DATA UPDATE
   const updateBioData = async (student: string) => {
@@ -118,5 +120,49 @@ export const useStudentBioData = createSharedComposable(() => {
       subTitle.value = 'Please wait while we prepare your form'
     }
   }
-  return { tabCount, updateBioData, downloadStudentBiodata, loading, headTitle, subTitle }
+
+
+  // fetch countries
+  const fetchCountries = async () => {
+    try {
+      loading.value = true
+      const response = await studentBiodataRepository.getInformation(constant.nationality.getCountries)
+      countries.value = response.data as CountryResponse[]
+      return response.data as CountryResponse[]
+    } catch (error) {
+      return error
+    } finally {
+      loading.value = false
+    }
+  }
+
+  // fetch states
+  const fetchStates = async (countryId: number) => {
+    try {
+      loading.value = true
+      const response = await studentBiodataRepository.getInformation(constant.nationality.getStates + countryId)
+      console.log("THIS ARE THE STATE RESPONSE: ", response.data)
+      return response.data
+    } catch (error) {
+      return error
+    } finally {
+      loading.value = false
+    }
+  }
+
+  // fetch local government
+  const fetchLocalGovernment = async (stateId: number) => {
+    try {
+      loading.value = true
+      const response = await studentBiodataRepository.getInformation(constant.nationality.getLgas + stateId)
+      console.log("THIS ARE THE LOCAL GOVERNMENT RESPONSE: ", response.data)
+      return response.data
+    } catch (error) {
+      return error
+    } finally {
+      loading.value = false
+    }
+  }
+
+  return { tabCount, updateBioData, downloadStudentBiodata, fetchCountries, fetchStates, fetchLocalGovernment, countries, loading, headTitle, subTitle }
 })

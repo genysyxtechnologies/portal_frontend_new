@@ -24,6 +24,7 @@ const { user, getStudentInformation } = useStudentDashboard()
 
 onMounted(async () => {
   await getStudentInformation()
+  console.log(user.value)
 })
 </script>
 

@@ -15,6 +15,7 @@
               v-model="formData.sponsorName"
               type="text"
               class="w-full pr-10"
+              :placeholder="user?.information.sponsorName || 'Not Specified'"
               :readonly="!editableFields.sponsorName"
               :class="{ 'bg-gray-50': !editableFields.sponsorName }"
             />
@@ -37,7 +38,7 @@
               v-model="formData.otherSponsorName"
               type="text"
               class="w-full pr-10"
-              :placeholder="user?.information.otherSponsorName || 'Enter Other Sponsor Name'"
+              :placeholder="user?.information.otherSponsorName || 'Not Specified'"
               :readonly="!editableFields.otherSponsorName"
               :class="{ 'bg-gray-50': !editableFields.otherSponsorName }"
             />
@@ -60,7 +61,7 @@
               v-model="formData.sport"
               type="text"
               class="w-full pr-10"
-              :placeholder="user?.information.sport || 'Enter Sport'"
+              :placeholder="user?.information.sport || 'Not Specified'"
               :readonly="!editableFields.sport"
               :class="{ 'bg-gray-50': !editableFields.sport }"
             />
@@ -159,14 +160,14 @@ const isEditingAnyField = computed(() => {
     'isEditingBiodataAnyField',
     JSON.stringify(Object.values(editableFields.value).some((val) => val)),
   )
-  
+
   // Store sponsorship data in sessionStorage with specific key
   const sponsorshipData = {
     sponsorName: formData.value.sponsorName,
     otherSponsorName: formData.value.otherSponsorName,
     sport: formData.value.sport
   }
-  
+
   console.log('Sponsorship data being saved:', sponsorshipData)
   sessionStorage.setItem('sponsorshipValues', JSON.stringify(sponsorshipData))
 

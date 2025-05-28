@@ -4,7 +4,7 @@ interface Authority {
 }
 
 // Country interface
-interface Country {
+export interface Country {
   code: string
   disabled: boolean
   id: number
@@ -31,7 +31,7 @@ interface LGA {
 }
 
 // State interface
-interface State {
+export interface State {
   code: string
   country: Country
   creationTime: number | null
@@ -302,4 +302,8 @@ export interface User {
 export interface UserResponse {
   user: User
   superOption: boolean
+}
+
+export interface CountryResponse extends Country {
+  states: State[]
 }

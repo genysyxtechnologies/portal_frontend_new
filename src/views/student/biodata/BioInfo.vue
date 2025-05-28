@@ -1,7 +1,5 @@
 <template>
   <div class="bioinfo-container relative h-full">
-    <!-- <SpinningAnimation :loading="loading" /> -->
-
     <transition name="fade-scale">
       <div v-if="!loading" class="bioinfo-grid">
         <!-- Country Field -->
@@ -11,11 +9,14 @@
             <Sel-ect
               :size="'large'"
               v-model="selectedCountry"
-              :options="[user?.information.country]"
+              :options="availableCountries"
               optionLabel="name"
-              placeholder="Select Session"
+              placeholder="Select Country"
               class="card w-full"
-              :disabled="!editableFields.country"
+              :readonly="!editableFields.country"
+              @change="handleCountryChange"
+              :filter="true"
+              filterPlaceholder="Search countries"
             />
             <EditToggle
               :is-editing="editableFields.country"
@@ -32,11 +33,14 @@
             <Sel-ect
               :size="'large'"
               v-model="selectedState"
-              :options="[user?.information.state]"
+              :options="availableStates"
               optionLabel="name"
-              placeholder="Select Session"
+              placeholder="Select State"
               class="card w-full"
               :disabled="!editableFields.state"
+              @change="handleStateChange"
+              :filter="true"
+              filterPlaceholder="Search states"
             />
             <EditToggle
               :is-editing="editableFields.state"
@@ -50,17 +54,16 @@
         <div class="field-container" data-aos="fade-up" data-aos-delay="200">
           <label for="lgaCity" class="field-label">LGA/City</label>
           <div class="input-container">
-            <InputText
-              id="lgaCity"
-              v-model="formData.lgaCity"
-              type="text"
-              class="custom-input"
-              :placeholder="user?.information.lga?.name || 'Enter LGA/City'"
-              :readonly="!editableFields.lgaCity"
-              :class="{
-                'input-readonly': !editableFields.lgaCity,
-                'input-active': editableFields.lgaCity,
-              }"
+            <Sel-ect
+              :size="'large'"
+              v-model="selectedLGA"
+              :options="availableLGAs"
+              optionLabel="name"
+              placeholder="Select LGA/City"
+              class="card w-full"
+              :disabled="!editableFields.lgaCity"
+              :filter="true"
+              filterPlaceholder="Search LGAs"
             />
             <EditToggle
               :is-editing="editableFields.lgaCity"
@@ -215,6 +218,7 @@
               v-model="formData.gender"
               type="text"
               class="w-full pr-10"
+              :placeholder="user?.information?.gender?.title || 'Not Specified'"
               :readonly="!editableFields.gender"
               :class="{ 'bg-gray-50': !editableFields.gender }"
             />
@@ -297,22 +301,10 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue'
 import { formatDateOfBirth } from '@/utils/dateFormater'
-import type { UserResponse } from '@/types/student/dashboard_information'
+import type { UserResponse, State, Country } from '@/types/student/dashboard_information'
 import EditToggle from '@/views/student/biodata/EditToogle.vue'
 import LockIndicator from './LockIndicator.vue'
-
-// Import AOS for scroll animations if not already imported globally
-try {
-  // @ts-expect-error - AOS might not be available globally
-  const aos = window.AOS
-  if (aos) {
-    onMounted(() => {
-      aos.refresh()
-    })
-  }
-} catch (error) {
-  console.error('AOS not available, animations might not work', error)
-}
+import { useStudentBioData } from '@/services/student/useStudentBioData'
 
 const props = defineProps<{
   user: UserResponse['user']
@@ -373,11 +365,78 @@ const formData = ref<FormData>({
   tribe: props.user?.information?.tribe?.name || 'Not Specified',
 })
 
+// Get countries from the useStudentBioData service
+const { countries, fetchCountries, fetchStates, fetchLocalGovernment } = useStudentBioData()
+
+// Create a computed property for available countries
+const availableCountries = computed(() => {
+  return countries.value || []
+})
+
 // Selected values for select inputs
-const selectedCountry = ref(props.user?.information.country)
-const selectedState = ref(props.user?.information.state)
+const selectedCountry = ref(props.user?.information.country || null)
+const selectedState = ref(props.user?.information.state || null)
+const selectedLGA = ref(props.user?.information?.lga || null)
 const selectedReligion = ref(props.user?.information.religion)
 const selectedMaritalStatus = ref(props.user?.information.maritalStatus)
+
+// Available options for dropdowns
+const availableStates = ref<State[]>([])
+// Using the same LGA interface structure as in the user information
+type LGA = {
+  id: number
+  name: string
+  code: string
+  state?: State
+  disabled?: boolean
+  creationTime?: number | null
+  updatedTime?: number | null
+}
+const availableLGAs = ref<LGA[]>([])
+
+// Fetch countries on component mount
+onMounted(async () => {
+  if (!countries.value || countries.value.length === 0) {
+    await fetchCountries()
+  }
+
+  if (props.user?.information?.country) {
+    const userCountry = countries.value?.find(
+      (country) => country.id === props.user.information.country.id,
+    )
+
+    if (userCountry) {
+      selectedCountry.value = userCountry
+      // Fetch states for the user's country
+      const statesData = await fetchStates(userCountry.id)
+      availableStates.value = (statesData as State[]) || []
+
+      // Set the user's state if available
+      if (props.user?.information?.state) {
+        const userState = availableStates.value.find(
+          (state) => state.id === props.user.information.state.id,
+        )
+        if (userState) {
+          selectedState.value = userState
+
+          // Fetch LGAs for the user's state
+          const lgasData = await fetchLocalGovernment(userState.id)
+          availableLGAs.value = (lgasData as LGA[]) || []
+
+          // Set the user's LGA if available
+          if (props.user?.information?.lga) {
+            const userLGA = availableLGAs.value.find(
+              (lga) => lga.id === props.user.information.lga.id,
+            )
+            if (userLGA) {
+              selectedLGA.value = userLGA
+            }
+          }
+        }
+      }
+    }
+  }
+})
 
 // Watch for user prop changes to update form data
 watch(
@@ -394,8 +453,33 @@ watch(
         gender: newUser.gender || '',
         tribe: newUser.information?.tribe?.name || 'Not Specified',
       }
-      selectedCountry.value = newUser.information.country
-      selectedState.value = newUser.information.state
+
+      if (countries.value && countries.value.length > 0 && newUser.information.country) {
+        const userCountry = countries.value.find(
+          (country) => country.id === newUser.information.country.id,
+        )
+
+        if (userCountry) {
+          selectedCountry.value = userCountry
+          updateStatesForCountry(userCountry)
+
+          if (newUser.information.state && availableStates.value.length > 0) {
+            const userState = availableStates.value.find(
+              (state) => state.id === newUser.information.state.id,
+            )
+            if (userState) {
+              selectedState.value = userState
+            }
+          }
+        } else {
+          selectedCountry.value = newUser.information.country
+          selectedState.value = newUser.information.state
+        }
+      } else {
+        selectedCountry.value = newUser.information.country
+        selectedState.value = newUser.information.state
+      }
+
       selectedReligion.value = newUser.information.religion
       selectedMaritalStatus.value = newUser.information.maritalStatus
     }
@@ -410,20 +494,31 @@ const isEditingAnyField = computed(() => {
     JSON.stringify(Object.values(editableFields.value).some((val) => val)),
   )
 
-  // Store bio info data in sessionStorage with specific key
   const bioInfoData = {
-    lgaCity: formData.value.lgaCity,
     contactAddress: formData.value.contactAddress,
-    homeTown: formData.value.hometown, // Note: API expects homeTown (camelCase)
+    homeTown: formData.value.hometown,
     homeAddress: formData.value.homeAddress,
     placeOfBirth: formData.value.placeOfBirth,
     dateOfBirth: formData.value.dateOfBirth,
     gender: formData.value.gender,
     tribe: formData.value.tribe,
-    country: typeof selectedCountry.value === 'object' ? selectedCountry.value?.name || '' : selectedCountry.value || '',
-    state: typeof selectedState.value === 'object' ? selectedState.value?.name || '' : selectedState.value || '',
-    religion: typeof selectedReligion.value === 'object' ? selectedReligion.value?.title   || '' : selectedReligion.value || '',
-    maritalStatus: typeof selectedMaritalStatus.value === 'object' ? selectedMaritalStatus.value?.title || '' : selectedMaritalStatus.value || '',
+    country:
+      typeof selectedCountry.value === 'object'
+        ? selectedCountry.value?.id || ''
+        : selectedCountry.value || '',
+    state:
+      typeof selectedState.value === 'object'
+        ? selectedState.value?.id || ''
+        : selectedState.value || '',
+    religion:
+      typeof selectedReligion.value === 'object'
+        ? selectedReligion.value?.id || ''
+        : selectedReligion.value || '',
+    maritalStatus:
+      typeof selectedMaritalStatus.value === 'object'
+        ? selectedMaritalStatus.value?.id || ''
+        : selectedMaritalStatus.value || '',
+    lga: selectedLGA.value?.id || null,
   }
 
   sessionStorage.setItem('bioInfoValues', JSON.stringify(bioInfoData))
@@ -452,7 +547,6 @@ const handleSave = () => {
   successMessage.innerHTML = '<i class="fas fa-check-circle"></i> Changes saved successfully!'
   document.body.appendChild(successMessage)
 
-  // Remove the message after animation completes
   setTimeout(() => {
     successMessage.classList.add('fade-out')
     setTimeout(() => document.body.removeChild(successMessage), 500)
@@ -465,10 +559,49 @@ const handleSave = () => {
 const handleNext = () => {
   return
 }
+const updateStatesForCountry = (country: Country) => {
+  if (country && 'states' in country && country.states) {
+    availableStates.value = country.states as State[]
+  } else if (country && countries.value) {
+    const foundCountry = countries.value.find((c) => c.id === country.id)
+    if (foundCountry && 'states' in foundCountry && foundCountry.states) {
+      availableStates.value = foundCountry.states
+    } else {
+      availableStates.value = [] as State[]
+    }
+  } else {
+    availableStates.value = [] as State[]
+  }
+}
+
+// Handle country change to update states
+const handleCountryChange = async () => {
+  selectedState.value = null
+  selectedLGA.value = null
+  availableLGAs.value = []
+
+  if (selectedCountry.value && selectedCountry.value.id) {
+    const statesData = await fetchStates(selectedCountry.value.id)
+    availableStates.value = (statesData as State[]) || []
+  } else {
+    availableStates.value = [] as State[]
+  }
+}
+
+// Handle state change to update LGAs
+const handleStateChange = async () => {
+  selectedLGA.value = null
+
+  if (selectedState.value && selectedState.value.id) {
+    const lgasData = await fetchLocalGovernment(selectedState.value.id)
+    availableLGAs.value = lgasData || []
+  } else {
+    availableLGAs.value = []
+  }
+}
 </script>
 
 <style scoped>
-/* Container styling */
 .bioinfo-container {
   padding: 2rem;
   background-color: white;

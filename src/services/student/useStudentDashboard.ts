@@ -19,7 +19,6 @@ export const useStudentDashboard = createSharedComposable(() => {
     error.value = null
     try {
       const response = await authService.getCurrentUser()
-      console.log('THIS IS THE RESPONSE OF THE GET INFORMATION', response.data)
       user.value = response.data.user
     } catch (err) {
       return err
@@ -53,7 +52,6 @@ export const useStudentDashboard = createSharedComposable(() => {
     const dashboard = new StudentDashboardRepositories()
     try {
       const response = await dashboard.getInformation(users.dashboard)
-      console.log('THIS IS THE RESPONSE OF THE GET INFORMATION', response.data)
       return response.data
     } catch (err) {
       return err

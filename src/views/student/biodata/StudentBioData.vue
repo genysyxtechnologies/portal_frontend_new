@@ -126,29 +126,25 @@ const {
   tabCount,
   downloadStudentBiodata,
   updateBioData,
+  fetchCountries,
   headTitle,
   subTitle,
+  countries,
   loading: bioDataLoading,
 } = useStudentBioData()
 
 // Function to handle updating biodata from all tabs
 const handleUpdateBioData = async () => {
-  // Make sure we have the latest user data in sessionStorage
   if (user.value) {
     sessionStorage.setItem('userData', JSON.stringify(user.value))
     console.log('Updated user data in sessionStorage before update')
   }
-
-  // Ensure all tabs have saved their data
   const activeTab = tabCount.value
 
-  // Trigger a save on all tabs by cycling through them quickly
   for (let i = 0; i < tabs.length; i++) {
     tabCount.value = i.toString()
-    await new Promise((resolve) => setTimeout(resolve, 50)) // Brief delay to let the tab render
+    await new Promise((resolve) => setTimeout(resolve, 50))
   }
-
-  // Return to the original tab
   tabCount.value = activeTab
 
   // Show loading notification
@@ -164,12 +160,8 @@ const handleUpdateBioData = async () => {
     // Remove loading notification
     document.body.removeChild(loadingNotification)
   } catch (error: any) {
-    // Type assertion for error
-    console.error('Error updating biodata:', error)
-    // Remove loading notification in case of error
     document.body.removeChild(loadingNotification)
 
-    // Show error details in console
     if (error.response && error.response.data) {
       console.error('Server error details:', error.response.data)
     }
@@ -179,9 +171,9 @@ const { user, getStudentInformation, loading } = useStudentDashboard()
 
 onMounted(async () => {
   await getStudentInformation()
+  await fetchCountries()
 
-  // Store user data in sessionStorage for reference
-  if (user.value) {
+    if (user.value) {
     sessionStorage.setItem('userData', JSON.stringify(user.value))
   }
 })
@@ -210,7 +202,7 @@ const getTabIcon = (index: number) => {
     'fas fa-user', // Bio Info
     'fas fa-heartbeat', // Health Info
     'fas fa-users', // Next of Kin
-    'fas fa-money-bill', // Sponsorship (commented out)
+    'fas fa-money-bill', // Sponsorship
   ]
   return icons[index] || 'fas fa-circle'
 }
