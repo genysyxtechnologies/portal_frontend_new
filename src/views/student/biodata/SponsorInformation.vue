@@ -6,44 +6,44 @@
       <div v-if="!loading" class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <!-- Next of KIN name -->
         <div>
-          <label for="nextOfKinName" class="block text-sm font-medium text-gray-700 mb-1 labels"
-            >Next of KIN Name</label
+          <label for="sponsorName" class="block text-sm font-medium text-gray-700 mb-1 labels"
+            >Sponsor Name</label
           >
           <div class="relative">
             <InputText
-              id="nextOfKinName"
-              v-model="formData.nextOfKinName"
+              id="sponsorName"
+              v-model="formData.sponsorName"
               type="text"
               class="w-full pr-10"
-              :readonly="!editableFields.nextOfKinName"
-              :class="{ 'bg-gray-50': !editableFields.nextOfKinName }"
+              :readonly="!editableFields.sponsorName"
+              :class="{ 'bg-gray-50': !editableFields.sponsorName }"
             />
             <EditToggle
-              :is-editing="editableFields.nextOfKinName"
-              @click="toggleEdit('nextOfKinName')"
+              :is-editing="editableFields.sponsorName"
+              @click="toggleEdit('sponsorName')"
               class="absolute right-3 top-3"
             />
           </div>
         </div>
 
-        <!-- Next of KIN Contact Address -->
+        <!-- Other Sponsor Name -->
         <div>
-          <label for="nextOfKinPhone" class="block text-sm font-medium text-gray-700 mb-1 labels"
-            >Next of KIN Phone</label
+          <label for="otherSponsorName" class="block text-sm font-medium text-gray-700 mb-1 labels"
+            >Other Sponsor Name</label
           >
           <div class="relative">
             <InputText
-              id="nextOfKinPhone"
-              v-model="formData.nextOfKinPhone"
+              id="otherSponsorName"
+              v-model="formData.otherSponsorName"
               type="text"
               class="w-full pr-10"
-              :placeholder="user?.information.nextOfKinPhone || 'Enter Next of KIN Phone'"
-              :readonly="!editableFields.nextOfKinPhone"
-              :class="{ 'bg-gray-50': !editableFields.nextOfKinPhone }"
+              :placeholder="user?.information.otherSponsorName || 'Enter Other Sponsor Name'"
+              :readonly="!editableFields.otherSponsorName"
+              :class="{ 'bg-gray-50': !editableFields.otherSponsorName }"
             />
             <EditToggle
-              :is-editing="editableFields.nextOfKinPhone"
-              @click="toggleEdit('nextOfKinPhone')"
+              :is-editing="editableFields.otherSponsorName"
+              @click="toggleEdit('otherSponsorName')"
               class="absolute right-3 top-3"
             />
           </div>
@@ -51,47 +51,22 @@
 
         <!-- Next of KIN Home Address -->
         <div>
-          <label for="nextOfKinAddress" class="block text-sm font-medium text-gray-700 mb-1 labels"
-            >Next of KIN Address</label
+          <label for="sport" class="block text-sm font-medium text-gray-700 mb-1 labels"
+            >Sport</label
           >
           <div class="relative">
             <InputText
-              id="nextOfKinAddress"
-              v-model="formData.nextOfKinAddress"
+              id="sport"
+              v-model="formData.sport"
               type="text"
               class="w-full pr-10"
-              :placeholder="user?.information.nextOfKinAddress || 'Enter Next of KIN Address'"
-              :readonly="!editableFields.nextOfKinAddress"
-              :class="{ 'bg-gray-50': !editableFields.nextOfKinAddress }"
+              :placeholder="user?.information.sport || 'Enter Sport'"
+              :readonly="!editableFields.sport"
+              :class="{ 'bg-gray-50': !editableFields.sport }"
             />
             <EditToggle
-              :is-editing="editableFields.nextOfKinAddress"
-              @click="toggleEdit('nextOfKinAddress')"
-              class="absolute right-3 top-3"
-            />
-          </div>
-        </div>
-
-        <!-- Relationship with Next of KIN -->
-        <div>
-          <label
-            for="nextOfKinRelationship"
-            class="block text-sm font-medium text-gray-700 mb-1 labels"
-            >Relationship with Next of KIN</label
-          >
-          <div class="relative">
-            <Sel-ect
-              :size="'large'"
-              v-model="selectedNextOfKinRelationship"
-              :options="[user?.information.nextOfKinRelationship]"
-              optionLabel="title"
-              placeholder="Select Relationship with Next of KIN"
-              class="card w-full"
-              :disabled="!editableFields.nextOfKinRelationship"
-            />
-            <EditToggle
-              :is-editing="editableFields.nextOfKinRelationship"
-              @click="toggleEdit('nextOfKinRelationship')"
+              :is-editing="editableFields.sport"
+              @click="toggleEdit('sport')"
               class="absolute right-3 top-3"
             />
           </div>
@@ -132,31 +107,31 @@ const props = defineProps<{
 // Define a type for our editable fields
 type EditableFields = {
   nextOfKinRelationship: boolean
-  nextOfKinName: boolean
-  nextOfKinPhone: boolean
-  nextOfKinAddress: boolean
+  sponsorName: boolean
+  otherSponsorName: boolean
+  sport: boolean
 }
 
 // Define a type for our form data
 type FormData = {
-  nextOfKinName: string
-  nextOfKinPhone: string
-  nextOfKinAddress: string
+  sponsorName: string
+  otherSponsorName: string
+  sport: string
 }
 
 // Editable state for each field with proper typing
 const editableFields = ref<EditableFields>({
   nextOfKinRelationship: false,
-  nextOfKinName: false,
-  nextOfKinPhone: false,
-  nextOfKinAddress: false,
+  sponsorName: false,
+  otherSponsorName: false,
+  sport: false,
 })
 
 // Form data with proper typing and initial values from props
 const formData = ref<FormData>({
-  nextOfKinName: props.user?.information?.nextOfKinName || 'Not Specified',
-  nextOfKinPhone: props.user?.information?.nextOfKinPhone || 'Not Specified',
-  nextOfKinAddress: props.user?.information?.nextOfKinAddress || 'Not Specified',
+  sponsorName: props.user?.information?.sponsorName || 'Not Specified',
+  otherSponsorName: props.user?.information?.otherSponsorName || 'Not Specified',
+  sport: props.user?.information?.sport || 'Not Specified',
 })
 
 // Selected values for select inputs
@@ -168,9 +143,9 @@ watch(
   (newUser) => {
     if (newUser) {
       formData.value = {
-        nextOfKinName: newUser?.information?.nextOfKinName || '',
-        nextOfKinPhone: newUser?.information?.nextOfKinPhone || '',
-        nextOfKinAddress: newUser?.information?.nextOfKinAddress || '',
+        sponsorName: newUser?.information?.sponsorName || '',
+        otherSponsorName: newUser?.information?.otherSponsorName || '',
+        sport: newUser?.information?.sport || '',
       }
       selectedNextOfKinRelationship.value = newUser?.information?.nextOfKinRelationship
     }
@@ -184,7 +159,16 @@ const isEditingAnyField = computed(() => {
     'isEditingBiodataAnyField',
     JSON.stringify(Object.values(editableFields.value).some((val) => val)),
   )
-  sessionStorage.setItem('biodataValues', JSON.stringify(formData.value))
+  
+  // Store sponsorship data in sessionStorage with specific key
+  const sponsorshipData = {
+    sponsorName: formData.value.sponsorName,
+    otherSponsorName: formData.value.otherSponsorName,
+    sport: formData.value.sport
+  }
+  
+  console.log('Sponsorship data being saved:', sponsorshipData)
+  sessionStorage.setItem('sponsorshipValues', JSON.stringify(sponsorshipData))
 
   return Object.values(editableFields.value).some((val) => val)
 })

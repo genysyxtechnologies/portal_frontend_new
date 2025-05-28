@@ -1,462 +1,757 @@
 <template>
-  <Drawer v-model:visible="drawerVisible">
-    <div
-      class="sidebar bg-white h-[calc(100vh-32px)] fixed top-4 bottom-4 left-4 p-6 rounded-xl shadow-lg w-[280px] overflow-hidden transition-all duration-300">
-      <!-- Profile Section -->
-      <div class="profile-section animate-fade-in">
-        <div class="flex flex-col items-center text-center mb-6">
-          <div class="relative mb-4 group profile-image-container">
-            <div class="profile-image-glow"></div>
-            <img :src="profile" alt="Profile"
-              class="w-24 h-24 rounded-full object-cover border-4 border-[#0D47A1]/10 group-hover:border-[#0D47A1]/30 transition-all duration-300 ease-out z-10 relative" />
-            <span
-              class="absolute bottom-2 right-2 w-4 h-4 bg-green-500 rounded-full border-2 border-white animate-pulse z-20"></span>
+  <div class="course-registration-wrapper">
+    <!-- Filter Section with enhanced styling -->
+    <div class="filter-section">
+      <Sel-ect :options="sessionOptions" optionLabel="name" :size="'large'" :placeholder="sessionPlaceholder"
+        :modelValue="selectedSession"
+        @update:modelValue="(value: string | null) => $emit('update:selectedSession', value)"
+        class="card w-full transition-all duration-200 hover:border-blue-400 focus-within:ring-2 focus-within:ring-blue-200" />
+      <Sel-ect :options="semesterOptions" optionLabel="title" :size="'large'" :placeholder="semesterPlaceholder"
+        :modelValue="selectedSemester"
+        @update:modelValue="(value: string | null) => $emit('update:selectedSemester', value)"
+        class="card w-full transition-all duration-200 hover:border-blue-400 focus-within:ring-2 focus-within:ring-blue-200" />
+      <div class="w-full relative">
+        <InputText
+          class="flex-1 w-full h-full transition-all duration-200 hover:border-blue-400 focus:ring-2 focus:ring-blue-200"
+          :placeholder="searchPlaceholder" :modelValue="searchQuery"
+          @update:modelValue="(value: string | undefined) => $emit('update:searchQuery', value as string)" />
+        <span class="absolute top-3 right-3 text-gray-400 transition-colors duration-200">
+          <i class="pi pi-search"></i>
+        </span>
+      </div>
+    </div>
+
+    <!-- Loading State with better animation -->
+    <div v-if="courseLoading" class="relative h-64 flex items-center justify-center">
+      <div class="spinner-container">
+        <div class="spinner-circle spinner-circle-1"></div>
+        <div class="spinner-circle spinner-circle-2"></div>
+        <div class="spinner-circle spinner-circle-3"></div>
+      </div>
+      <p class="mt-16 text-gray-500 animate-pulse">Loading course data...</p>
+    </div>
+
+    <!-- Empty State with improved design -->
+    <EmptySelection v-else-if="
+      (!registeredCourses || registeredCourses?.length === 0) &&
+      (!courseList || courseList?.length === 0) &&
+      !courseLoading
+    " :emptyMessage="emptyStateMessage" class="transition-all duration-300" />
+
+    <!-- Main Content Area -->
+    <div v-else class="course-panels-container">
+      <!-- Available Courses Panel -->
+      <div class="course-panel available-courses-panel">
+        <div class="panel-header">
+          <h2 class="panel-title">
+            <i class="pi pi-book panel-icon"></i>
+            Available Courses
+            <span class="course-count">
+              ({{ courseList.length }} courses)
+            </span>
+          </h2>
+          <div class="panel-subtitle">Select courses to register</div>
+        </div>
+
+        <div class="course-list-container available-courses-list">
+          <div class="course-list-scroll">
+            <transition-group name="list" tag="div">
+              <div v-for="course in courseList" :key="`available-${course.id}`"
+                class="course-item"
+                :class="{ 'course-item-selected': course.selected }">
+                <div class="course-item-content">
+                  <div class="course-item-checkbox">
+                    <Check-box v-model="course.selected" :binary="true"
+                      @change="handleRegistredCoursesCheckboxChange(course)" class="custom-checkbox" />
+                  </div>
+                  <div class="course-item-details">
+                    <div class="course-item-header">
+                      <h3 class="course-item-code">{{ course.courseCode }}</h3>
+                      <span class="course-item-units available-units">{{ course.creditUnit }} CU</span>
+                    </div>
+                    <p class="course-item-title">{{ course.title }}</p>
+                  </div>
+                </div>
+                <div class="course-item-hover-effect"></div>
+              </div>
+            </transition-group>
           </div>
-          <h1
-            class="font-bold text-xl text-gray-800 mb-1 transition-colors duration-200 hover:text-[#0D47A1] cursor-default">
-            {{ username }}
-          </h1>
-          <h3 class="text-gray-500 text-sm mb-2 transition-colors duration-200 hover:text-[#0D47A1]/70 cursor-default">
-            {{ userID }}
-          </h3>
-          <h4 class="text-gray-400 text-xs flex items-center justify-center transition-colors duration-200 date-badge">
-            <span>{{ currentDate }}</span>
-          </h4>
         </div>
       </div>
 
-      <Divider class="my-4 opacity-30 transition-all duration-500" style="height: 2px; background-color: #0d47a1" />
+      <!-- Registered Courses Panel -->
+      <div class="course-panel registered-courses-panel">
+        <div class="panel-header">
+          <h2 class="panel-title">
+            <i class="pi pi-check-circle panel-icon registered-icon"></i>
+            Registered Courses
+            <span class="course-count">
+              ({{ registeredCourses.length }} courses)
+            </span>
+          </h2>
+          <div class="panel-subtitle">Select courses to remove</div>
+        </div>
 
-      <!-- Navigation Menu -->
-      <ul class="menu-list space-y-1 overflow-y-auto max-h-[60vh] flex flex-col gap-2 pr-2">
-        <li v-for="(item, index) in items" :key="index" class="animate-slide-in menu-item-container"
-          :style="`--delay: ${index * 0.05}s`">
-          <span @click="handleRoute(item.path)">
-            <div
-              :class="['menu-item flex items-center gap-3 p-3 rounded-lg transition-all duration-300 cursor-pointer hover:bg-gradient-to-r hover:from-[#0D47A1]/5 hover:to-[#0D47A1]/15 hover:text-[#0D47A1] hover:shadow-md active:scale-[0.98]', $router.currentRoute.value.path === item.path ? 'active' : '']">
-              <div class="menu-icon-wrapper">
-                <img :src="item.icon" class="menu-icon w-5 h-5 transition-all duration-300" />
+        <div class="course-list-container registered-courses-list">
+          <div class="course-list-scroll">
+            <transition-group name="list" tag="div">
+              <div v-for="course in registeredCourses" :key="`registered-${course.id}`"
+                class="course-item"
+                :class="{ 'course-item-selected': course.selected }">
+                <div class="course-item-content">
+                  <div class="course-item-checkbox">
+                    <Check-box v-model="course.selected" :binary="true"
+                      @change="handleCourseRemovalCheckBox(course)" class="custom-checkbox" />
+                  </div>
+                  <div class="course-item-details">
+                    <div class="course-item-header">
+                      <h3 class="course-item-code">{{ course.courseCode }}</h3>
+                      <span class="course-item-units registered-units">{{ course.creditUnit }} CU</span>
+                    </div>
+                    <p class="course-item-title">{{ course.title }}</p>
+                  </div>
+                </div>
+                <div class="course-item-hover-effect registered-effect"></div>
               </div>
-              <span class="font-medium text-sm transition-all duration-200 menu-text">{{ item.title }}</span>
-              <span class="flex-1"></span>
-              <div class="menu-indicator"></div>
+            </transition-group>
+          </div>
+
+          <!-- Summary Footer with enhanced styling -->
+          <div v-if="selectedCount > 0" class="course-action-footer">
+            <div class="selected-count">
+              <span class="count-highlight">{{ selectedCount }}</span> of
+              {{ registeredCourses.length }} selected
             </div>
-          </span>
-        </li>
-      </ul>
+            <Button label="Register Selected" icon="pi pi-send"
+              class="action-button"
+              @click="handleRegistration" />
+          </div>
+        </div>
+      </div>
     </div>
-  </Drawer>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
-import profile from '../../assets/images/student/profile.png'
-import { useStudentSideBar } from '@/services/student/useSidebar'
-import Divider from 'primevue/divider'
-import { useRouter } from 'vue-router'
 
-const $router = useRouter()
+import EmptySelection from '@/views/empty/EmptySelection.vue'
+import { computed, type PropType } from 'vue'
 
-const handleRoute = (path: string) => {
-  $router.push(path)
-  console.log('THIS IS THE PATH: ', $router.currentRoute)
+interface Course {
+  id: number
+  courseCode: string
+  title: string
+  creditUnit: number
+  selected: boolean
 }
 
 const props = defineProps({
-  open: {
-    default: true,
+  courseLoading: {
     type: Boolean,
+    default: false,
   },
-  username: {
+  sessionOptions: {
+    type: Array as PropType<{ name: string; value: string }[]>,
+    default: () => [],
+  },
+  semesterOptions: {
+    type: Array as PropType<{ name: string; value: string }[]>,
+    default: () => [],
+  },
+  selectedSession: {
+    type: String as PropType<string | null>,
+    default: null,
+  },
+  selectedSemester: {
+    type: String as PropType<string | null>,
+    default: null,
+  },
+  searchQuery: {
     type: String,
+    default: '',
   },
-  userID: {
+  sessionPlaceholder: {
     type: String,
+    default: 'Select Session',
+  },
+  semesterPlaceholder: {
+    type: String,
+    default: 'Select Semester',
+  },
+  searchPlaceholder: {
+    type: String,
+    default: 'Search Course',
+  },
+  emptyStateMessage: {
+    type: String,
+    default: 'No courses available',
+  },
+  registeredCourses: {
+    type: Array as PropType<Course[]>,
+    required: true,
+  },
+  courseList: {
+    type: Array as PropType<Course[]>,
+    required: true,
   },
 })
 
-const { items } = useStudentSideBar()
+const emit = defineEmits<{
+  (e: 'update:selectedSession', value: string | null): void
+  (e: 'update:selectedSemester', value: string | null): void
+  (e: 'update:searchQuery', value: string): void
+  (e: 'course-selected', course: Course): void
+  (e: 'remove-selected', course: Course): void
+  (e: 'register-selected', registeredCourses: Course[]): void
+}>()
 
-const currentDate = computed(() => {
-  const date = new Date()
-  return date.toLocaleDateString('en-US', {
-    weekday: 'short',
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-  })
+const selectedCount = computed(() => {
+  return props.registeredCourses?.filter((c) => c.selected).length
 })
 
-const drawerVisible = computed(() => {
-  return props.open
-})
+const handleRegistredCoursesCheckboxChange = (course: Course) => {
+  emit('course-selected', course)
+}
+
+const handleCourseRemovalCheckBox = (course: Course) => {
+  emit('remove-selected', course)
+}
+
+const handleRegistration = () => {
+  const selectedCourses = props.registeredCourses?.filter((c) => c.selected)
+  emit('register-selected', selectedCourses)
+}
 </script>
 
 <style scoped>
+/* Main Container Styles */
+.course-registration-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  animation: fadeIn 0.6s ease-out forwards;
+}
+
+/* Filter Section Styles */
+.filter-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.5rem;
+  background-color: #ffffff;
+  border-radius: 1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  transition: all 0.3s ease;
+  animation: slideDown 0.5s ease-out forwards;
+}
+
+@media (min-width: 768px) {
+  .filter-section {
+    flex-direction: row;
+  }
+}
+
+.filter-section:hover {
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+
+/* Course Panels Container */
+.course-panels-container {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  width: 100%;
+  transition: all 0.3s ease;
+}
+
+@media (min-width: 1024px) {
+  .course-panels-container {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* Course Panel Styles */
+.course-panel {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  transition: all 0.3s ease;
+}
+
+.available-courses-panel {
+  animation: slideInFromLeft 0.6s ease-out forwards;
+}
+
+.registered-courses-panel {
+  animation: slideInFromRight 0.6s ease-out forwards;
+}
+
+/* Panel Header Styles */
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.panel-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.panel-icon {
+  color: #3b82f6;
+  font-size: 1.25rem;
+}
+
+.registered-icon {
+  color: #10b981;
+}
+
+.course-count {
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: #64748b;
+  margin-left: 0.5rem;
+}
+
+.panel-subtitle {
+  font-size: 0.875rem;
+  color: #64748b;
+}
+
+/* Course List Container Styles */
+.course-list-container {
+  background-color: #ffffff;
+  border-radius: 1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  overflow: hidden;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.course-list-container:hover {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+
+.available-courses-list {
+  border-top: 3px solid #3b82f6;
+}
+
+.registered-courses-list {
+  border-top: 3px solid #10b981;
+}
+
+.course-list-scroll {
+  max-height: 500px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #c1c1c1 #f1f1f1;
+}
+
+/* Course Item Styles */
+.course-item {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+.course-item:last-child {
+  border-bottom: none;
+}
+
+.course-item-content {
+  display: flex;
+  align-items: flex-start;
+  padding: 1.25rem;
+  position: relative;
+  z-index: 1;
+}
+
+.course-item-checkbox {
+  margin-right: 1rem;
+}
+
+.course-item-details {
+  flex: 1;
+  min-width: 0;
+}
+
+.course-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 0.5rem;
+}
+
+.course-item-code {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1e293b;
+  transition: color 0.3s ease;
+}
+
+.course-item:hover .course-item-code {
+  color: #3b82f6;
+}
+
+.course-item-title {
+  font-size: 0.875rem;
+  color: #64748b;
+  margin-top: 0.25rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 90%;
+}
+
+.course-item-units {
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 0.25rem 0.75rem;
+  border-radius: 1rem;
+  transition: all 0.3s ease;
+}
+
+.available-units {
+  background-color: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+}
+
+.course-item:hover .available-units {
+  background-color: rgba(59, 130, 246, 0.2);
+}
+
+.registered-units {
+  background-color: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+}
+
+.course-item:hover .registered-units {
+  background-color: rgba(16, 185, 129, 0.2);
+}
+
+.course-item-hover-effect {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(241, 245, 249, 0);
+  transition: background-color 0.3s ease;
+  z-index: 0;
+}
+
+.course-item:hover .course-item-hover-effect {
+  background-color: rgba(241, 245, 249, 0.8);
+}
+
+.course-item-selected {
+  background-color: rgba(59, 130, 246, 0.05);
+}
+
+.course-item-selected .course-item-hover-effect {
+  background-color: rgba(59, 130, 246, 0.1);
+}
+
+.course-item-selected.course-item:hover .course-item-hover-effect {
+  background-color: rgba(59, 130, 246, 0.15);
+}
+
+.registered-effect {
+  background-color: rgba(16, 185, 129, 0);
+}
+
+.course-item:hover .registered-effect {
+  background-color: rgba(241, 245, 249, 0.8);
+}
+
+.course-item-selected .registered-effect {
+  background-color: rgba(16, 185, 129, 0.1);
+}
+
+.course-item-selected.course-item:hover .registered-effect {
+  background-color: rgba(16, 185, 129, 0.15);
+}
+
+/* Course Action Footer */
+.course-action-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  background-color: #f8fafc;
+  border-top: 1px solid rgba(226, 232, 240, 0.8);
+  transition: all 0.3s ease;
+}
+
+.selected-count {
+  font-size: 0.875rem;
+  color: #64748b;
+}
+
+.count-highlight {
+  font-weight: 600;
+  color: #3b82f6;
+}
+
+.action-button {
+  background-color: #10b981 !important;
+  border-color: #10b981 !important;
+  color: white !important;
+  padding: 0.5rem 1rem !important;
+  font-size: 0.875rem !important;
+  border-radius: 0.5rem !important;
+  transition: all 0.3s ease !important;
+  box-shadow: 0 2px 5px rgba(16, 185, 129, 0.2) !important;
+}
+
+.action-button:hover {
+  background-color: #059669 !important;
+  border-color: #059669 !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3) !important;
+}
+
+/* Enhanced List transition */
+.list-move,
+.list-enter-active,
+.list-leave-active {
+  transition: all 0.5s ease;
+}
+
+.list-enter-from,
+.list-leave-to {
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+.list-leave-active {
+  position: absolute;
+}
+
+/* Custom scrollbar */
+.custom-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scroll::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 0 8px 8px 0;
+}
+
+.custom-scroll::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+.custom-scroll::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* checkbox styling */
+:deep(.p-checkbox .p-checkbox-box) {
+  border-radius: 0.375rem;
+  border-width: 1px;
+  transition: all 0.2s ease;
+  border-color: #d1d5db;
+}
+
+:deep(.p-checkbox .p-checkbox-box.p-highlight) {
+  background-color: #3b82f6;
+  border-color: #3b82f6;
+}
+
+:deep(.p-checkbox:not(.p-checkbox-disabled) .p-checkbox-box:hover) {
+  border-color: #3b82f6;
+}
+
+/* Button hover effect */
+:deep(.p-button) {
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+:deep(.p-button:not(:disabled):hover) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+:deep(.p-button:not(:disabled):active) {
+  transform: translateY(0);
+}
+
+/* Loading spinner animation */
+.spinner-container {
+  position: relative;
+  height: 3rem;
+  width: 3rem;
+}
+
 /* Animation Keyframes */
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(-10px);
   }
+  to {
+    opacity: 1;
+  }
+}
 
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
 
-@keyframes slideIn {
+@keyframes slideInFromLeft {
   from {
     opacity: 0;
-    transform: translateX(-20px);
+    transform: translateX(-30px);
   }
-
   to {
     opacity: 1;
     transform: translateX(0);
   }
 }
 
-@keyframes glowPulse {
-  0% {
-    opacity: 0.4;
-    transform: scale(0.95);
+@keyframes slideInFromRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
   }
-
-  50% {
-    opacity: 0.6;
-    transform: scale(1.05);
-  }
-
-  100% {
-    opacity: 0.4;
-    transform: scale(0.95);
-  }
-}
-
-@keyframes shimmer {
-  0% {
-    background-position: -200% 0;
-  }
-
-  100% {
-    background-position: 200% 0;
-  }
-}
-
-@keyframes ping-slow {
-
-  0%,
-  100% {
-    transform: scale(1);
+  to {
     opacity: 1;
-  }
-
-  50% {
-    transform: scale(1.5);
-    opacity: 0.5;
-  }
-}
-
-/* Animation Classes */
-.animate-fade-in {
-  animation: fadeIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-}
-
-.animate-slide-in {
-  animation: slideIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) var(--delay) forwards;
-  opacity: 0;
-}
-
-.animate-ping-slow {
-  animation: ping-slow 2s cubic-bezier(0, 0, 0.2, 1) infinite;
-}
-
-/* Profile Section Styles */
-.profile-image-container {
-  position: relative;
-  display: inline-block;
-  transition: all 0.5s ease;
-}
-
-.profile-image-container:hover {
-  transform: scale(1.05);
-}
-
-.profile-image-glow {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(13, 71, 161, 0.3) 0%, rgba(13, 71, 161, 0) 70%);
-  filter: blur(10px);
-  z-index: 1;
-  animation: glowPulse 3s ease-in-out infinite;
-}
-
-.date-badge {
-  background: linear-gradient(90deg, rgba(13, 71, 161, 0.1), rgba(13, 71, 161, 0.2), rgba(13, 71, 161, 0.1));
-  background-size: 200% 100%;
-  animation: shimmer 3s infinite linear;
-  padding: 4px 8px;
-  border-radius: 12px;
-  margin-top: 4px;
-  transition: all 0.3s ease;
-}
-
-.date-badge:hover {
-  background-color: rgba(13, 71, 161, 0.15);
-  transform: translateY(-2px);
-}
-
-/* Menu Item Hover Effects */
-.menu-item {
-  will-change: transform;
-  position: relative;
-  overflow: hidden;
-  border-left: 3px solid transparent;
-  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.menu-item::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  height: 100%;
-  width: 100%;
-  background: linear-gradient(90deg, rgba(13, 71, 161, 0.05) 0%, rgba(13, 71, 161, 0) 100%);
-  transform: translateX(-100%);
-  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
-  z-index: -1;
-}
-
-.menu-item:hover {
-  border-left: 3px solid #0d47a1;
-  transform: translateX(4px);
-  box-shadow: 0 4px 12px rgba(13, 71, 161, 0.1);
-}
-
-.menu-item:hover::before {
-  transform: translateX(0);
-}
-
-.menu-icon-wrapper {
-  position: relative;
-  width: 24px;
-  height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 6px;
-  transition: all 0.3s ease;
-  background-color: transparent;
-}
-
-.menu-item:hover .menu-icon-wrapper {
-  background-color: rgba(13, 71, 161, 0.1);
-  transform: rotate(5deg) scale(1.1);
-}
-
-.menu-text {
-  position: relative;
-  transition: all 0.3s ease;
-}
-
-.menu-text::after {
-  content: '';
-  position: absolute;
-  bottom: -2px;
-  left: 0;
-  width: 0;
-  height: 1px;
-  background-color: #0d47a1;
-  transition: width 0.3s ease;
-}
-
-.menu-item:hover .menu-text::after {
-  width: 100%;
-}
-
-.menu-indicator {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background-color: transparent;
-  transition: all 0.3s ease;
-  margin-right: 4px;
-}
-
-.menu-item:hover .menu-indicator {
-  background-color: #0d47a1;
-  animation: ping-slow 2s cubic-bezier(0, 0, 0.2, 1) infinite;
-}
-
-/* Scrollbar Styling */
-.menu-list::-webkit-scrollbar {
-  width: 4px;
-  transition: width 0.3s ease;
-}
-
-.menu-list:hover::-webkit-scrollbar {
-  width: 6px;
-}
-
-.menu-list::-webkit-scrollbar-track {
-  background: rgba(13, 71, 161, 0.05);
-  border-radius: 10px;
-  box-shadow: inset 0 0 4px rgba(13, 71, 161, 0.05);
-}
-
-.menu-list::-webkit-scrollbar-thumb {
-  background: linear-gradient(to bottom, rgba(13, 71, 161, 0.2), rgba(13, 71, 161, 0.3));
-  border-radius: 10px;
-  transition: all 0.3s ease;
-}
-
-.menu-list::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(to bottom, rgba(13, 71, 161, 0.3), rgba(13, 71, 161, 0.5));
-  box-shadow: 0 0 2px rgba(0, 0, 0, 0.1);
-}
-
-/* Responsive Adjustments */
-@media (max-width: 768px) {
-  .sidebar {
-    width: 240px;
-    padding: 1.5rem;
-    transform: translateX(-100%);
-    z-index: 100;
-  }
-
-  .sidebar.active {
     transform: translateX(0);
   }
 }
 
-.sidebar * {
-  transition-property: color, background-color, border-color, transform, opacity;
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.spinner-circle {
+  position: absolute;
+  width: 1rem;
+  height: 1rem;
+  background-color: #3b82f6;
+  border-radius: 9999px;
+  animation: spinner-animation 1.2s infinite ease-in-out;
+}
+
+.spinner-circle-1 {
+  left: 0;
+  animation-delay: -0.32s;
+}
+
+.spinner-circle-2 {
+  left: 50%;
+  margin-left: -0.5rem;
+  animation-delay: -0.16s;
+}
+
+.spinner-circle-3 {
+  right: 0;
+}
+
+@keyframes spinner-animation {
+
+  0%,
+  80%,
+  100% {
+    transform: scale(0);
+  }
+
+  40% {
+    transform: scale(1);
+  }
+}
+
+/* Panel hover effects */
+.panel-hover {
+  transition-property: all;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 200ms;
-}
-.menu-item.active {
-  border-left: 4px solid #0D47A1;
-  background: linear-gradient(90deg, rgba(13,71,161,0.10) 0%, rgba(13,71,161,0.04) 100%);
-  color: #0D47A1;
-  box-shadow: 0 8px 24px rgba(13,71,161,0.10);
-  transform: scale(1.03) translateX(2px);
-  font-weight: 600;
-  /* Add a subtle glow effect */
-  box-shadow: 0 0 0 2px rgba(13,71,161,0.08), 0 8px 24px rgba(13,71,161,0.10);
+  transition-duration: 300ms;
 }
 
-.menu-item.active .menu-icon-wrapper {
-  background-color: rgba(13,71,161,0.10);
-  transform: scale(1.12) rotate(-3deg);
+.panel-hover:hover {
+  --tw-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --tw-shadow-colored: 0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);
+  box-shadow:
+    var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+  transform: translateY(-2px);
 }
 
-.menu-item.active .menu-text {
-  color: #0D47A1;
+/* Credit unit badge */
+.badge {
+  transition: all 0.2s ease;
 }
 
-.menu-item.active .menu-indicator {
-  background-color: #0D47A1;
-  box-shadow: 0 0 8px 2px rgba(13,71,161,0.15);
+/* Input focus effect */
+:deep(.p-inputtext:enabled:hover) {
+  border-color: #60a5fa;
 }
 
+:deep(.p-inputtext:enabled:focus) {
+  --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+  --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);
+  box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000);
+  --tw-ring-color: rgb(191 219 254 / var(--tw-ring-opacity));
+  --tw-ring-opacity: 1;
+  border-color: #60a5fa;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1023px) {
+  .course-panel {
+    width: 100%;
+    margin-bottom: 1.5rem;
+  }
+}
+
+:deep(.custom-checkbox .p-checkbox-box) {
+  border-radius: 0.375rem;
+  border: 1px solid #d1d5db;
+  transition: all 0.2s ease;
+}
+
+:deep(.custom-checkbox .p-checkbox-box .p-checkbox-icon) {
+  font-size: 1.25rem !important;
+}
+
+:deep(.custom-checkbox .p-checkbox-box.p-highlight) {
+  background-color: #3b82f6;
+  border-color: #3b82f6;
+}
+
+:deep(.custom-checkbox .p-checkbox-box:hover) {
+  border-color: #3b82f6;
+}
+
+:deep(.custom-checkbox .p-checkbox-box:focus) {
+  box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.5);
+  outline: none;
+}
 </style>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-import { createSharedComposable } from '@vueuse/core'
-import { ref } from 'vue'
-import image2 from '../../assets/images/student/sidebar/image2.png'
-import image3 from '../../assets/images/student/sidebar/image3.png'
-import image4 from '../../assets/images/student/sidebar/image4.png'
-import image5 from '../../assets/images/student/sidebar/image5.png'
-import image6 from '../../assets/images/student/sidebar/image6.png'
-import image7 from '../../assets/images/student/sidebar/image7.png'
-import image8 from '../../assets/images/student/sidebar/image8.png'
-import image9 from '../../assets/images/student/sidebar/image9.png'
-import image10 from '../../assets/images/student/sidebar/image10.png'
-
-export const useStudentSideBar = createSharedComposable(() => {
-  const items = ref([
-    {
-      title: 'Dashboard',
-      icon: image4,
-      path: '/student',
-    },
-    {
-      title: 'Fees',
-      icon: image2,
-      path: '/student/fees',
-      hasChildren: true,
-      children: [
-        {
-          title: 'School Fee',
-          path: '/student/fees',
-        },
-        {
-          title: 'Stand Alone',
-          path: '/student/fees/stand-alone',
-        }
-      ]
-    },
-    {
-      title: 'Bio Data',
-      icon: image3,
-      path: '/student/bio-data',
-    },
-    {
-      title: 'Course Registration',
-      icon: image4,
-      path: '/student/course-registration',
-    },
-    {
-      title: 'My Results',
-      icon: image5,
-      path: '/student/my-results',
-    },
-    {
-      title: 'My Accomodation',
-      icon: image6,
-      path: '/student/my-accomodation',
-    },
-    {
-      title: 'Change Programme',
-      icon: image7,
-      path: '/student/change-programme',
-    },
-    {
-      title: 'My Document',
-      icon: image8,
-      path: 'my-documents',
-    },
-    {
-      title: 'Self Service',
-      icon: image9,
-      path: '',
-    },
-    {
-      title: 'Settings',
-      icon: image10,
-      path: '',
-    },
-  ])
-
-  return { items }
-})

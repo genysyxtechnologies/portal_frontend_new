@@ -61,7 +61,7 @@ interface MaritalStatus {
   title: string
   value: string
 }
-type DateArray = [number, number, number] // [year, month, day]
+type DateArray = [number, number, number]
 
 // Genotype interface
 interface Genotype {
@@ -94,12 +94,12 @@ interface UserInformation {
   nextOfKinName: string
   nextOfKinPhone: string
   nextOfKinRelationship: Genotype
-  otherSponsorName: string
+  otherSponsorName: string | null
   payerId: string
   placeOfBirth: string
   religion: Religion
   sessionGroup: string
-  sponsorName: string
+  sponsorName: string | null
   sport: string
   state: State
   tribe: Tribe
@@ -267,7 +267,7 @@ export interface User {
   email: string
   enabled: boolean
   firstName: string
-  gender: null
+  gender: string
   id: number
   information: UserInformation
   institutionalEmail: null

@@ -12,28 +12,96 @@ export const useStudentBioData = createSharedComposable(() => {
   const loading = ref<boolean>(false)
 
   // HANDLE BIO DATA UPDATE
-  const updateBioData = async () => {
-    const isEditing = sessionStorage.getItem('isEditingBiodataAnyField')
-    if (!isEditing) {
-      isUserEditingBiodata.value = false
-      return
-    }
-    isUserEditingBiodata.value = true
-    const editingValues = sessionStorage.getItem('biodataValues')
-    const parsedEditingValues = JSON.parse(editingValues || '{}')
+  const updateBioData = async (student: string) => {
+    loading.value = true
+    headTitle.value = 'Updating your information...'
+    subTitle.value = 'Please wait while we save your data'
+
     try {
-      await studentBiodataRepository.updateBiodata(
-        constant.studentInformation.updateInformation,
-        parsedEditingValues,
+      // Collect data from all tabs
+      const bioInfoData = sessionStorage.getItem('bioInfoValues')
+      const healthInfoData = sessionStorage.getItem('healthInfoValues')
+      const nextOfKinData = sessionStorage.getItem('nextOfKinValues')
+      const sponsorshipData = sessionStorage.getItem('sponsorshipValues')
+
+      // Parse all data
+      const parsedBioInfoData = JSON.parse(bioInfoData || '{}')
+      const parsedHealthInfoData = JSON.parse(healthInfoData || '{}')
+      const parsedNextOfKinData = JSON.parse(nextOfKinData || '{}')
+      const parsedSponsorshipData = JSON.parse(sponsorshipData || '{}')
+
+      // Combine all data
+      const allFormData = {
+        ...parsedBioInfoData,
+        ...parsedHealthInfoData,
+        ...parsedNextOfKinData,
+        ...parsedSponsorshipData,
+      }
+
+      // Ensure required fields have values
+      const requiredFields = [
+        'country',
+        'bloodGroup',
+        'nextOfKinRelationship',
+        'maritalStatus',
+        'genotype',
+        'religion',
+        'lgaCity',
+        'state',
+        'dateOfBirth',
+        'gender',
+        'homeTown',
+        'tribe',
+      ]
+
+      const userDataStr = sessionStorage.getItem('userData')
+      const userData = userDataStr ? JSON.parse(userDataStr) : {}
+      requiredFields.forEach((field) => {
+        if (!allFormData[field] || allFormData[field] === '') {
+
+          if (field === 'gender' && userData.gender) {
+            allFormData.gender = userData.gender
+          } else if (userData.information && userData.information[field] !== undefined) {
+            if (
+              typeof userData.information[field] === 'object' &&
+              userData.information[field]?.name
+            ) {
+              allFormData[field] = userData.information[field].name
+            } else if (
+              typeof userData.information[field] === 'object' &&
+              userData.information[field]?.title
+            ) {
+              allFormData[field] = userData.information[field].title
+            } else {
+              allFormData[field] = userData.information[field] || 'Not Specified'
+            }
+          } else {
+            allFormData[field] = 'Not Specified'
+          }
+        }
+      })
+
+      if (allFormData.hometown && !allFormData.homeTown) {
+        allFormData.homeTown = allFormData.hometown
+      }
+
+      const response = await studentBiodataRepository.updateBiodata(
+        constant.studentInformation.updateInformation + '?id=' + student,
+        allFormData,
       )
+
+      return response
     } catch (error) {
       return error
+    } finally {
+      loading.value = false
+      headTitle.value = 'Loading your information...'
+      subTitle.value = 'Please wait while we prepare your form'
     }
   }
 
   // download student biodata
   const downloadStudentBiodata = async (student: string) => {
-
     headTitle.value = 'Downloading your information...'
     subTitle.value = 'Please wait while we prepare your form'
     try {

@@ -184,7 +184,21 @@ const isEditingAnyField = computed(() => {
     'isEditingBiodataAnyField',
     JSON.stringify(Object.values(editableFields.value).some((val) => val)),
   )
-  sessionStorage.setItem('biodataValues', JSON.stringify(formData.value))
+
+  // Store next of kin data in sessionStorage with specific key
+  const nextOfKinData = {
+    nextOfKinName: formData.value.nextOfKinName,
+    nextOfKinPhone: formData.value.nextOfKinPhone,
+    nextOfKinAddress: formData.value.nextOfKinAddress,
+    // Handle different possible property names for relationship
+    nextOfKinRelationship: typeof selectedNextOfKinRelationship.value === 'object' ?
+      (selectedNextOfKinRelationship.value?.name || selectedNextOfKinRelationship.value?.name || '') :
+      selectedNextOfKinRelationship.value || ''
+  }
+
+  console.log('Next of kin data being saved:', nextOfKinData)
+
+  sessionStorage.setItem('nextOfKinValues', JSON.stringify(nextOfKinData))
 
   return Object.values(editableFields.value).some((val) => val)
 })
