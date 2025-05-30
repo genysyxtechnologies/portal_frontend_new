@@ -19,6 +19,7 @@ export const useStudentDashboard = createSharedComposable(() => {
     error.value = null
     try {
       const response = await authService.getCurrentUser()
+      console.log("THIS IS THE STUDENT RESPONSE: ", response.data)
       user.value = response.data.user
     } catch (err) {
       return err

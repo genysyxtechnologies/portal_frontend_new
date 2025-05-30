@@ -14,6 +14,7 @@
               placeholder="Select Country"
               class="card w-full"
               :readonly="!editableFields.country"
+              :disabled="!editableFields.country"
               @change="handleCountryChange"
               :filter="true"
               filterPlaceholder="Search countries"
@@ -189,7 +190,7 @@
           <div class="input-container">
             <InputText
               id="tribe"
-              v-model="formData.tribe"
+              :value="user?.information?.tribe?.name"
               type="text"
               class="custom-input"
               :placeholder="user?.information?.tribe?.name || 'Not Specified'"
@@ -213,14 +214,15 @@
             >Gender</label
           >
           <div class="input-container">
-            <InputText
-              id="gender"
-              v-model="formData.gender"
-              type="text"
-              class="w-full pr-10"
-              :placeholder="user?.information?.gender?.title || 'Not Specified'"
-              :readonly="!editableFields.gender"
-              :class="{ 'bg-gray-50': !editableFields.gender }"
+            <Sel-ect
+              :size="'large'"
+              v-model="selectedGender"
+              :options="availableGenders"
+              optionLabel="title"
+              placeholder="Select Gender"
+              class="card w-full"
+              :filter="true"
+              filterPlaceholder="Search genders"
             />
             <EditToggle
               :is-editing="editableFields.gender"
@@ -335,7 +337,13 @@ type FormData = {
   placeOfBirth: string
   dateOfBirth: string
   gender: string
-  tribe: string
+  tribe: number | string
+}
+
+// Define a type for gender
+interface Gender {
+  id: number
+  title: string
 }
 
 // Editable state for each field with proper typing
@@ -361,8 +369,8 @@ const formData = ref<FormData>({
   homeAddress: props.user?.information.homeAddress || 'Not Specified',
   placeOfBirth: props.user?.information.placeOfBirth || 'Not Specified',
   dateOfBirth: formatDateOfBirth(props.user?.information?.dob) || '',
-  gender: props.user?.gender || 'Not Specified',
-  tribe: props.user?.information?.tribe?.name || 'Not Specified',
+  gender: '', // Will use selectedGender instead
+  tribe: props.user?.information?.tribe?.id || 'Not Specified',
 })
 
 // Get countries from the useStudentBioData service
@@ -373,15 +381,29 @@ const availableCountries = computed(() => {
   return countries.value || []
 })
 
+// Gender options with id and title structure
+const availableGenders = ref<Gender[]>([
+  { id: 1, title: 'Male' },
+  { id: 2, title: 'Female' },
+])
+
 // Selected values for select inputs
 const selectedCountry = ref(props.user?.information.country || null)
 const selectedState = ref(props.user?.information.state || null)
 const selectedLGA = ref(props.user?.information?.lga || null)
 const selectedReligion = ref(props.user?.information.religion)
 const selectedMaritalStatus = ref(props.user?.information.maritalStatus)
+// Check if user.gender exists and has a title property (using the Gender interface)
+const selectedGender = ref<Gender>(
+  props.user?.gender && typeof props.user.gender === 'object' && props.user.gender.title
+    ? { id: props.user.gender.id, title: props.user.gender.title }
+    : props.user?.gender && typeof props.user.gender === 'string'
+      ? { id: props.user.gender === 'Male' ? 1 : 2, title: props.user.gender as string }
+      : availableGenders.value[0], // Default to first gender in the array if null
+)
 
-// Available options for dropdowns
 const availableStates = ref<State[]>([])
+
 // Using the same LGA interface structure as in the user information
 type LGA = {
   id: number
@@ -392,7 +414,43 @@ type LGA = {
   creationTime?: number | null
   updatedTime?: number | null
 }
-const availableLGAs = ref<LGA[]>([])
+// Initialize with user's LGA if available to ensure it's always displayed as default
+const availableLGAs = ref([props.user?.information?.lga])
+
+// Function to load LGA data with retry mechanism
+const loadLGAData = async (stateId: number, retryCount = 3): Promise<boolean> => {
+  // Store user's LGA before fetching new data
+  const userLga = props.user?.information?.lga
+
+  try {
+    const lgasData = await fetchLocalGovernment(stateId)
+
+    if (lgasData && Array.isArray(lgasData)) {
+      // Set the fetched LGAs
+      availableLGAs.value = lgasData
+
+      // If user has an LGA and it's not in the fetched list, add it
+      if (userLga && !availableLGAs.value.some((lga) => lga.id === userLga.id)) {
+        availableLGAs.value.unshift(userLga)
+      }
+
+      return true
+    }
+  } catch {
+    // Silent catch - continue to retry
+  }
+  if (retryCount > 0) {
+    await new Promise((resolve) => setTimeout(resolve, 500))
+    return loadLGAData(stateId, retryCount - 1)
+  }
+  if (userLga) {
+    availableLGAs.value = [userLga]
+    return true
+  }
+
+  availableLGAs.value = []
+  return false
+}
 
 // Fetch countries on component mount
 onMounted(async () => {
@@ -419,17 +477,26 @@ onMounted(async () => {
         if (userState) {
           selectedState.value = userState
 
-          // Fetch LGAs for the user's state
-          const lgasData = await fetchLocalGovernment(userState.id)
-          availableLGAs.value = (lgasData as LGA[]) || []
+          // Load LGA data with retry mechanism
+          await loadLGAData(userState.id)
 
           // Set the user's LGA if available
           if (props.user?.information?.lga) {
-            const userLGA = availableLGAs.value.find(
-              (lga) => lga.id === props.user.information.lga.id,
-            )
-            if (userLGA) {
-              selectedLGA.value = userLGA
+            const userLga = props.user.information.lga
+            const existingLga = availableLGAs.value.find((lga) => lga.id === userLga.id)
+
+            if (existingLga) {
+              selectedLGA.value = existingLga
+            } else {
+              selectedLGA.value = userLga
+
+              // Add user's LGA to options if not present and LGAs were loaded
+              if (availableLGAs.value.length > 0) {
+                availableLGAs.value.push(userLga)
+              } else {
+                // If no LGAs were loaded, use the user's LGA directly
+                availableLGAs.value = [userLga]
+              }
             }
           }
         }
@@ -451,7 +518,7 @@ watch(
         placeOfBirth: newUser.information.placeOfBirth || '',
         dateOfBirth: formatDateOfBirth(newUser.information?.dob) || '',
         gender: newUser.gender || '',
-        tribe: newUser.information?.tribe?.name || 'Not Specified',
+        tribe: newUser.information?.tribe?.id || 'Not Specified',
       }
 
       if (countries.value && countries.value.length > 0 && newUser.information.country) {
@@ -499,26 +566,26 @@ const isEditingAnyField = computed(() => {
     homeTown: formData.value.hometown,
     homeAddress: formData.value.homeAddress,
     placeOfBirth: formData.value.placeOfBirth,
-    dateOfBirth: formData.value.dateOfBirth,
-    gender: formData.value.gender,
-    tribe: formData.value.tribe,
-    country:
+    dob: formData.value.dateOfBirth,
+    genderId: selectedGender.value?.id || availableGenders.value?.[0]?.id,
+    tribeId: formData.value.tribe,
+    countryId:
       typeof selectedCountry.value === 'object'
         ? selectedCountry.value?.id || ''
         : selectedCountry.value || '',
-    state:
+    stateId:
       typeof selectedState.value === 'object'
         ? selectedState.value?.id || ''
         : selectedState.value || '',
-    religion:
+    religionId:
       typeof selectedReligion.value === 'object'
         ? selectedReligion.value?.id || ''
         : selectedReligion.value || '',
-    maritalStatus:
+    maritalStatusId:
       typeof selectedMaritalStatus.value === 'object'
         ? selectedMaritalStatus.value?.id || ''
         : selectedMaritalStatus.value || '',
-    lga: selectedLGA.value?.id || null,
+    lgaId: selectedLGA.value?.id || null,
   }
 
   sessionStorage.setItem('bioInfoValues', JSON.stringify(bioInfoData))
@@ -540,19 +607,28 @@ const toggleEdit = (field: keyof EditableFields) => {
   editableFields.value[field] = !editableFields.value[field]
 }
 
-const handleSave = () => {
-  // Implement save logic here
-  const successMessage = document.createElement('div')
-  successMessage.className = 'save-notification'
-  successMessage.innerHTML = '<i class="fas fa-check-circle"></i> Changes saved successfully!'
-  document.body.appendChild(successMessage)
+const handleSave = async () => {
+  // Store form values in session storage for use in the updateBioData function
+  const bioInfoValues = {
+    countryId: selectedCountry.value?.id || null,
+    stateId: selectedState.value?.id || null,
+    lgaId: selectedLGA.value?.id || null,
+    contactAddress: formData.value.contactAddress,
+    homeTown: formData.value.hometown,
+    homeAddress: formData.value.homeAddress,
+    placeOfBirth: formData.value.placeOfBirth,
+    tribeId: formData.value.tribe,
+    religionId: selectedReligion.value?.id || null,
+    maritalStatusId: selectedMaritalStatus.value?.id || null,
+    genderId: selectedGender.value.id,
+  }
 
-  setTimeout(() => {
-    successMessage.classList.add('fade-out')
-    setTimeout(() => document.body.removeChild(successMessage), 500)
-  }, 3000)
-  ;(Object.keys(editableFields.value) as Array<keyof EditableFields>).forEach((key) => {
-    editableFields.value[key] = false
+  // Save to session storage
+  sessionStorage.setItem('bioInfoValues', JSON.stringify(bioInfoValues))
+
+  // Reset all editable fields
+  Object.keys(editableFields.value).forEach((key) => {
+    editableFields.value[key as keyof EditableFields] = false
   })
 }
 
@@ -593,8 +669,8 @@ const handleStateChange = async () => {
   selectedLGA.value = null
 
   if (selectedState.value && selectedState.value.id) {
-    const lgasData = await fetchLocalGovernment(selectedState.value.id)
-    availableLGAs.value = lgasData || []
+    // Use the loadLGAData function with retry mechanism
+    await loadLGAData(selectedState.value.id)
   } else {
     availableLGAs.value = []
   }

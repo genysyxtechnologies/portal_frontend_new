@@ -191,12 +191,11 @@ const isEditingAnyField = computed(() => {
     nextOfKinPhone: formData.value.nextOfKinPhone,
     nextOfKinAddress: formData.value.nextOfKinAddress,
     // Handle different possible property names for relationship
-    nextOfKinRelationship: typeof selectedNextOfKinRelationship.value === 'object' ?
-      (selectedNextOfKinRelationship.value?.name || selectedNextOfKinRelationship.value?.name || '') :
+    nextOfKinRelationshipId: typeof selectedNextOfKinRelationship.value === 'object' ?
+      (selectedNextOfKinRelationship.value?.id || selectedNextOfKinRelationship.value?.id || '') :
       selectedNextOfKinRelationship.value || ''
   }
 
-  console.log('Next of kin data being saved:', nextOfKinData)
 
   sessionStorage.setItem('nextOfKinValues', JSON.stringify(nextOfKinData))
 
@@ -224,7 +223,7 @@ const handleSave = () => {
 }
 
 const handleNext = () => {
-  console.log('Proceeding to next step')
+return
 }
 </script>
 

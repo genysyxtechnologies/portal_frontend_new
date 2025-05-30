@@ -12,12 +12,12 @@
           class="download-button"
           @on-click="downloadStudentBiodata(user?.username!)"
         />
-       <!--  <ReUsableButtons
+        <ReUsableButtons
           :label="'Update'"
           class="update-button"
           :disabled="loading || bioDataLoading || !user?.username"
           @on-click="handleUpdateBioData"
-        /> -->
+        />
       </div>
     </div>
 

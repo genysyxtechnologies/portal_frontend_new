@@ -7,7 +7,6 @@ import type { CountryResponse } from '@/types/student/dashboard_information'
 export const useStudentBioData = createSharedComposable(() => {
   const studentBiodataRepository = new StudentBiodataRepository()
   const tabCount = ref<string>('0')
-  const isUserEditingBiodata = ref<boolean>(false)
   const headTitle = ref<string>('Loading your information...')
   const subTitle = ref<string>('Please wait while we prepare your form')
   const loading = ref<boolean>(false)
@@ -42,27 +41,26 @@ export const useStudentBioData = createSharedComposable(() => {
 
       // Ensure required fields have values
       const requiredFields = [
-        'country',
-        'bloodGroup',
-        'nextOfKinRelationship',
-        'maritalStatus',
-        'genotype',
-        'religion',
-        'lgaCity',
-        'state',
-        'dateOfBirth',
-        'gender',
+        'countryId',
+        'bloodGroupId',
+        'nextOfKinRelationshipId',
+        'maritalStatusId',
+        'genotypeId',
+        'religionId',
+        'lgaId',
+        'stateId',
+        'dob',
+        'genderId',
         'homeTown',
-        'tribe',
+        'tribeId',
       ]
 
       const userDataStr = sessionStorage.getItem('userData')
       const userData = userDataStr ? JSON.parse(userDataStr) : {}
       requiredFields.forEach((field) => {
         if (!allFormData[field] || allFormData[field] === '') {
-
-          if (field === 'gender' && userData.gender) {
-            allFormData.gender = userData.gender
+          if (field === 'genderId' && userData.gender) {
+            allFormData.genderId = userData.gender === 'Male' ? 1 : 2
           } else if (userData.information && userData.information[field] !== undefined) {
             if (
               typeof userData.information[field] === 'object' &&
@@ -121,12 +119,13 @@ export const useStudentBioData = createSharedComposable(() => {
     }
   }
 
-
   // fetch countries
   const fetchCountries = async () => {
     try {
       loading.value = true
-      const response = await studentBiodataRepository.getInformation(constant.nationality.getCountries)
+      const response = await studentBiodataRepository.getInformation(
+        constant.nationality.getCountries,
+      )
       countries.value = response.data as CountryResponse[]
       return response.data as CountryResponse[]
     } catch (error) {
@@ -140,8 +139,9 @@ export const useStudentBioData = createSharedComposable(() => {
   const fetchStates = async (countryId: number) => {
     try {
       loading.value = true
-      const response = await studentBiodataRepository.getInformation(constant.nationality.getStates + countryId)
-      console.log("THIS ARE THE STATE RESPONSE: ", response.data)
+      const response = await studentBiodataRepository.getInformation(
+        constant.nationality.getStates + countryId,
+      )
       return response.data
     } catch (error) {
       return error
@@ -154,8 +154,9 @@ export const useStudentBioData = createSharedComposable(() => {
   const fetchLocalGovernment = async (stateId: number) => {
     try {
       loading.value = true
-      const response = await studentBiodataRepository.getInformation(constant.nationality.getLgas + stateId)
-      console.log("THIS ARE THE LOCAL GOVERNMENT RESPONSE: ", response.data)
+      const response = await studentBiodataRepository.getInformation(
+        constant.nationality.getLgas + stateId,
+      )
       return response.data
     } catch (error) {
       return error
@@ -164,5 +165,16 @@ export const useStudentBioData = createSharedComposable(() => {
     }
   }
 
-  return { tabCount, updateBioData, downloadStudentBiodata, fetchCountries, fetchStates, fetchLocalGovernment, countries, loading, headTitle, subTitle }
+  return {
+    tabCount,
+    updateBioData,
+    downloadStudentBiodata,
+    fetchCountries,
+    fetchStates,
+    fetchLocalGovernment,
+    countries,
+    loading,
+    headTitle,
+    subTitle,
+  }
 })

@@ -120,12 +120,11 @@ const toggleEdit = (field: keyof EditableFields) => {
 // Function to update session storage with health info data
 const updateSessionStorage = () => {
   const healthInfoData = {
-    bloodGroup: typeof selectedBloodGroup.value === 'object' ? selectedBloodGroup.value?.name || '' : selectedBloodGroup.value || '',
-    genotype: typeof selectedGenotype.value === 'object' ? selectedGenotype.value?.name || '' : selectedGenotype.value || '',
+    bloodGroupId: typeof selectedBloodGroup.value === 'object' ? selectedBloodGroup.value?.id || '' : selectedBloodGroup.value || '',
+    genotypeId: typeof selectedGenotype.value === 'object' ? selectedGenotype.value?.id || '' : selectedGenotype.value || '',
     disability: formData.value.disability || ''
   }
 
-  console.log('Health info data being saved:', healthInfoData)
   sessionStorage.setItem('healthInfoValues', JSON.stringify(healthInfoData))
 }
 

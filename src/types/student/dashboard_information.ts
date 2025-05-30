@@ -255,6 +255,13 @@ export interface Programme {
   startingLevel: null
 }
 
+// Gender interface
+interface Gender {
+  id: number
+  title: string
+  value: string
+}
+
 // Main User interface
 export interface User {
   accountNonExpired: boolean
@@ -267,7 +274,7 @@ export interface User {
   email: string
   enabled: boolean
   firstName: string
-  gender: string
+  gender: Gender
   id: number
   information: UserInformation
   institutionalEmail: null
