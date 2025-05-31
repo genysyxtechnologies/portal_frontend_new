@@ -19,7 +19,7 @@ export const useStudentSideBar = createSharedComposable(() => {
     {
       title: 'Fees',
       icon: image2,
-      path: '/student/fees',
+      path: '/student/feesss',
       hasChildren: true,
       children: [
         {

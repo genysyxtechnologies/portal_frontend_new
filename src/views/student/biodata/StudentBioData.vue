@@ -22,34 +22,13 @@
     </div>
 
     <div class="main-content">
-      <!-- User Information Card -->
-      <div class="profile-card" data-aos="fade-up" data-aos-duration="800">
-        <div class="card-content">
-          <div class="card-header">
-            <h2 class="card-title">Student Profile</h2>
-          </div>
-          <UserInformation
-            :first-label="'Name'"
-            :second-label="'Matric Number'"
-            :third-label="'Phone Number'"
-            :third-input="user?.phone"
-            :first-input="user?.name"
-            :second-input="user?.username"
-            class="profile-information"
-          />
-        </div>
-      </div>
-
       <!-- Tabbed Bio Data Section -->
       <div
         class="biodata-details-card"
         data-aos="fade-up"
         data-aos-duration="800"
-        data-aos-delay="200"
       >
-        <div class="card-header">
-          <h2 class="card-title">Bio Data Information</h2>
-        </div>
+
 
         <SpinningAnimation
           :loading="loading || bioDataLoading"
@@ -303,15 +282,23 @@ const getTabIcon = (index: number) => {
 }
 
 .update-button {
-  background: linear-gradient(135deg, #3498db, #2980b9);
-  color: white;
+  background: linear-gradient(135deg, #3b82f6, #2563eb) !important;
+  border-radius: 1rem !important;
+  color: white !important;
+  font-weight: 600 !important;
   transition: all 0.3s ease;
+  border: none !important;
+  box-shadow:
+    0 8px 16px rgba(59, 130, 246, 0.3),
+    0 4px 8px rgba(0, 0, 0, 0.1) !important;
 }
 
 .update-button:hover {
-  background: linear-gradient(135deg, #2980b9, #1a5276);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+  background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
+  transform: translateY(-3px) scale(1.05) !important;
+  box-shadow:
+    0 12px 24px rgba(59, 130, 246, 0.4),
+    0 8px 16px rgba(0, 0, 0, 0.15) !important;
 }
 
 @keyframes slideIn {
@@ -368,16 +355,22 @@ const getTabIcon = (index: number) => {
   overflow: hidden;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   transform-origin: center;
+  background: linear-gradient(135deg, #10b981, #059669) !important;
+  border-radius: 1rem !important;
+  color: white !important;
+  font-weight: 600 !important;
   box-shadow:
-    0 4px 6px -1px rgba(0, 0, 0, 0.1),
-    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    0 8px 16px rgba(16, 185, 129, 0.3),
+    0 4px 8px rgba(0, 0, 0, 0.1) !important;
+  border: none !important;
 }
 
 .download-button:hover {
-  transform: translateY(-2px) scale(1.02);
+  transform: translateY(-3px) scale(1.05) !important;
   box-shadow:
-    0 10px 15px -3px rgba(0, 0, 0, 0.1),
-    0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    0 12px 24px rgba(16, 185, 129, 0.4),
+    0 8px 16px rgba(0, 0, 0, 0.15) !important;
+  background: linear-gradient(135deg, #059669, #047857) !important;
 }
 
 .download-button:active {
@@ -386,99 +379,12 @@ const getTabIcon = (index: number) => {
 
 /* Main content layout */
 .main-content {
-  display: grid;
-  grid-template-columns: 1fr;
+  display: flex;
+  flex-direction: column;
   gap: 1.5rem;
   min-height: calc(100vh - 180px);
 }
 
-@media (min-width: 1024px) {
-  .main-content {
-    grid-template-columns: 5fr 7fr;
-  }
-}
-
-/* Profile card styling */
-.profile-card {
-  background-color: white;
-  border-radius: 1rem;
-  box-shadow:
-    0 4px 6px -1px rgba(0, 0, 0, 0.05),
-    0 2px 4px -1px rgba(0, 0, 0, 0.03);
-  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-  border: 1px solid transparent;
-  overflow: hidden;
-  height: 100%;
-  position: relative;
-}
-
-.profile-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 4px;
-  background: linear-gradient(90deg, #3b82f6, #8b5cf6);
-  z-index: 1;
-}
-
-.profile-card:hover {
-  transform: translateY(-4px);
-  box-shadow:
-    0 20px 25px -5px rgba(0, 0, 0, 0.1),
-    0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  border-color: rgba(59, 130, 246, 0.2);
-}
-
-.card-content {
-  padding: 1.5rem;
-  height: 100%;
-}
-
-.card-header {
-  margin-bottom: 1rem;
-  padding-bottom: 0.75rem;
-  border-bottom: 1px solid #f3f4f6;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.card-title {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #1f2937;
-  position: relative;
-  padding-left: 1rem;
-}
-
-.card-title::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 4px;
-  height: 18px;
-  background: linear-gradient(180deg, #3b82f6, #8b5cf6);
-  border-radius: 2px;
-}
-
-.profile-information {
-  animation: fadeInUp 0.6s ease-out 0.2s both;
-}
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
 
 /* Bio data details card styling */
 .biodata-details-card {
