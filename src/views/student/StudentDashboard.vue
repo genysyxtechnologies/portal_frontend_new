@@ -1,11 +1,18 @@
 <template>
   <div class="dashboard-layout">
     <!-- fixedss Sidebar -->
-    <SidebarView :username="user?.name" :userID="user?.username" />
+    <SidebarView 
+      :basic-details="user as unknown as Record<any,any>"
+      :initial-collapsed="sidebarCollapsed"
+      @toggle="handleSidebarToggle"
+    />
 
     <!-- main Content Area -->
-    <div class="main-content">
-      <NavbarView />
+    <div class="main-content" :class="{ 'main-content-collapsed': sidebarCollapsed }">
+      <NavbarView 
+        :sidebar-collapsed="sidebarCollapsed"
+        @toggle-sidebar="handleSidebarToggle"
+      />
       <div class="page-content">
         <router-view />
       </div>
@@ -16,11 +23,21 @@
 <script setup lang="ts">
 
 
-import { onMounted } from 'vue'
+import { onMounted, ref } from 'vue'
 import NavbarView from './NavbarView.vue'
 import SidebarView from './SidebarView.vue'
 import { useStudentDashboard } from '@/services/student/useStudentDashboard'
+
 const { user, getStudentInformation } = useStudentDashboard()
+const sidebarCollapsed = ref(false)
+
+const handleSidebarToggle = (collapsed?: boolean) => {
+  if (typeof collapsed === 'boolean') {
+    sidebarCollapsed.value = collapsed
+  } else {
+    sidebarCollapsed.value = !sidebarCollapsed.value
+  }
+}
 
 onMounted(async () => {
   await getStudentInformation()
@@ -46,13 +63,16 @@ onMounted(async () => {
 
 .main-content {
   flex: 1;
-  margin-left: 270px;
-
-  /* sidebar width */
+  margin-left: 300px; /* Account for sidebar + margin */
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   width: 100%;
+  transition: margin-left 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.main-content-collapsed {
+  margin-left: 104px; /* Collapsed sidebar width + margin */
 }
 
 .navbar {
@@ -69,9 +89,20 @@ onMounted(async () => {
   flex: 1;
   padding: 0.8rem;
   margin-left: 35px;
+  transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 /* responsive adjustments */
+@media (max-width: 1024px) {
+  .main-content {
+    margin-left: 260px;
+  }
+  
+  .main-content-collapsed {
+    margin-left: 94px;
+  }
+}
+
 @media (max-width: 768px) {
   .sidebar {
     width: 240px;
@@ -84,6 +115,10 @@ onMounted(async () => {
   }
 
   .main-content {
+    margin-left: 0;
+  }
+  
+  .main-content-collapsed {
     margin-left: 0;
   }
 }

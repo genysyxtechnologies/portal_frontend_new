@@ -523,92 +523,92 @@
             </div>
 
             <!-- Ultra-Modern Payment Instructions -->
-            <div class="relative overflow-hidden bg-gradient-to-br from-slate-50 via-blue-50/60 to-indigo-50/40 p-8 rounded-3xl border border-white/40 mb-8 shadow-xl backdrop-blur-sm mt-8">
-              <!-- Animated gradient border -->
-              <div class="absolute inset-0 bg-gradient-to-r from-blue-500 via-purple-500 to-cyan-500 rounded-3xl p-[2px]">
-                <div class="bg-gradient-to-br from-slate-50 via-blue-50/60 to-indigo-50/40 rounded-3xl h-full w-full"></div>
-              </div>
+<!--            <div class="relative overflow-hidden bg-gradient-to-br from-slate-50 via-blue-50/60 to-indigo-50/40 p-8 rounded-3xl border border-white/40 mb-8 shadow-xl backdrop-blur-sm mt-8">-->
+<!--              &lt;!&ndash; Animated gradient border &ndash;&gt;-->
+<!--              <div class="absolute inset-0 bg-gradient-to-r from-blue-500 via-purple-500 to-cyan-500 rounded-3xl p-[2px]">-->
+<!--                <div class="bg-gradient-to-br from-slate-50 via-blue-50/60 to-indigo-50/40 rounded-3xl h-full w-full"></div>-->
+<!--              </div>-->
 
-              <!-- Floating geometric elements -->
-              <div class="absolute top-4 right-4 w-20 h-20 bg-gradient-to-br from-blue-400/10 to-purple-400/10 rounded-2xl blur-xl rotate-12 animate-pulse"></div>
-              <div class="absolute bottom-6 left-6 w-16 h-16 bg-gradient-to-br from-cyan-400/10 to-blue-400/10 rounded-full blur-lg animate-pulse" style="animation-delay: 1s"></div>
-              <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-gradient-to-br from-indigo-400/5 to-purple-400/5 rounded-full blur-2xl"></div>
+<!--              &lt;!&ndash; Floating geometric elements &ndash;&gt;-->
+<!--              <div class="absolute top-4 right-4 w-20 h-20 bg-gradient-to-br from-blue-400/10 to-purple-400/10 rounded-2xl blur-xl rotate-12 animate-pulse"></div>-->
+<!--              <div class="absolute bottom-6 left-6 w-16 h-16 bg-gradient-to-br from-cyan-400/10 to-blue-400/10 rounded-full blur-lg animate-pulse" style="animation-delay: 1s"></div>-->
+<!--              <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-gradient-to-br from-indigo-400/5 to-purple-400/5 rounded-full blur-2xl"></div>-->
 
-              <div class="relative z-10">
-                <!-- Enhanced header with icon animation -->
-                <div class="flex items-center gap-4 mb-8">
-                  <div class="relative">
-                    <div class="w-14 h-14 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300">
-                      <i class="pi pi-shield text-white text-xl"></i>
-                    </div>
-                    <div class="absolute -inset-1 bg-gradient-to-br from-blue-500/30 to-purple-600/30 rounded-2xl blur-md animate-pulse"></div>
-                  </div>
-                  <div>
-                    <h4 class="text-2xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
-                      Payment Guidelines
-                    </h4>
-                    <p class="text-sm text-gray-500 font-medium">Secure & streamlined payment process</p>
-                  </div>
-                </div>
+<!--              <div class="relative z-10">-->
+<!--                &lt;!&ndash; Enhanced header with icon animation &ndash;&gt;-->
+<!--                <div class="flex items-center gap-4 mb-8">-->
+<!--                  <div class="relative">-->
+<!--                    <div class="w-14 h-14 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300">-->
+<!--                      <i class="pi pi-shield text-white text-xl"></i>-->
+<!--                    </div>-->
+<!--                    <div class="absolute -inset-1 bg-gradient-to-br from-blue-500/30 to-purple-600/30 rounded-2xl blur-md animate-pulse"></div>-->
+<!--                  </div>-->
+<!--                  <div>-->
+<!--                    <h4 class="text-2xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">-->
+<!--                      Payment Guidelines-->
+<!--                    </h4>-->
+<!--                    <p class="text-sm text-gray-500 font-medium">Secure & streamlined payment process</p>-->
+<!--                  </div>-->
+<!--                </div>-->
 
-                <!-- Modern instruction cards -->
-                <div class="grid gap-4">
-                  <div class="group relative overflow-hidden bg-white/70 backdrop-blur-sm p-5 rounded-2xl border border-white/50 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-                    <div class="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                    <div class="relative flex items-start gap-4">
-                      <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center flex-shrink-0 shadow-md group-hover:scale-110 transition-transform duration-300">
-                        <i class="pi pi-download text-white text-sm"></i>
-                      </div>
-                      <div class="flex-1">
-                        <h5 class="font-bold text-gray-800 mb-1 group-hover:text-blue-700 transition-colors">Download Your Invoice</h5>
-                        <p class="text-sm text-gray-600 leading-relaxed">Generate and download your official fee invoice before proceeding with payment. This document serves as your payment reference.</p>
-                      </div>
-                    </div>
-                  </div>
+<!--                &lt;!&ndash; Modern instruction cards &ndash;&gt;-->
+<!--                <div class="grid gap-4">-->
+<!--                  <div class="group relative overflow-hidden bg-white/70 backdrop-blur-sm p-5 rounded-2xl border border-white/50 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">-->
+<!--                    <div class="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>-->
+<!--                    <div class="relative flex items-start gap-4">-->
+<!--                      <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center flex-shrink-0 shadow-md group-hover:scale-110 transition-transform duration-300">-->
+<!--                        <i class="pi pi-download text-white text-sm"></i>-->
+<!--                      </div>-->
+<!--                      <div class="flex-1">-->
+<!--                        <h5 class="font-bold text-gray-800 mb-1 group-hover:text-blue-700 transition-colors">Download Your Invoice</h5>-->
+<!--                        <p class="text-sm text-gray-600 leading-relaxed">Generate and download your official fee invoice before proceeding with payment. This document serves as your payment reference.</p>-->
+<!--                      </div>-->
+<!--                    </div>-->
+<!--                  </div>-->
 
-                  <div class="group relative overflow-hidden bg-white/70 backdrop-blur-sm p-5 rounded-2xl border border-white/50 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-                    <div class="absolute inset-0 bg-gradient-to-r from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                    <div class="relative flex items-start gap-4">
-                      <div class="w-10 h-10 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl flex items-center justify-center flex-shrink-0 shadow-md group-hover:scale-110 transition-transform duration-300">
-                        <i class="pi pi-credit-card text-white text-sm"></i>
-                      </div>
-                      <div class="flex-1">
-                        <h5 class="font-bold text-gray-800 mb-1 group-hover:text-emerald-700 transition-colors">Multiple Payment Options</h5>
-                        <p class="text-sm text-gray-600 leading-relaxed">Pay conveniently through our secure online portal, mobile banking, or visit any designated bank branch with your invoice.</p>
-                      </div>
-                    </div>
-                  </div>
+<!--                  <div class="group relative overflow-hidden bg-white/70 backdrop-blur-sm p-5 rounded-2xl border border-white/50 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">-->
+<!--                    <div class="absolute inset-0 bg-gradient-to-r from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>-->
+<!--                    <div class="relative flex items-start gap-4">-->
+<!--                      <div class="w-10 h-10 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl flex items-center justify-center flex-shrink-0 shadow-md group-hover:scale-110 transition-transform duration-300">-->
+<!--                        <i class="pi pi-credit-card text-white text-sm"></i>-->
+<!--                      </div>-->
+<!--                      <div class="flex-1">-->
+<!--                        <h5 class="font-bold text-gray-800 mb-1 group-hover:text-emerald-700 transition-colors">Multiple Payment Options</h5>-->
+<!--                        <p class="text-sm text-gray-600 leading-relaxed">Pay conveniently through our secure online portal, mobile banking, or visit any designated bank branch with your invoice.</p>-->
+<!--                      </div>-->
+<!--                    </div>-->
+<!--                  </div>-->
 
-                  <div class="group relative overflow-hidden bg-white/70 backdrop-blur-sm p-5 rounded-2xl border border-white/50 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-                    <div class="absolute inset-0 bg-gradient-to-r from-amber-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                    <div class="relative flex items-start gap-4">
-                      <div class="w-10 h-10 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl flex items-center justify-center flex-shrink-0 shadow-md group-hover:scale-110 transition-transform duration-300">
-                        <i class="pi pi-shield text-white text-sm"></i>
-                      </div>
-                      <div class="flex-1">
-                        <h5 class="font-bold text-gray-800 mb-1 group-hover:text-amber-700 transition-colors">Secure Receipt Storage</h5>
-                        <p class="text-sm text-gray-600 leading-relaxed">Always keep your payment receipt and transaction confirmations safe. These serve as proof of payment and may be required for verification.</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+<!--                  <div class="group relative overflow-hidden bg-white/70 backdrop-blur-sm p-5 rounded-2xl border border-white/50 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">-->
+<!--                    <div class="absolute inset-0 bg-gradient-to-r from-amber-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>-->
+<!--                    <div class="relative flex items-start gap-4">-->
+<!--                      <div class="w-10 h-10 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl flex items-center justify-center flex-shrink-0 shadow-md group-hover:scale-110 transition-transform duration-300">-->
+<!--                        <i class="pi pi-shield text-white text-sm"></i>-->
+<!--                      </div>-->
+<!--                      <div class="flex-1">-->
+<!--                        <h5 class="font-bold text-gray-800 mb-1 group-hover:text-amber-700 transition-colors">Secure Receipt Storage</h5>-->
+<!--                        <p class="text-sm text-gray-600 leading-relaxed">Always keep your payment receipt and transaction confirmations safe. These serve as proof of payment and may be required for verification.</p>-->
+<!--                      </div>-->
+<!--                    </div>-->
+<!--                  </div>-->
+<!--                </div>-->
 
-                <!-- Quick action section -->
-                <div class="mt-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl border border-blue-100/50">
-                  <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-3">
-                      <div class="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
-                        <i class="pi pi-info-circle text-white text-sm"></i>
-                      </div>
-                      <span class="text-sm font-semibold text-blue-700">Need help with payment?</span>
-                    </div>
-                    <button class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium rounded-lg transition-colors duration-200 shadow-md hover:shadow-lg">
-                      Contact Support
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
+<!--                &lt;!&ndash; Quick action section &ndash;&gt;-->
+<!--                <div class="mt-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl border border-blue-100/50">-->
+<!--                  <div class="flex items-center justify-between">-->
+<!--                    <div class="flex items-center gap-3">-->
+<!--                      <div class="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">-->
+<!--                        <i class="pi pi-info-circle text-white text-sm"></i>-->
+<!--                      </div>-->
+<!--                      <span class="text-sm font-semibold text-blue-700">Need help with payment?</span>-->
+<!--                    </div>-->
+<!--                    <button class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium rounded-lg transition-colors duration-200 shadow-md hover:shadow-lg">-->
+<!--                      Contact Support-->
+<!--                    </button>-->
+<!--                  </div>-->
+<!--                </div>-->
+<!--              </div>-->
+<!--            </div>-->
           </div>
 
           <!-- Modern footer -->
