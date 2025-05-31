@@ -27,7 +27,7 @@ export const useStudentSideBar = createSharedComposable(() => {
           path: '/student/fees',
         },
         {
-          title: 'Stand Alone',
+          title: 'Standalone',
           path: '/student/stand-alone-fee',
         },
       ],
@@ -44,11 +44,11 @@ export const useStudentSideBar = createSharedComposable(() => {
       hasChildren: true,
       children: [
         {
-          title: 'Course Registration',
+          title: 'Registration',
           path: '/student/course-registration',
         },
         {
-          title: 'My Results',
+          title: 'Results',
           path: '/student/my-results',
         },
       ],

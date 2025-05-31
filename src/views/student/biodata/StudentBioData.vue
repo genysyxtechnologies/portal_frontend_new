@@ -76,7 +76,6 @@
 </template>
 
 <script setup lang="ts">
-import UserInformation from '../dashboard/UserInformation.vue'
 import BioInfo from './BioInfo.vue'
 import HealthInfo from './HealthInfo.vue'
 import ReUsableButtons from '@/views/buttons/ReUsableButtons.vue'
@@ -108,7 +107,6 @@ const {
   fetchCountries,
   headTitle,
   subTitle,
-  countries,
   loading: bioDataLoading,
 } = useStudentBioData()
 
@@ -138,11 +136,14 @@ const handleUpdateBioData = async () => {
 
     // Remove loading notification
     document.body.removeChild(loadingNotification)
-  } catch (error: any) {
+  } catch (error: unknown) {
     document.body.removeChild(loadingNotification)
 
-    if (error.response && error.response.data) {
-      console.error('Server error details:', error.response.data)
+    if (error && typeof error === 'object' && 'response' in error) {
+      const responseError = error as { response?: { data?: unknown } }
+      if (responseError.response?.data) {
+        console.error('Server error details:', responseError.response.data)
+      }
     }
   }
 }

@@ -21,13 +21,15 @@ export const useStudentFee = createSharedComposable(() => {
   const error = ref<string | null>(null)
 
   // fetch user information
-  async function getStudentFee(student: string, session: number) {
+  async function getStudentFee(student: string, session: number, semester?: number) {
     loading.value = true
     error.value = null
     try {
-      const response = await studentFeeRepository.getInformation(
-        schoolFees.getFeeFor + '?user=' + student + '&session=' + session,
-      )
+      let url = schoolFees.getFeeFor + '?user=' + student + '&session=' + session
+      if (semester) {
+        url += '&semester=' + semester
+      }
+      const response = await studentFeeRepository.getInformation(url)
       fee.value = response.data as {
         student: UserResponse['user']
         feeItems: FeeItem[]
