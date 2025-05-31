@@ -1,49 +1,16 @@
 <template>
   <div class="academic-dashboard w-full relative" ref="resultTableRef">
-    <SpinningAnimation v-if="loading" :loading="loading" :head-title="'Academic Performance'"
-      class="absolute inset-0" />
-    <div class="profile-card animate-fade-in">
-      <div class="profile-header">
-        <div class="profile-avatar">
-          <i class="pi pi-user text-4xl text-white"></i>
-        </div>
-        <div class="profile-info">
-          <h1 class="profile-name">{{ name }}</h1>
-          <p class="profile-id">{{ username }}</p>
+    <div class="performance-section animate-fade-in" :class="{ 'loading-state': loading }">
+      <!-- Loading State -->
+      <div v-if="loading" class="loading-container">
+        <div class="loading-spinner">
+          <div class="spinner-ring"></div>
+          <p class="loading-text">Loading academic results...</p>
         </div>
       </div>
 
-      <div class="profile-grid">
-        <div v-for="(item, index) in profileItems" :key="index" class="profile-item"
-          :style="{ 'transition-delay': `${index * 50}ms` }">
-          <div class="item-icon">
-            <i :class="item.icon"></i>
-          </div>
-          <div>
-            <p class="item-label">{{ item.label }}</p>
-            <p class="item-value">{{ item.value }}</p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="performance-section animate-fade-in" style="animation-delay: 100ms">
-      <div class="section-header">
-        <h2 class="section-title">
-          <i class="pi pi-table"></i> Academic Performance
-        </h2>
-        <div class="gpa-display">
-          <span class="gpa-label">Current GPA:</span>
-          <span class="gpa-value">{{ gpa }}</span>
-        </div>
-        <div class="gpa-display">
-          <span class="gpa-label">CGPA:</span>
-          <span class="gpa-value">{{ cgpa }}</span>
-        </div>
-      </div>
-
-
-      <div class="table-container">
+      <!-- Table Content -->
+      <div v-else class="table-container">
         <DataTable :value="results" class="p-datatable-striped academic-table" :paginator="true" :rows="10"
           paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport"
           currentPageReportTemplate="Showing {first} to {last} of {totalRecords} courses" responsiveLayout="scroll">
@@ -102,11 +69,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, defineExpose, type PropType } from 'vue'
+import { ref, defineExpose, type PropType } from 'vue'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import type { StudentResult } from "@/types/student/result.information";
-import SpinningAnimation from "@/views/spinner/SpinningAnimation.vue";
 
 const resultTableRef = ref<HTMLElement | null>(null);
 
@@ -612,26 +578,6 @@ const props = defineProps({
 });
 
 
-const profileItems = computed(() => [
-  {
-    label: "Faculty",
-    value: props.department?.faculty.name,
-    icon: "pi pi-building",
-  },
-  {
-    label: "Department",
-    value: props.department?.name,
-    icon: "pi pi-briefcase",
-  },
-  { label: "Programme", value: props.programme, icon: "pi pi-book" },
-  { label: "Level", value: props.level, icon: "pi pi-sort-numeric-up" },
-  {
-    label: "Academic Session",
-    value: props.session,
-    icon: "pi pi-calendar",
-  },
-  { label: "Date", value: props.currentDate, icon: "pi pi-clock" },
-]);
 
 const formatScore = (score: null | number) => {
   return score ? Number(score).toFixed(1) : '-';
@@ -668,106 +614,25 @@ const getStatusText = (total: number) => {
 <style scoped>
 /* Base Styles */
 .academic-dashboard {
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
   font-family: "Inter", system-ui, sans-serif;
-}
-
-/* Profile Card */
-.profile-card {
-  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
-  color: white;
-  border-radius: 1.25rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  overflow: hidden;
-  animation: fadeIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-}
-
-.profile-header {
-  display: flex;
-  align-items: center;
-  padding: 1.5rem;
-  gap: 1rem;
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.profile-avatar {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 4rem;
-  height: 4rem;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.2);
-}
-
-.profile-name {
-  font-size: 1.5rem;
-  font-weight: bold;
-}
-
-.profile-id {
-  color: #d1d5db;
-}
-
-.profile-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-
-  @media (min-width: 768px) {
-    grid-template-columns: repeat(3, 1fr);
-  }
-
-  gap: 0.125rem;
-  padding: 0.125rem;
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.profile-item {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 1rem;
-  background-color: rgba(255, 255, 255, 0.9);
-  color: #374151;
-  transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
-  opacity: 0;
-  transform: translateY(20px);
-  animation: fadeInUp 0.6s forwards;
-}
-
-.item-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
-  color: white;
-}
-
-.item-label {
-  font-size: 0.75rem;
-  color: #6b7280;
-}
-
-.item-value {
-  font-weight: 600;
 }
 
 /* Performance Section */
 .performance-section {
-  background-color: white;
-  border-radius: 1.25rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
+  background: transparent;
+  width: 100%;
+}
+
+.performance-section.loading-state {
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
 }
 
 .section-header {
   display: flex;
   flex-direction: column;
+  gap: 1rem;
 
   @media (min-width: 768px) {
     flex-direction: row;
@@ -775,42 +640,81 @@ const getStatusText = (total: number) => {
     justify-content: space-between;
   }
 
-  padding: 1.5rem;
-  border-bottom: 1px solid #f3f4f6;
+  padding: 0 0 1.5rem 0;
+  border-bottom: 1px solid rgba(59, 130, 246, 0.1);
+  margin-bottom: 1.5rem;
 }
 
 .section-title {
   font-size: 1.25rem;
   font-weight: bold;
-  color: #374151;
+  color: #1f2937;
   display: flex;
   align-items: center;
   gap: 0.5rem;
+}
+
+.gpa-container {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
 }
 
 .gpa-display {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  margin-top: 0.5rem;
-
-  @media (min-width: 768px) {
-    margin-top: 0;
-  }
 }
 
 .gpa-label {
   color: #6b7280;
+  font-size: 0.875rem;
+  font-weight: 500;
 }
 
 .gpa-value {
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   font-weight: bold;
-  color: #2563eb;
+  color: #3b82f6;
+}
+
+/* Loading Styles */
+.loading-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1rem;
+  flex: 1;
+}
+
+.loading-spinner {
+  text-align: center;
+}
+
+.spinner-ring {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(59, 130, 246, 0.2);
+  border-top: 3px solid #3b82f6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 1rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-text {
+  color: #3b82f6;
+  font-weight: 500;
+  font-size: 0.875rem;
+  margin: 0;
 }
 
 .table-container {
-  padding: 0.5rem;
+  width: 100%;
 }
 
 /* Table Styles */
@@ -981,42 +885,209 @@ const getStatusText = (total: number) => {
 }
 
 /* Responsive Adjustments */
-@media (max-width: 768px) {
-  .profile-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .profile-header {
+@media (max-width: 1024px) {
+  .section-header {
     flex-direction: column;
     align-items: flex-start;
+    gap: 1rem;
   }
+  
+  .gpa-container {
+    align-self: flex-start;
+    gap: 1rem;
+  }
+}
 
-  .profile-avatar {
+@media (max-width: 768px) {
+  .section-header {
+    padding: 0 0 1rem 0;
     margin-bottom: 1rem;
   }
-
-  :deep(.academic-table .p-datatable-thead) {
-    display: none;
+  
+  .section-title {
+    font-size: 1.1rem;
   }
-
+  
+  .gpa-container {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .gpa-display {
+    flex-direction: column;
+    gap: 0.25rem;
+    text-align: center;
+  }
+  
+  .gpa-label {
+    font-size: 0.75rem;
+  }
+  
+  .gpa-value {
+    font-size: 1.1rem;
+  }
+  
+  .loading-container {
+    padding: 2rem 1rem;
+  }
+  
+  .loading-text {
+    font-size: 0.8rem;
+  }
+  
+  /* Mobile Table Styles */
+  :deep(.academic-table) {
+    font-size: 0.875rem;
+  }
+  
   :deep(.academic-table .p-datatable-tbody > tr > td) {
-    display: block;
-    padding-top: 0.75rem;
-    padding-bottom: 0.75rem;
-    text-align: right;
+    padding: 0.75rem 0.5rem;
   }
-
-  :deep(.academic-table .p-datatable-tbody > tr > td:before) {
-    content: attr(data-label);
-    float: left;
-    font-weight: 600;
-    color: #6b7280;
+  
+  :deep(.academic-table .p-datatable-thead > tr > th) {
+    padding: 0.75rem 0.5rem;
+    font-size: 0.75rem;
   }
-
+  
+  .course-code {
+    font-size: 0.8rem;
+  }
+  
+  .credit-badge {
+    width: 1.5rem;
+    height: 1.5rem;
+    font-size: 0.75rem;
+  }
+  
+  .grade-badge {
+    width: 1.5rem;
+    height: 1.5rem;
+    font-size: 0.75rem;
+  }
+  
+  .status-badge {
+    padding: 0.125rem 0.5rem;
+    font-size: 0.7rem;
+  }
+  
+  .score {
+    font-size: 0.875rem;
+  }
+  
+  /* Mobile Paginator */
   :deep(.academic-table .p-paginator) {
-    display: flex;
+    padding: 0.75rem 0.5rem;
     flex-wrap: wrap;
-    justify-content: center;
+    gap: 0.5rem;
+  }
+  
+  :deep(.academic-table .p-paginator .p-paginator-current) {
+    order: -1;
+    width: 100%;
+    text-align: center;
+    font-size: 0.75rem;
+    margin-bottom: 0.5rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .section-title {
+    font-size: 1rem;
+  }
+  
+  .gpa-container {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .gpa-display {
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 0.5rem;
+    background: rgba(59, 130, 246, 0.05);
+    border-radius: 0.5rem;
+  }
+  
+  /* Stack table horizontally on very small screens */
+  :deep(.academic-table .p-datatable-wrapper) {
+    overflow-x: auto;
+  }
+  
+  :deep(.academic-table) {
+    min-width: 600px;
+  }
+}
+
+@media (max-width: 480px) {
+  .section-header {
+    padding: 0 0 0.75rem 0;
+    margin-bottom: 0.75rem;
+  }
+  
+  .section-title {
+    font-size: 0.9rem;
+    gap: 0.375rem;
+  }
+  
+  .section-title i {
+    font-size: 0.8rem;
+  }
+  
+  .gpa-label {
+    font-size: 0.7rem;
+  }
+  
+  .gpa-value {
+    font-size: 1rem;
+  }
+  
+  .loading-container {
+    padding: 1.5rem 0.75rem;
+  }
+  
+  .spinner-ring {
+    width: 32px;
+    height: 32px;
+    border-width: 2px;
+  }
+  
+  .loading-text {
+    font-size: 0.75rem;
+  }
+  
+  /* Very small mobile adjustments */
+  :deep(.academic-table) {
+    font-size: 0.8rem;
+    min-width: 550px;
+  }
+  
+  :deep(.academic-table .p-datatable-thead > tr > th) {
+    padding: 0.5rem 0.25rem;
+    font-size: 0.7rem;
+  }
+  
+  :deep(.academic-table .p-datatable-tbody > tr > td) {
+    padding: 0.5rem 0.25rem;
+  }
+  
+  .credit-badge,
+  .grade-badge {
+    width: 1.25rem;
+    height: 1.25rem;
+    font-size: 0.7rem;
+  }
+  
+  .status-badge {
+    padding: 0.125rem 0.375rem;
+    font-size: 0.65rem;
+  }
+  
+  .course-code {
+    font-size: 0.75rem;
+  }
+  
+  .score {
+    font-size: 0.8rem;
   }
 }
 </style>

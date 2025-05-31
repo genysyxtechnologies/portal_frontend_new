@@ -54,7 +54,7 @@ export const useStudentSideBar = createSharedComposable(() => {
       ],
     },
     {
-      title: 'My Accomodation',
+      title: 'My Accommodation',
       icon: image6,
       path: '/student/my-accomodation',
     },
@@ -74,7 +74,7 @@ export const useStudentSideBar = createSharedComposable(() => {
       path: '/student/self-service',
     },
     {
-      title: 'Settings',
+      title: 'Account',
       icon: image10,
       path: '/student/student-settings',
     },

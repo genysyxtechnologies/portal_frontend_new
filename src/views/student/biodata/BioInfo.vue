@@ -7,7 +7,7 @@
           <label for="country" class="field-label">Country</label>
           <div class="input-container">
             <Sel-ect
-              :size="'large'"
+              :size="'default'"
               v-model="selectedCountry"
               :options="availableCountries"
               optionLabel="name"
@@ -32,7 +32,7 @@
           <label for="state" class="field-label">State</label>
           <div class="input-container">
             <Sel-ect
-              :size="'large'"
+              :size="'default'"
               v-model="selectedState"
               :options="availableStates"
               optionLabel="name"
@@ -56,7 +56,7 @@
           <label for="lgaCity" class="field-label">LGA/City</label>
           <div class="input-container">
             <Sel-ect
-              :size="'large'"
+              :size="'default'"
               v-model="selectedLGA"
               :options="availableLGAs"
               optionLabel="name"
@@ -209,13 +209,11 @@
         </div>
 
         <!-- Gender -->
-        <div>
-          <label for="gender" class="block text-sm font-medium text-gray-700 mb-1 labels"
-            >Gender</label
-          >
+        <div class="field-container" data-aos="fade-up" data-aos-delay="550">
+          <label for="gender" class="field-label">Gender</label>
           <div class="input-container">
             <Sel-ect
-              :size="'large'"
+              :size="'default'"
               v-model="selectedGender"
               :options="availableGenders"
               optionLabel="title"
@@ -233,13 +231,11 @@
         </div>
 
         <!-- Religion -->
-        <div>
-          <label for="religion" class="block text-sm font-medium text-gray-700 mb-1 labels"
-            >Religion</label
-          >
+        <div class="field-container" data-aos="fade-up" data-aos-delay="600">
+          <label for="religion" class="field-label">Religion</label>
           <div class="input-container">
             <Sel-ect
-              :size="'large'"
+              :size="'default'"
               v-model="selectedReligion"
               :options="[user?.information.religion]"
               optionLabel="title"
@@ -256,14 +252,11 @@
         </div>
 
         <!-- marital status -->
-
-        <div>
-          <label for="maritalStatus" class="block text-sm font-medium text-gray-700 mb-1 labels"
-            >Marital Status</label
-          >
+        <div class="field-container" data-aos="fade-up" data-aos-delay="650">
+          <label for="maritalStatus" class="field-label">Marital Status</label>
           <div class="input-container">
             <Sel-ect
-              :size="'large'"
+              :size="'default'"
               v-model="selectedMaritalStatus"
               :options="[user?.information.maritalStatus]"
               optionLabel="title"
@@ -679,7 +672,7 @@ const handleStateChange = async () => {
 
 <style scoped>
 .bioinfo-container {
-  padding: 2rem;
+  padding: 1.5rem;
   background-color: white;
   border-radius: 1rem;
   box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
@@ -703,36 +696,52 @@ const handleStateChange = async () => {
 .bioinfo-grid {
   display: grid;
   grid-template-columns: repeat(1, 1fr);
-  gap: 1.5rem;
+  gap: 1rem;
 }
 
 @media (min-width: 768px) {
   .bioinfo-grid {
     grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .bioinfo-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
   }
 }
 
 /* Field container styling */
 .field-container {
-  margin-bottom: 1rem;
+  margin-bottom: 0.75rem;
   transition:
     transform 0.3s ease,
     opacity 0.3s ease;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 0.75rem;
+  padding: 0.75rem;
+  border: 1px solid rgba(229, 231, 235, 0.5);
+  backdrop-filter: blur(10px);
 }
 
 .field-container:hover {
-  transform: translateY(-2px);
+  transform: translateY(-1px);
+  border-color: rgba(59, 130, 246, 0.3);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
 }
 
 .field-label {
   display: block;
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   font-weight: 600;
-  color: #374151;
-  margin-bottom: 0.5rem;
-  letter-spacing: 0.025em;
+  color: #6b7280;
+  margin-bottom: 0.375rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
   position: relative;
-  padding-left: 0.75rem;
+  padding-left: 0.5rem;
   transition: color 0.3s ease;
 }
 
@@ -742,10 +751,10 @@ const handleStateChange = async () => {
   left: 0;
   top: 50%;
   transform: translateY(-50%);
-  width: 4px;
-  height: 16px;
+  width: 2px;
+  height: 12px;
   background: linear-gradient(180deg, #3b82f6, #8b5cf6);
-  border-radius: 2px;
+  border-radius: 1px;
 }
 
 /* Input container styling */
@@ -755,39 +764,49 @@ const handleStateChange = async () => {
 }
 
 .input-container:focus-within {
-  transform: scale(1.01);
+  transform: scale(1.005);
 }
 
 /* Custom input styling */
 .custom-input {
   width: 100%;
-  padding-right: 2.5rem;
+  padding: 0.6rem 2.5rem 0.6rem 0.75rem;
   border-radius: 0.5rem;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  font-size: 0.95rem;
-  border: 1px solid #e5e7eb;
+  font-size: 0.875rem;
+  border: 1px solid rgba(229, 231, 235, 0.8);
+  background: rgba(249, 250, 251, 0.5);
+  backdrop-filter: blur(5px);
+  font-weight: 500;
 }
 
 .input-readonly {
-  background-color: #f9fafb;
+  background: rgba(243, 244, 246, 0.6);
   cursor: not-allowed;
-  color: #4b5563;
+  color: #6b7280;
+  border-color: rgba(209, 213, 219, 0.6);
 }
 
 .input-active {
-  background-color: white;
+  background: rgba(255, 255, 255, 0.9);
   border-color: #3b82f6;
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+  box-shadow: 
+    0 0 0 2px rgba(59, 130, 246, 0.2),
+    0 2px 8px rgba(59, 130, 246, 0.1);
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
 @keyframes pulse {
   0%,
   100% {
-    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+    box-shadow: 
+      0 0 0 2px rgba(59, 130, 246, 0.2),
+      0 2px 8px rgba(59, 130, 246, 0.1);
   }
   50% {
-    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.4);
+    box-shadow: 
+      0 0 0 2px rgba(59, 130, 246, 0.3),
+      0 4px 12px rgba(59, 130, 246, 0.15);
   }
 }
 
@@ -809,9 +828,50 @@ const handleStateChange = async () => {
 
 /* Ensure selects look disabled when readonly */
 .card[disabled] {
-  background-color: #f9fafb;
+  background: rgba(243, 244, 246, 0.6);
   cursor: not-allowed;
   opacity: 0.8;
+}
+
+/* Modern select styling */
+:deep(.p-dropdown) {
+  background: rgba(249, 250, 251, 0.5);
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(229, 231, 235, 0.8);
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+:deep(.p-dropdown:not(.p-disabled):hover) {
+  border-color: rgba(59, 130, 246, 0.5);
+  background: rgba(255, 255, 255, 0.7);
+}
+
+:deep(.p-dropdown:not(.p-disabled).p-focus) {
+  border-color: #3b82f6;
+  box-shadow: 
+    0 0 0 2px rgba(59, 130, 246, 0.2),
+    0 2px 8px rgba(59, 130, 246, 0.1);
+  background: rgba(255, 255, 255, 0.9);
+}
+
+:deep(.p-dropdown .p-dropdown-label) {
+  padding: 0.6rem 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+}
+
+:deep(.p-dropdown .p-dropdown-trigger) {
+  width: 2rem;
+  color: #6b7280;
+}
+
+:deep(.p-dropdown.p-disabled) {
+  background: rgba(243, 244, 246, 0.6);
+  border-color: rgba(209, 213, 219, 0.6);
 }
 
 /* Add hover effect to edit toggle */

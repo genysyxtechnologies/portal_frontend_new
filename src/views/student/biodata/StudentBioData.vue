@@ -36,40 +36,12 @@
           :sub-title="subTitle"
           class="loading-overlay"
         />
-        <Ta-bs v-model:value="tabCount" class="tabs-container">
-          <TabList class="tab-list">
-            <T-ab
-              v-for="(tab, index) in tabs"
-              :key="index"
-              :value="index.toString()"
-              class="tab-item"
-              :class="{
-                'tab-active': tabCount === index.toString(),
-                'tab-inactive': tabCount !== index.toString(),
-              }"
-              :style="{ pointerEvents: loading || bioDataLoading ? 'none' : 'auto' }"
-            >
-              <div class="tab-content">
-                <span class="tab-icon" :class="getTabIcon(index)"></span>
-                <span class="tab-label">{{ tab.label }}</span>
-              </div>
-              <span v-if="tabCount === index.toString()" class="tab-indicator"></span>
-            </T-ab>
-          </TabList>
-
-          <TabPanels class="tab-panels">
-            <transition-group name="panel-transition" mode="out-in">
-              <TabPanel
-                v-for="(tab, index) in tabs"
-                :key="index"
-                :value="index.toString()"
-                class="tab-panel"
-              >
-                <component :is="tab.component" :user="user!" :loading="loading" />
-              </TabPanel>
-            </transition-group>
-          </TabPanels>
-        </Ta-bs>
+        <ModernTabs
+          v-model="activeTabIndex"
+          :tabs="tabsConfig"
+          :disabled="loading || bioDataLoading"
+          @tab-change="handleTabChange"
+        />
       </div>
     </div>
   </div>
@@ -80,12 +52,13 @@ import BioInfo from './BioInfo.vue'
 import HealthInfo from './HealthInfo.vue'
 import ReUsableButtons from '@/views/buttons/ReUsableButtons.vue'
 import NextOfKinInfo from './NextOfKinInfo.vue'
-/* import SponsorInformation from './SponsorInformation.vue'; */
 import { useStudentBioData } from '@/services/student/useStudentBioData'
-import { onMounted, watch } from 'vue'
+import { onMounted, watch, ref, computed } from 'vue'
 import { useStudentDashboard } from '@/services/student/useStudentDashboard'
 import SpinningAnimation from '@/views/spinner/SpinningAnimation.vue'
 import SponsorInformation from './SponsorInformation.vue'
+import ModernTabs from '@/components/shared/ModernTabs.vue'
+import type { TabItem } from '@/components/shared/ModernTabs.vue'
 
 // Import AOS for scroll animations if not already imported globally
 try {
@@ -101,7 +74,6 @@ try {
 }
 
 const {
-  tabCount,
   downloadStudentBiodata,
   updateBioData,
   fetchCountries,
@@ -110,19 +82,22 @@ const {
   loading: bioDataLoading,
 } = useStudentBioData()
 
+// Active tab management
+const activeTabIndex = ref(0)
+
 // Function to handle updating biodata from all tabs
 const handleUpdateBioData = async () => {
   if (user.value) {
     sessionStorage.setItem('userData', JSON.stringify(user.value))
     console.log('Updated user data in sessionStorage before update')
   }
-  const activeTab = tabCount.value
+  const currentActiveTab = activeTabIndex.value
 
-  for (let i = 0; i < tabs.length; i++) {
-    tabCount.value = i.toString()
+  for (let i = 0; i < tabsConfig.length; i++) {
+    activeTabIndex.value = i
     await new Promise((resolve) => setTimeout(resolve, 50))
   }
-  tabCount.value = activeTab
+  activeTabIndex.value = currentActiveTab
 
   // Show loading notification
   const loadingNotification = document.createElement('div')
@@ -169,22 +144,37 @@ watch(
   { deep: true },
 )
 
-const tabs = [
-  { label: 'Bio Info', component: BioInfo, user: user.value },
-  { label: 'Health Info', component: HealthInfo, user: user.value },
-  { label: 'Next Of Kin Info', component: NextOfKinInfo, user: user.value },
-  { label: 'Sponsorship Info', component: SponsorInformation, user: user.value, loading: loading },
-]
+// Tabs configuration for ModernTabs component
+const tabsConfig = computed<TabItem[]>(() => [
+  {
+    label: 'Bio Info',
+    icon: 'fas fa-user',
+    component: BioInfo,
+    props: { user: user.value, loading: loading.value }
+  },
+  {
+    label: 'Health Info',
+    icon: 'fas fa-heartbeat',
+    component: HealthInfo,
+    props: { user: user.value, loading: loading.value }
+  },
+  {
+    label: 'Next Of Kin Info',
+    icon: 'fas fa-users',
+    component: NextOfKinInfo,
+    props: { user: user.value, loading: loading.value }
+  },
+  {
+    label: 'Sponsorship Info',
+    icon: 'fas fa-money-bill',
+    component: SponsorInformation,
+    props: { user: user.value, loading: loading.value }
+  }
+])
 
-// Function to get icon class for each tab
-const getTabIcon = (index: number) => {
-  const icons = [
-    'fas fa-user', // Bio Info
-    'fas fa-heartbeat', // Health Info
-    'fas fa-users', // Next of Kin
-    'fas fa-money-bill', // Sponsorship
-  ]
-  return icons[index] || 'fas fa-circle'
+// Handle tab change events
+const handleTabChange = (index: number, tab: TabItem) => {
+  console.log(`Switched to tab: ${tab.label}`)
 }
 </script>
 
@@ -433,121 +423,4 @@ const getTabIcon = (index: number) => {
   z-index: 10;
 }
 
-/* Tabs styling */
-.tabs-container {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-}
-
-.tab-list {
-  display: flex;
-  border-bottom: 1px solid #f3f4f6;
-  background-color: #f9fafb;
-  position: relative;
-  overflow-x: auto;
-  scrollbar-width: none; /* Firefox */
-}
-
-.tab-list::-webkit-scrollbar {
-  display: none; /* Chrome, Safari, Edge */
-}
-
-.tab-item {
-  padding: 1rem 1.5rem;
-  font-size: 0.95rem;
-  font-weight: 500;
-  height: 4rem;
-  position: relative;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-.tab-active {
-  color: #4f46e5;
-  background-color: white;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-}
-
-.tab-inactive {
-  color: #6b7280;
-}
-
-.tab-inactive:hover {
-  color: #4f46e5;
-  background-color: #f3f4f6;
-}
-
-.tab-content {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.tab-icon {
-  font-size: 1rem;
-  transition: transform 0.3s ease;
-}
-
-.tab-active .tab-icon {
-  transform: scale(1.2);
-  color: #4f46e5;
-}
-
-.tab-label {
-  position: relative;
-}
-
-.tab-indicator {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, #4f46e5, #8b5cf6);
-  animation: indicatorGrow 0.4s cubic-bezier(0.65, 0, 0.35, 1);
-}
-
-@keyframes indicatorGrow {
-  from {
-    transform: scaleX(0);
-    transform-origin: left;
-  }
-  to {
-    transform: scaleX(1);
-  }
-}
-
-.tab-panels {
-  flex: 1;
-  overflow: auto;
-  padding: 1.5rem;
-  position: relative;
-}
-
-.tab-panel {
-  height: 100%;
-}
-
-/* Panel transition animations */
-.panel-transition-enter-active,
-.panel-transition-leave-active {
-  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-  position: absolute;
-  width: 100%;
-  top: 0;
-  left: 0;
-  padding: 1.5rem;
-}
-
-.panel-transition-enter-from {
-  opacity: 0;
-  transform: translateX(30px) scale(0.95);
-}
-
-.panel-transition-leave-to {
-  opacity: 0;
-  transform: translateX(-30px) scale(0.95);
-}
 </style>
