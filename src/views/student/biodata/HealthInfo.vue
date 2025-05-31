@@ -10,7 +10,7 @@
           <Sel-ect
             :size="'large'"
             v-model="selectedBloodGroup"
-            :options="[user?.information.bloodGroup]"
+            :options="studentBasicInformation?.bloodGroups"
             optionLabel="name"
             placeholder="Select Blood Group"
             class="card w-full"
@@ -33,7 +33,7 @@
           <Sel-ect
             :size="'large'"
             v-model="selectedGenotype"
-            :options="[user?.information.genotype]"
+            :options="studentBasicInformation?.genotypes"
             optionLabel="name"
             placeholder="Select Genotype"
             class="card w-full"
@@ -74,7 +74,7 @@
 </template>
 
 <script setup lang="ts">
-import type { UserResponse } from '@/types/student/dashboard_information'
+import type { StudentBasicInformation, UserResponse } from '@/types/student/dashboard_information'
 import { ref, watch } from 'vue'
 const selectedBloodGroup = ref()
 const selectedGenotype = ref()
@@ -82,6 +82,7 @@ const selectedGenotype = ref()
 const props = defineProps<{
   user: UserResponse['user']
   loading: boolean
+  studentBasicInformation: StudentBasicInformation
 }>()
 
 type EditableFields = {

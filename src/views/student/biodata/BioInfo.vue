@@ -188,17 +188,16 @@
         <div class="field-container" data-aos="fade-up" data-aos-delay="500">
           <label for="tribe" class="field-label">Tribe</label>
           <div class="input-container">
-            <InputText
-              id="tribe"
-              :value="user?.information?.tribe?.name"
-              type="text"
-              class="custom-input"
-              :placeholder="user?.information?.tribe?.name || 'Not Specified'"
-              :readonly="!editableFields.tribe"
-              :class="{
-                'input-readonly': !editableFields.tribe,
-                'input-active': editableFields.tribe,
-              }"
+            <Sel-ect
+              :size="'large'"
+              v-model="selectedTribe"
+              :options="tribes"
+              optionLabel="name"
+              placeholder="Select Tribe"
+              class="card w-full"
+              :filter="true"
+              filterPlaceholder="Search tribes"
+              :disabled="!editableFields.tribe"
             />
             <EditToggle
               :is-editing="editableFields.tribe"
@@ -215,7 +214,7 @@
             <Sel-ect
               :size="'default'"
               v-model="selectedGender"
-              :options="availableGenders"
+              :options="studentBasicInformation?.genders"
               optionLabel="title"
               placeholder="Select Gender"
               class="card w-full"
@@ -237,7 +236,7 @@
             <Sel-ect
               :size="'default'"
               v-model="selectedReligion"
-              :options="[user?.information.religion]"
+              :options="studentBasicInformation?.religions"
               optionLabel="title"
               placeholder="Select Religion"
               class="card w-full"
@@ -258,7 +257,7 @@
             <Sel-ect
               :size="'default'"
               v-model="selectedMaritalStatus"
-              :options="[user?.information.maritalStatus]"
+              :options="studentBasicInformation?.maritalStatuses"
               optionLabel="title"
               placeholder="Select Marital Status"
               class="card w-full"
@@ -296,7 +295,13 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue'
 import { formatDateOfBirth } from '@/utils/dateFormater'
-import type { UserResponse, State, Country } from '@/types/student/dashboard_information'
+import type {
+  UserResponse,
+  State,
+  Country,
+  Tribe,
+  StudentBasicInformation,
+} from '@/types/student/dashboard_information'
 import EditToggle from '@/views/student/biodata/EditToogle.vue'
 import LockIndicator from './LockIndicator.vue'
 import { useStudentBioData } from '@/services/student/useStudentBioData'
@@ -304,6 +309,7 @@ import { useStudentBioData } from '@/services/student/useStudentBioData'
 const props = defineProps<{
   user: UserResponse['user']
   loading: boolean
+  studentBasicInformation: StudentBasicInformation
 }>()
 
 // Define a type for our editable fields
@@ -366,19 +372,14 @@ const formData = ref<FormData>({
   tribe: props.user?.information?.tribe?.id || 'Not Specified',
 })
 
-// Get countries from the useStudentBioData service
-const { countries, fetchCountries, fetchStates, fetchLocalGovernment } = useStudentBioData()
+// Get countries and other data from the useStudentBioData service
+const { countries, fetchCountries, fetchStates, fetchLocalGovernment, fetchTribes, tribes } =
+  useStudentBioData()
 
 // Create a computed property for available countries
 const availableCountries = computed(() => {
   return countries.value || []
 })
-
-// Gender options with id and title structure
-const availableGenders = ref<Gender[]>([
-  { id: 1, title: 'Male' },
-  { id: 2, title: 'Female' },
-])
 
 // Selected values for select inputs
 const selectedCountry = ref(props.user?.information.country || null)
@@ -392,8 +393,11 @@ const selectedGender = ref<Gender>(
     ? { id: props.user.gender.id, title: props.user.gender.title }
     : props.user?.gender && typeof props.user.gender === 'string'
       ? { id: props.user.gender === 'Male' ? 1 : 2, title: props.user.gender as string }
-      : availableGenders.value[0], // Default to first gender in the array if null
+      : props.studentBasicInformation?.genders[0] ,
 )
+
+// Initialize selectedTribe with the user's tribe
+const selectedTribe = ref<Tribe | null>(props.user?.information?.tribe || null)
 
 const availableStates = ref<State[]>([])
 
@@ -498,6 +502,10 @@ onMounted(async () => {
   }
 })
 
+onMounted(async () => {
+  await fetchTribes()
+})
+
 // Watch for user prop changes to update form data
 watch(
   () => props.user,
@@ -542,6 +550,7 @@ watch(
 
       selectedReligion.value = newUser.information.religion
       selectedMaritalStatus.value = newUser.information.maritalStatus
+      selectedTribe.value = newUser.information.tribe
     }
   },
   { immediate: true, deep: true },
@@ -560,8 +569,8 @@ const isEditingAnyField = computed(() => {
     homeAddress: formData.value.homeAddress,
     placeOfBirth: formData.value.placeOfBirth,
     dob: formData.value.dateOfBirth,
-    genderId: selectedGender.value?.id || availableGenders.value?.[0]?.id,
-    tribeId: formData.value.tribe,
+    genderId: selectedGender.value?.id || props.studentBasicInformation?.genders[0]?.id,
+    tribeId: selectedTribe.value?.id || props.user?.information?.tribe?.id || null,
     countryId:
       typeof selectedCountry.value === 'object'
         ? selectedCountry.value?.id || ''
@@ -610,7 +619,7 @@ const handleSave = async () => {
     homeTown: formData.value.hometown,
     homeAddress: formData.value.homeAddress,
     placeOfBirth: formData.value.placeOfBirth,
-    tribeId: formData.value.tribe,
+    tribeId: selectedTribe.value?.id || props.user?.information?.tribe?.id || null,
     religionId: selectedReligion.value?.id || null,
     maritalStatusId: selectedMaritalStatus.value?.id || null,
     genderId: selectedGender.value.id,

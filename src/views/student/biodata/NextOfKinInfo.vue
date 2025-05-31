@@ -83,7 +83,7 @@
             <Sel-ect
               :size="'large'"
               v-model="selectedNextOfKinRelationship"
-              :options="[user?.information.nextOfKinRelationship]"
+              :options="studentBasicInformation?.relationships"
               optionLabel="title"
               placeholder="Select Relationship with Next of KIN"
               class="card w-full"
@@ -120,13 +120,14 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
-import type { UserResponse } from '@/types/student/dashboard_information'
+import type { StudentBasicInformation, UserResponse } from '@/types/student/dashboard_information'
 import SpinningAnimation from '@/views/spinner/SpinningAnimation.vue'
 import EditToggle from '@/views/student/biodata/EditToogle.vue'
 
 const props = defineProps<{
   user: UserResponse['user']
   loading: boolean
+  studentBasicInformation: StudentBasicInformation
 }>()
 
 // Define a type for our editable fields
@@ -191,11 +192,11 @@ const isEditingAnyField = computed(() => {
     nextOfKinPhone: formData.value.nextOfKinPhone,
     nextOfKinAddress: formData.value.nextOfKinAddress,
     // Handle different possible property names for relationship
-    nextOfKinRelationshipId: typeof selectedNextOfKinRelationship.value === 'object' ?
-      (selectedNextOfKinRelationship.value?.id || selectedNextOfKinRelationship.value?.id || '') :
-      selectedNextOfKinRelationship.value || ''
+    nextOfKinRelationshipId:
+      typeof selectedNextOfKinRelationship.value === 'object'
+        ? selectedNextOfKinRelationship.value?.id || selectedNextOfKinRelationship.value?.id || ''
+        : selectedNextOfKinRelationship.value || '',
   }
-
 
   sessionStorage.setItem('nextOfKinValues', JSON.stringify(nextOfKinData))
 
@@ -223,7 +224,7 @@ const handleSave = () => {
 }
 
 const handleNext = () => {
-return
+  return
 }
 </script>
 

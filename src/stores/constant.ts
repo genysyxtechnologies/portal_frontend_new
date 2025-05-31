@@ -286,6 +286,7 @@ export default {
     dashboard: '/user/dashboard',
     lockAccount: '/user/lock-account',
     unlockAccount: '/user/unlock-account',
+    profile: "/profile-picture/fetch?user="
   },
 
   schoolFees: {
