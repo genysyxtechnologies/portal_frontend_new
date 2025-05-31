@@ -1,17 +1,18 @@
 import StudentDashboardRepositories from '@/repositories/student/student.dashboard.repositories'
 import constant from '@/stores/constant'
 import { createSharedComposable } from '@vueuse/core'
-import { onMounted, ref } from 'vue'
+import { ref } from 'vue'
 import authService from '../api/authService'
 import type { UserResponse } from '@/types/student/dashboard_information'
 import { type Session } from '@/types/student/sessions'
-const { session, user:  users } = constant
+const { session, user: users } = constant
 
 export const useStudentDashboard = createSharedComposable(() => {
   const user = ref<UserResponse['user'] | null>(null)
   const sessions = ref<Session[] | null>(null)
   const loading = ref(false)
   const error = ref<string | null>(null)
+  const profile = ref<string | null>(null)
 
   // fetch user information
   async function getStudentInformation() {
@@ -19,7 +20,6 @@ export const useStudentDashboard = createSharedComposable(() => {
     error.value = null
     try {
       const response = await authService.getCurrentUser()
-      console.log("THIS IS THE STUDENT RESPONSE: ", response.data)
       user.value = response.data.user
     } catch (err) {
       return err
@@ -61,16 +61,16 @@ export const useStudentDashboard = createSharedComposable(() => {
     }
   }
 
-  // get current session
-  async function getCurrentSessison() {
+
+  // get student profile
+  const getStudentProfile = async () => {
     loading.value = true
     error.value = null
     const dashboard = new StudentDashboardRepositories()
     try {
-      const response = await dashboard.getInformation(
-        session.current + '/' + parseInt(user.value?.programme.programmeType.id || '0'),
-      )
-      sessions.value = response.data as Session[]
+      const response = await dashboard.getInformation(users.profile + user.value?.username)
+      profile.value = response.data as string
+      return response.data
     } catch (err) {
       return err
     } finally {
@@ -81,11 +81,12 @@ export const useStudentDashboard = createSharedComposable(() => {
   return {
     getStudentInformation,
     getSessions,
-    getCurrentSessison,
     getUserDashboard,
+    getStudentProfile,
     user,
     sessions,
     loading,
     error,
+    profile,
   }
 })

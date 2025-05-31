@@ -2,7 +2,11 @@ import { createSharedComposable } from '@vueuse/core'
 import { ref } from 'vue'
 import StudentBiodataRepository from '@/repositories/student/student.biodata.repository'
 import constant from '@/stores/constant'
-import type { CountryResponse } from '@/types/student/dashboard_information'
+import {
+  type CountryResponse,
+  type StudentBasicInformation,
+  type Tribe,
+} from '@/types/student/dashboard_information'
 
 export const useStudentBioData = createSharedComposable(() => {
   const studentBiodataRepository = new StudentBiodataRepository()
@@ -11,6 +15,14 @@ export const useStudentBioData = createSharedComposable(() => {
   const subTitle = ref<string>('Please wait while we prepare your form')
   const loading = ref<boolean>(false)
   const countries = ref<CountryResponse[] | null>(null)
+  const tribes = ref<Tribe[] | null>(null)
+  const studentBasicInformation = ref<StudentBasicInformation | null>(null)
+  /*   const bloodGroups = ref<Genotype[] | null>(null)
+  const genders = ref<Genotype[] | null>(null)
+  const relationships = ref<MaritalStatus[] | null> (null)
+ const genotype = ref<Genotype[] | null>(null)
+  const religions = ref<Religion[] | null>(null)
+  const maritalStatus = ref <MaritalStatus[] | null>(null) */
 
   // HANDLE BIO DATA UPDATE
   const updateBioData = async (student: string) => {
@@ -165,14 +177,46 @@ export const useStudentBioData = createSharedComposable(() => {
     }
   }
 
+  // fetch tribes
+  const fetchTribes = async () => {
+    try {
+      loading.value = true
+      const response = await studentBiodataRepository.getInformation(constant.nationality.getTribes)
+      tribes.value = response.data as Tribe[]
+      return response.data
+    } catch (error) {
+      return error
+    } finally {
+      loading.value = false
+    }
+  }
+
+  // fetch basic informations
+  const fetchBasicInformation = async () => {
+    try {
+      const response = await studentBiodataRepository.getInformation(
+        constant.basicInformation.getAll,
+      )
+      if (response.data as StudentBasicInformation) {
+        studentBasicInformation.value = response.data as StudentBasicInformation
+      }
+    } catch (error) {
+      return error
+    }
+  }
+
   return {
     tabCount,
     updateBioData,
+    fetchTribes,
     downloadStudentBiodata,
     fetchCountries,
     fetchStates,
     fetchLocalGovernment,
+    fetchBasicInformation,
+    studentBasicInformation,
     countries,
+    tribes,
     loading,
     headTitle,
     subTitle,

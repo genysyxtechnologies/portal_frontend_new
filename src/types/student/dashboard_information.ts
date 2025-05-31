@@ -42,7 +42,7 @@ export interface State {
 }
 
 // Tribe interface
-interface Tribe {
+export interface Tribe {
   disabled: boolean
   id: number
   name: string
@@ -50,13 +50,13 @@ interface Tribe {
 }
 
 // Religion interface
-interface Religion {
+export interface Religion {
   id: number
   title: string
   value: string
 }
 
-interface MaritalStatus {
+export interface MaritalStatus {
   id: number
   title: string
   value: string
@@ -64,7 +64,7 @@ interface MaritalStatus {
 type DateArray = [number, number, number]
 
 // Genotype interface
-interface Genotype {
+export interface Genotype {
   id: number
   name: string
   value: string
@@ -313,4 +313,15 @@ export interface UserResponse {
 
 export interface CountryResponse extends Country {
   states: State[]
+}
+
+// student basic informations
+export interface StudentBasicInformation {
+  bloodGroups: Genotype[]
+  genders: Gender[]
+  genotypes: Genotype[]
+  maritalStatuses: MaritalStatus[]
+  relationships: MaritalStatus[]
+  religions: Religion[]
+  titles: MaritalStatus[]
 }

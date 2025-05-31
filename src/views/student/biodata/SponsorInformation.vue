@@ -168,7 +168,6 @@ const isEditingAnyField = computed(() => {
     sport: formData.value.sport
   }
 
-  console.log('Sponsorship data being saved:', sponsorshipData)
   sessionStorage.setItem('sponsorshipValues', JSON.stringify(sponsorshipData))
 
   return Object.values(editableFields.value).some((val) => val)

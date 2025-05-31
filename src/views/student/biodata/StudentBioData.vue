@@ -86,7 +86,12 @@
                 :value="index.toString()"
                 class="tab-panel"
               >
-                <component :is="tab.component" :user="user!" :loading="loading" />
+                <component
+                  :is="tab.component"
+                  :user="user!"
+                  :loading="loading"
+                  :studentBasicInformation="studentBasicInformation"
+                />
               </TabPanel>
             </transition-group>
           </TabPanels>
@@ -109,7 +114,6 @@ import { useStudentDashboard } from '@/services/student/useStudentDashboard'
 import SpinningAnimation from '@/views/spinner/SpinningAnimation.vue'
 import SponsorInformation from './SponsorInformation.vue'
 
-// Import AOS for scroll animations if not already imported globally
 try {
   // @ts-expect-error - AOS might not be available globally
   const aos = window.AOS
@@ -119,17 +123,18 @@ try {
     })
   }
 } catch (error) {
-  console.error('AOS not available, animations might not work', error)
+  throw error
 }
 
 const {
   tabCount,
   downloadStudentBiodata,
+  fetchBasicInformation,
+  studentBasicInformation,
   updateBioData,
   fetchCountries,
   headTitle,
   subTitle,
-  countries,
   loading: bioDataLoading,
 } = useStudentBioData()
 
@@ -170,10 +175,9 @@ const handleUpdateBioData = async () => {
 const { user, getStudentInformation, loading } = useStudentDashboard()
 
 onMounted(async () => {
-  await getStudentInformation()
-  await fetchCountries()
+  await Promise.all([getStudentInformation(), fetchCountries(), fetchBasicInformation()])
 
-    if (user.value) {
+  if (user.value) {
     sessionStorage.setItem('userData', JSON.stringify(user.value))
   }
 })
@@ -190,7 +194,12 @@ watch(
 )
 
 const tabs = [
-  { label: 'Bio Info', component: BioInfo, user: user.value },
+  {
+    label: 'Bio Info',
+    component: BioInfo,
+    user: user.value,
+    studentBasicInformation: studentBasicInformation?.value,
+  },
   { label: 'Health Info', component: HealthInfo, user: user.value },
   { label: 'Next Of Kin Info', component: NextOfKinInfo, user: user.value },
   { label: 'Sponsorship Info', component: SponsorInformation, user: user.value, loading: loading },

@@ -23,7 +23,7 @@
             <i class="pi pi-calendar text-white text-sm"></i>
             <span class="text-white font-medium">{{ currentSession || 'Current Session' }}</span>
           </div>
-          
+
           <div class="bg-white/15 backdrop-blur-lg py-2 px-4 rounded-lg flex items-center gap-2 transition-all duration-300 hover:bg-white/20">
             <i class="pi pi-clock text-white text-sm"></i>
             <span class="text-white font-medium">{{ currentSemester || 'Current Semester' }}</span>
