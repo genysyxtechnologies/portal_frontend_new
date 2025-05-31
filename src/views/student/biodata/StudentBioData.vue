@@ -70,7 +70,7 @@ try {
     })
   }
 } catch (error) {
-  console.error('AOS not available, animations might not work', error)
+  throw error
 }
 
 const {
@@ -80,6 +80,8 @@ const {
   headTitle,
   subTitle,
   loading: bioDataLoading,
+  fetchBasicInformation,
+  studentBasicInformation,
 } = useStudentBioData()
 
 // Active tab management
@@ -125,8 +127,12 @@ const handleUpdateBioData = async () => {
 const { user, getStudentInformation, loading } = useStudentDashboard()
 
 onMounted(async () => {
-  await getStudentInformation()
-  await fetchCountries()
+  await Promise.all([
+   getStudentInformation(),
+   fetchCountries(),
+   fetchBasicInformation()
+  ])
+
 
     if (user.value) {
     sessionStorage.setItem('userData', JSON.stringify(user.value))
@@ -150,25 +156,26 @@ const tabsConfig = computed<TabItem[]>(() => [
     label: 'Bio Info',
     icon: 'fas fa-user',
     component: BioInfo,
-    props: { user: user.value, loading: loading.value }
+  studentBasicInformation,
+  props: { user: user.value, loading: loading.value, studentBasicInformation: studentBasicInformation?.value }
   },
   {
     label: 'Health Info',
     icon: 'fas fa-heartbeat',
     component: HealthInfo,
-    props: { user: user.value, loading: loading.value }
+    props: { user: user.value, loading: loading.value, studentBasicInformation: studentBasicInformation?.value }
   },
   {
     label: 'Next Of Kin Info',
     icon: 'fas fa-users',
     component: NextOfKinInfo,
-    props: { user: user.value, loading: loading.value }
+    props: { user: user.value, loading: loading.value, studentBasicInformation: studentBasicInformation?.value }
   },
   {
     label: 'Sponsorship Info',
     icon: 'fas fa-money-bill',
     component: SponsorInformation,
-    props: { user: user.value, loading: loading.value }
+    props: { user: user.value, loading: loading.value, studentBasicInformation: studentBasicInformation?.value }
   }
 ])
 
