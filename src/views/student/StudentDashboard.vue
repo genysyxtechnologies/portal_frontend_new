@@ -27,20 +27,26 @@ import { onMounted, ref } from 'vue'
 import NavbarView from './NavbarView.vue'
 import SidebarView from './SidebarView.vue'
 import { useStudentDashboard } from '@/services/student/useStudentDashboard'
+import { COLLAPSE_BREAKPOINT } from '@/utils/constants.ts'
 
 const { user, getStudentInformation } = useStudentDashboard()
 const sidebarCollapsed = ref(false)
 
 const handleSidebarToggle = (collapsed?: boolean) => {
-  if (typeof collapsed === 'boolean') {
-    sidebarCollapsed.value = collapsed
+  if(window.innerWidth >= COLLAPSE_BREAKPOINT){
+    if (typeof collapsed === 'boolean') {
+      sidebarCollapsed.value = collapsed
+    } else {
+      sidebarCollapsed.value = !sidebarCollapsed.value
+    }
   } else {
-    sidebarCollapsed.value = !sidebarCollapsed.value
+    sidebarCollapsed.value = true
   }
 }
 
 onMounted(async () => {
   await getStudentInformation()
+  console.log(user.value)
 })
 </script>
 

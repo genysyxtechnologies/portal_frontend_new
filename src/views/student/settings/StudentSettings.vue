@@ -112,7 +112,7 @@ const updateContactInfo = async (contactData: { phone: string; email: string}) =
     user.value.email = contactData.email
   }
 
-  await updateProfile({...contactData, userId: user.value?.userId!})
+  await updateProfile({...contactData, userId: user.value?.userId})
 }
 
 // Generate random styles for floating particles

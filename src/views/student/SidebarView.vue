@@ -41,7 +41,7 @@
       <ul class="menu-list">
         <li v-for="(item, index) in items" :key="index" class="menu-item-container"
           :style="`--delay: ${index * 0.05}s`">
-          <span 
+          <span
             @click="handleMenuItemClick(item, index)"
             @touchstart.passive="collapsed && item.hasChildren ? showCollapsedSubmenu(index) : null"
             @mouseenter="collapsed && item.hasChildren ? showCollapsedSubmenu(index) : null"
@@ -82,12 +82,12 @@
       </ul>
     </div>
   </Drawer>
-  
+
   <!-- Teleport popover outside sidebar to avoid clipping -->
   <Teleport to="body">
     <transition name="popover-transition">
-      <div 
-        v-if="collapsed && hoveredCollapsedIndex !== null && items[hoveredCollapsedIndex]?.hasChildren" 
+      <div
+        v-if="collapsed && hoveredCollapsedIndex !== null && items[hoveredCollapsedIndex]?.hasChildren"
         class="collapsed-popover"
         :style="getPopoverStyle(hoveredCollapsedIndex)"
         @mouseenter="showCollapsedSubmenu(hoveredCollapsedIndex)"
@@ -113,10 +113,11 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, onMounted, watch, nextTick } from 'vue'
+import { computed, ref, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import profile from '../../assets/images/student/profile.png'
 import { useStudentSideBar } from '@/services/student/useSidebar'
 import { useRouter } from 'vue-router'
+import { COLLAPSE_BREAKPOINT } from '@/utils/constants.ts'
 
 const $router = useRouter()
 
@@ -146,11 +147,31 @@ const emit = defineEmits(['toggle'])
 
 // Sidebar collapse state
 const collapsed = ref(props.initialCollapsed)
+const windowWidth = ref(typeof window !== 'undefined' ? window.innerWidth : 1024)
+
 
 // Watch for external toggle commands
 watch(() => props.initialCollapsed, (newValue) => {
   collapsed.value = newValue
 })
+
+// Auto-collapse based on viewport width
+const updateCollapsedState = () => {
+  if (windowWidth.value <= COLLAPSE_BREAKPOINT) {
+    collapsed.value = true
+  } else {
+    // Restore to initial state when screen is large enough
+    collapsed.value = props.initialCollapsed
+  }
+
+  emit('toggle', collapsed.value)
+}
+
+// Handle window resize
+const handleResize = () => {
+  windowWidth.value = window.innerWidth
+  updateCollapsedState()
+}
 
 const { items } = useStudentSideBar()
 
@@ -182,7 +203,7 @@ const showCollapsedSubmenu = (index: number) => {
     clearTimeout(popoverTimeout.value)
   }
   hoveredCollapsedIndex.value = index
-  
+
   // Ensure DOM is updated before calculating position
   nextTick(() => {
     // Force recalculation of popover position
@@ -206,11 +227,11 @@ const getPopoverStyle = (index: number) => {
   if (!menuItems[index]) {
     return { display: 'none' }
   }
-  
+
   const menuItem = menuItems[index] as HTMLElement
   const rect = menuItem.getBoundingClientRect()
   const sidebarWidth = collapsed.value ? 80 : 280
-  
+
   return {
     position: 'fixed',
     left: `${rect.right + 8}px`,
@@ -246,6 +267,12 @@ const handleMenuItemClick = (item: any, index: number) => {
 
 // Initialize animations when component mounts
 onMounted(() => {
+  // Set initial collapsed state based on viewport
+  updateCollapsedState()
+
+  // Add window resize listener
+  window.addEventListener('resize', handleResize)
+
   // Add staggered animation to menu items
   const menuItems = document.querySelectorAll('.menu-item-container');
   menuItems.forEach((item, index) => {
@@ -261,6 +288,11 @@ onMounted(() => {
       profileSection.classList.add('profile-fade-in');
     }, 100);
   }
+})
+
+// Cleanup event listener on unmount
+onUnmounted(() => {
+  window.removeEventListener('resize', handleResize)
 })
 
 const currentDate = computed(() => {
@@ -959,7 +991,7 @@ const drawerVisible = computed(() => {
 }
 
 @media (max-width: 768px) {
-  .sidebar {
+  .sidebar:not(.sidebar-collapsed) {
     width: 280px;
     padding: 1.5rem;
     transform: translateX(-100%);
@@ -971,13 +1003,16 @@ const drawerVisible = computed(() => {
     border-radius: 0;
   }
 
-  .sidebar.active {
+  .sidebar:not(.sidebar-collapsed).active {
     transform: translateX(0);
   }
 
   .sidebar-collapsed {
     width: 60px;
     padding: 1rem 0.5rem;
+    transform: translateX(0) !important;
+    position: fixed;
+    z-index: 100;
   }
 
 

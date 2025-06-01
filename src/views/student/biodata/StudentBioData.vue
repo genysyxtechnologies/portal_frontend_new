@@ -108,7 +108,7 @@ const handleUpdateBioData = async () => {
 
   try {
     // Call the updateBioData function with the username
-    await updateBioData(user.value?.username!)
+    await updateBioData(user.value?.username)
 
     // Remove loading notification
     document.body.removeChild(loadingNotification)

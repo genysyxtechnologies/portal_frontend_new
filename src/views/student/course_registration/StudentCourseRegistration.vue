@@ -287,7 +287,7 @@ interface Course {
 // handle course selection
 const handleRegistredCoursesCheckboxChange = async (course: Course) => {
   await registerStudentCourse(
-    user.value?.username!,
+    user.value?.username,
     course.id,
     selectedSession.value!.id,
     selectedSemester.value!.id,
@@ -296,7 +296,7 @@ const handleRegistredCoursesCheckboxChange = async (course: Course) => {
 
 const handleCourseRemovalCheckBox = async (course: Course) => {
   await removeStudentCourse(
-    user.value?.username!,
+    user.value?.username,
     course.id,
     selectedSession.value!.id,
     selectedSemester.value!.id,
@@ -305,7 +305,7 @@ const handleCourseRemovalCheckBox = async (course: Course) => {
 
 const handleDownload = async (document: number) => {
   await downloadStudentCourseForm(
-    user.value?.id!,
+    user.value?.id,
     selectedSession.value!.id,
     selectedSemester.value!.id,
     document,

@@ -199,7 +199,7 @@ watch(
   () => [selectedSession.value, selectedSemester.value],
   async ([session, semester]) => {
     if (session && semester && user.value?.id) {
-      await fetchStudentResult(user.value?.username!, session.id, semester.id)
+      await fetchStudentResult(user.value?.username, session.id, semester.id)
     }
   },
 )

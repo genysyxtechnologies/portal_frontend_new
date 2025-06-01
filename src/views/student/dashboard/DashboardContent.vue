@@ -389,12 +389,12 @@ onMounted(async () => {
   ) {
     await Promise.all([
       fetchStudentResult(
-        user.value?.username!,
+        user.value?.username,
         sessions.value[sessions.value.length - 1].id,
         sessions.value[sessions.value.length - 1]?.currentSemesters[0]?.id,
       ),
       fetchAllCoursesForStudent(
-        user.value?.username!,
+        user.value?.username,
         sessions.value[sessions.value.length - 1].id.toString(),
         sessions.value[sessions.value.length - 1]?.currentSemesters[0]?.id.toString(),
       ),

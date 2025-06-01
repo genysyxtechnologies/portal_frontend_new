@@ -123,7 +123,7 @@ export const userRole = reactive<{
 // Set the user role and update permissions
 export function setUserRole(roles: Array<Role>): void {
   userRole.current = roles
-  userRole.permissions = [...roles.flatMap((e) => rolePermissions[e])]
+  userRole.permissions = roles.flatMap((e) => rolePermissions[e])
 }
 
 // Check if the current user has a specific permission
