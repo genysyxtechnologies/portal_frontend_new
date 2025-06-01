@@ -31,6 +31,36 @@ const baseRoutes = [
   },
 
   {
+    path: '/forgot-password',
+    name: 'ForgotPassword',
+    component: () => import('@/views/shared/auth/AuthFlowContainer.vue'),
+    meta: {
+      title: 'Forgot Password',
+      icon: 'pi pi-lock',
+    },
+  },
+
+  {
+    path: '/verify-otp',
+    name: 'VerifyOTP',
+    component: () => import('@/views/shared/auth/AuthFlowContainer.vue'),
+    meta: {
+      title: 'Verify OTP',
+      icon: 'pi pi-lock',
+    },
+  },
+
+  {
+    path: '/reset-password',
+    name: 'ResetPassword',
+    component: () => import('@/views/shared/auth/AuthFlowContainer.vue'),
+    meta: {
+      title: 'Reset Password',
+      icon: 'pi pi-lock',
+    },
+  },
+
+  {
     path: '/forbidden',
     name: 'Forbidden',
     component: () => import('@/views/shared/auth/LoginView.vue'),

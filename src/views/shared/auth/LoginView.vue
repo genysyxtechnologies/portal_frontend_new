@@ -1,8 +1,8 @@
 <template>
   <div
     class="h-screen w-full flex items-center justify-center p-5 overflow-hidden"
-    :style="{ 
-      background: `linear-gradient(to bottom right, var(--primary-light-color), var(--primary-dark-color))` 
+    :style="{
+      background: `linear-gradient(to bottom right, var(--primary-light-color), var(--primary-dark-color))`
     }"
   >
     <div class="grid grid-cols-1 lg:grid-cols-2 w-full lg:w-7/8 h-full">
@@ -33,16 +33,14 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, watch } from 'vue'
+import { onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import LoginPage from './LoginPage.vue'
 import RegistrationPage from './RegistrationPage.vue'
 import { useAuth } from '@/services/student/useAuth'
 import urlUtil from '@/utils/urlUtil'
-import { useToast } from 'primevue/usetoast'
-const $toast = useToast()
 
-const { isLoginPage, handlePageChange, isAuthenticated, message } = useAuth()
+const { isLoginPage, handlePageChange } = useAuth()
 
 const $router = useRouter()
 
@@ -58,19 +56,6 @@ onMounted(() => {
   })
 })
 
-/* watch(
-  () => [message.value, isAuthenticated.value],
-  ([message, isAuthenticated]) => {
-    if (message) {
-      $toast.add({
-        severity: isAuthenticated ? 'success' : 'error',
-        summary: isAuthenticated ? 'Success' : 'Error',
-        detail: message,
-        life: 3000,
-      })
-    }
-  },
-) */
 
 {
   /* NSU/NAS/CMP/0696/17/18 */

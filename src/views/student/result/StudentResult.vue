@@ -11,7 +11,7 @@
           <p class="page-subtitle">View and track your academic performance</p>
         </div>
       </div>
-      
+
       <!-- Control Panel -->
       <div class="controls-panel" data-aos="fade-left" data-aos-delay="200">
         <div class="selectors-container">
@@ -20,19 +20,19 @@
               <i class="fas fa-calendar-alt"></i>
               Academic Session
             </label>
-            <Sel-ect 
-              v-model="selectedSession" 
-              :options="sessions" 
-              :size="'default'" 
+            <Sel-ect
+              v-model="selectedSession"
+              :options="sessions"
+              :size="'default'"
               optionLabel="name"
-              placeholder="Choose Session" 
+              placeholder="Choose Session"
               class="modern-select"
               :pt="{
                 root: { class: 'modern-dropdown-root' },
                 input: { class: 'modern-dropdown-input' },
                 trigger: { class: 'modern-dropdown-trigger' },
                 panel: { class: 'modern-dropdown-panel' }
-              }" 
+              }"
             />
           </div>
 
@@ -41,25 +41,25 @@
               <i class="fas fa-clock"></i>
               Semester
             </label>
-            <Sel-ect 
-              v-model="selectedSemester" 
-              :options="semesters" 
-              :size="'default'" 
+            <Sel-ect
+              v-model="selectedSemester"
+              :options="semesters"
+              :size="'default'"
               optionLabel="title"
-              placeholder="Choose Semester" 
+              placeholder="Choose Semester"
               class="modern-select"
               :pt="{
                 root: { class: 'modern-dropdown-root' },
                 input: { class: 'modern-dropdown-input' },
                 trigger: { class: 'modern-dropdown-trigger' },
                 panel: { class: 'modern-dropdown-panel' }
-              }" 
+              }"
             />
           </div>
         </div>
 
         <div class="action-buttons">
-          <button 
+          <button
             class="print-button"
             @click="printResult"
             :disabled="!selectedSession || !selectedSemester"
@@ -130,19 +130,19 @@
           </div>
 
           <div class="table-container">
-            <StudentResultTable 
-              ref="resultTableRef" 
-              :name="user?.name" 
-              :username="user?.username" 
+            <StudentResultTable
+              ref="resultTableRef"
+              :name="user?.name"
+              :username="user?.username"
               :session="selectedSession?.name"
-              :current-date="currentDate" 
-              :department="user?.programme?.department" 
+              :current-date="currentDate"
+              :department="user?.programme?.department"
               :level="studentResult?.level.title"
-              :programme="user?.programme.name" 
-              :results="studentResult?.results" 
+              :programme="user?.programme.name"
+              :results="studentResult?.results"
               :loading="loading"
-              :gpa="studentResult?.data?.current?.gpa" 
-              :cgpa="studentResult?.data?.current?.cgpa" 
+              :gpa="studentResult?.data?.current?.gpa"
+              :cgpa="studentResult?.data?.current?.cgpa"
             />
           </div>
         </div>
@@ -199,7 +199,6 @@ watch(
   () => [selectedSession.value, selectedSemester.value],
   async ([session, semester]) => {
     if (session && semester && user.value?.id) {
-      console.log(user.value.username, session.id, semester.id)
       await fetchStudentResult(user.value?.username!, session.id, semester.id)
     }
   },
@@ -577,39 +576,39 @@ watch(
     align-items: flex-start;
     gap: 1.5rem;
   }
-  
+
   .controls-panel {
     width: 100%;
     flex-direction: column;
     gap: 1.5rem;
   }
-  
+
   .selectors-container {
     width: 100%;
     flex-direction: column;
     gap: 1rem;
   }
-  
+
   .selector-group {
     width: 100%;
     min-width: auto;
   }
-  
+
   .action-buttons {
     width: 100%;
     justify-content: stretch;
   }
-  
+
   .print-button {
     width: 100%;
     justify-content: center;
   }
-  
+
   .card-header {
     flex-direction: column;
     gap: 1.5rem;
   }
-  
+
   .performance-badges {
     align-self: flex-start;
     width: 100%;
@@ -620,110 +619,110 @@ watch(
   .modern-results-page {
     padding: 0.5rem 0;
   }
-  
+
   .header-section {
     margin-bottom: 1.5rem;
   }
-  
+
   .title-container {
     flex-direction: column;
     text-align: center;
     gap: 0.75rem;
   }
-  
+
   .icon-wrapper {
     width: 3rem;
     height: 3rem;
     font-size: 1.25rem;
   }
-  
+
   .page-title {
     font-size: 1.75rem;
   }
-  
+
   .page-subtitle {
     font-size: 0.8rem;
   }
-  
+
   .controls-panel {
     gap: 1rem;
   }
-  
+
   .selector-label {
     font-size: 0.8rem;
   }
-  
+
   .print-button {
     padding: 0.875rem 1rem;
     font-size: 0.8rem;
   }
-  
+
   /* Results Container Mobile */
   .card-header {
     padding: 1.25rem;
   }
-  
+
   .results-title {
     font-size: 1.25rem;
   }
-  
+
   .metadata {
     flex-direction: column;
     gap: 0.75rem;
   }
-  
+
   .meta-item {
     font-size: 0.8rem;
   }
-  
+
   .performance-badges {
     flex-direction: row;
     gap: 0.75rem;
     justify-content: center;
     width: 100%;
   }
-  
+
   .badge {
     min-width: auto;
     flex: 1;
     padding: 0.75rem;
   }
-  
+
   .badge-label {
     font-size: 0.7rem;
   }
-  
+
   .badge-value {
     font-size: 1.1rem;
   }
-  
+
   /* Empty State Mobile */
   .empty-state {
     padding: 2rem 1rem;
   }
-  
+
   .empty-icon {
     width: 3rem;
     height: 3rem;
     font-size: 1.25rem;
     margin-bottom: 1rem;
   }
-  
+
   .empty-title {
     font-size: 1.25rem;
   }
-  
+
   .empty-description {
     font-size: 0.875rem;
     margin-bottom: 1.5rem;
   }
-  
+
   .selection-indicators {
     flex-direction: column;
     gap: 0.75rem;
     width: 100%;
   }
-  
+
   .indicator {
     width: 100%;
     justify-content: center;
@@ -736,76 +735,76 @@ watch(
   .modern-results-page {
     padding: 0.25rem 0;
   }
-  
+
   .header-section {
     margin-bottom: 1rem;
   }
-  
+
   .page-title {
     font-size: 1.5rem;
   }
-  
+
   .icon-wrapper {
     width: 2.5rem;
     height: 2.5rem;
     font-size: 1rem;
   }
-  
+
   .controls-panel {
     gap: 0.75rem;
   }
-  
+
   .selector-group {
     gap: 0.375rem;
   }
-  
+
   :deep(.modern-dropdown-input) {
     padding: 0.6rem 0.75rem;
     font-size: 0.875rem;
   }
-  
+
   .print-button {
     padding: 0.75rem;
     font-size: 0.75rem;
   }
-  
+
   .print-button span {
     display: none;
   }
-  
+
   .print-button i {
     margin: 0;
   }
-  
+
   .card-header {
     padding: 1rem;
   }
-  
+
   .results-title {
     font-size: 1.1rem;
   }
-  
+
   .performance-badges {
     flex-direction: column;
     gap: 0.5rem;
   }
-  
+
   .badge {
     padding: 0.5rem;
   }
-  
+
   .badge-value {
     font-size: 1rem;
   }
-  
+
   .empty-state {
     padding: 1.5rem 0.75rem;
   }
-  
+
   .empty-title {
     font-size: 1.1rem;
   }
-  
+
   .empty-description {
     font-size: 0.8rem;
   }

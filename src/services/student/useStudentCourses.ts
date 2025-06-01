@@ -61,7 +61,6 @@ export const useStudentCourses = createSharedComposable(() => {
         constant.permanentStudents.registerCourse,
         { studentMatric: student, course, sessionId, semesterId },
       )
-      console.log('THIS IS THE RESPONSE FOR THE NEW COURSE: ', response)
       return response
     } catch (error) {
       return error
@@ -84,7 +83,6 @@ export const useStudentCourses = createSharedComposable(() => {
         constant.permanentStudents.unRegisterCourse,
         { studentMatric: student, course, semesterId },
       )
-      console.log('THIS IS THE RESPONSE FOR THE REMOVED COURSE: ', response)
       return response
     } catch (error) {
       return error

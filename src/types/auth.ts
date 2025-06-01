@@ -37,8 +37,12 @@ export interface AuthResponse {
 }
 
 export interface ResetPasswordData {
-  email: string
-  token: string
+  userId: string
+  newPassword: string
+  confirmPassword: string
+}
+
+export interface OTPVerificationData {
   password: string
-  password_confirmation: string
+  username: string
 }

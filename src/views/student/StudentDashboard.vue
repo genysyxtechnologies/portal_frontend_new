@@ -1,7 +1,7 @@
 <template>
   <div class="dashboard-layout">
     <!-- fixedss Sidebar -->
-    <SidebarView 
+    <SidebarView
       :basic-details="user as unknown as Record<any,any>"
       :initial-collapsed="sidebarCollapsed"
       @toggle="handleSidebarToggle"
@@ -9,7 +9,7 @@
 
     <!-- main Content Area -->
     <div class="main-content" :class="{ 'main-content-collapsed': sidebarCollapsed }">
-      <NavbarView 
+      <NavbarView
         :sidebar-collapsed="sidebarCollapsed"
         @toggle-sidebar="handleSidebarToggle"
       />
@@ -41,7 +41,6 @@ const handleSidebarToggle = (collapsed?: boolean) => {
 
 onMounted(async () => {
   await getStudentInformation()
-  console.log(user.value)
 })
 </script>
 
@@ -97,7 +96,7 @@ onMounted(async () => {
   .main-content {
     margin-left: 260px;
   }
-  
+
   .main-content-collapsed {
     margin-left: 94px;
   }
@@ -117,7 +116,7 @@ onMounted(async () => {
   .main-content {
     margin-left: 0;
   }
-  
+
   .main-content-collapsed {
     margin-left: 0;
   }

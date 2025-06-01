@@ -91,7 +91,6 @@ const activeTabIndex = ref(0)
 const handleUpdateBioData = async () => {
   if (user.value) {
     sessionStorage.setItem('userData', JSON.stringify(user.value))
-    console.log('Updated user data in sessionStorage before update')
   }
   const currentActiveTab = activeTabIndex.value
 

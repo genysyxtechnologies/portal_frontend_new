@@ -13,7 +13,7 @@
               This password reset link is invalid or has expired. Please request a new password
               reset link.
             </p>
-            <router-link to="/auth/forgot-password" class="btn-request-new">
+            <router-link to="/forgot-password" class="btn-request-new">
               Request New Link
             </router-link>
           </div>

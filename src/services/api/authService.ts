@@ -3,6 +3,7 @@ import apiClient, { type ApiResponse } from './apiClient'
 import type {
   AuthResponse,
   LoginCredentials,
+  OTPVerificationData,
   RegisterData,
   ResetPasswordData,
   User,
@@ -58,19 +59,31 @@ class AuthService {
     return apiClient.get<UserResponse>(constant.current_user.current_user)
   }
 
-  // Send password reset link
-  public async forgotPassword(email: string): Promise<ApiResponse<{ message: string }>> {
-    return apiClient.post<{ message: string }>('/auth/forgot-password', { email })
+  // verify user id
+  public async verifyUserId(username: string): Promise<ApiResponse<{ message: string }>> {
+    return apiClient.post<{ message: string }>(constant.auth.sendOtp, { username })
   }
 
-  // Reset password with token
-  public async resetPassword(data: ResetPasswordData): Promise<ApiResponse<{ message: string }>> {
-    return apiClient.post<{ message: string }>('/auth/reset-password', data)
+  // verify otp
+  public async verifyOTP(
+    data: OTPVerificationData,
+  ): Promise<ApiResponse<{ message: string; success: boolean }>> {
+    return apiClient.post<{ message: string; success: boolean }>(constant.auth.verifyOtp, data)
+  }
+
+  // update forgot password
+  public async updateRecoveredPassword(
+    data: ResetPasswordData,
+  ): Promise<ApiResponse<{ message: string; success: boolean; data: boolean }>> {
+    return apiClient.post<{ message: string; success: boolean; data: boolean }>(
+      constant.auth.updatePasswordForgot,
+      data,
+    )
   }
 
   // Verify email with token
   public async verifyEmail(token: string): Promise<ApiResponse<{ message: string }>> {
-    return apiClient.post<{ message: string }>('/auth/verify-email', { token })
+    return apiClient.post<{ message: string }>(constant.auth.updatePasswordForgot, { token })
   }
 
   // Check if user is authenticated

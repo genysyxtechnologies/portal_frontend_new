@@ -135,6 +135,7 @@ class ApiClient {
 
   // POST method
   public async post<T = unknown>(url: string, data?: unknown): Promise<ApiResponse<T>> {
+    console.log("RUN THIS CODE: ", url)
     return this.request<T>({
       method: 'POST',
       url,

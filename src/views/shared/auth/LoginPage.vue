@@ -85,11 +85,12 @@
               :disabled="isLoading"
               class="hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300"
             />
-            <span
+            <router-link
+              to="/forgot-password"
               class="text-center text-[#0D47A1] hover:text-[#1565C0] cursor-pointer transition-colors duration-300 hover:underline"
             >
               Forget password?
-            </span>
+            </router-link>
           </div>
 
           <!-- Application link with smooth arrow animation -->

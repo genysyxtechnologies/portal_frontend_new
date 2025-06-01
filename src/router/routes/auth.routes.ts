@@ -31,13 +31,22 @@ const authRoutes: RouteRecordRaw[] = [
           icon: 'pi pi-user-plus',
         },
       },
-      {
+     /*  {
         path: 'forgot-password',
         name: 'ForgotPassword',
         component: () => import('@/views/shared/auth/ForgotPasswordView.vue'),
         meta: {
           title: 'Forgot Password',
           icon: 'pi pi-lock',
+        },
+      }, */
+      {
+        path: 'otp-verification',
+        name: 'OTPVerification',
+        component: () => import('@/views/shared/auth/OTPVerificationView.vue'),
+        meta: {
+          title: 'Verify OTP',
+          icon: 'pi pi-shield',
         },
       },
       {
