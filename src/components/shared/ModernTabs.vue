@@ -26,27 +26,26 @@
     </div>
 
     <div class="tab-panels">
-      <transition name="panel-transition" mode="out-in">
-        <div
-          v-if="activeTab !== null"
-          :key="activeTab"
-          class="tab-panel"
-        >
-          <component :is="tabs[activeTab].component" v-bind="tabs[activeTab].props" />
-        </div>
-      </transition>
+      <keep-alive>
+        <component 
+          v-if="activeTab !== null && tabs[activeTab]"
+          :key="`tab-${activeTab}`"
+          :is="tabs[activeTab].component" 
+          v-bind="tabs[activeTab].props || {}" 
+        />
+      </keep-alive>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, type Component } from 'vue'
 
 export interface TabItem {
   label: string
   icon: string
-  component: any
-  props?: Record<string, any>
+  component: Component
+  props?: Record<string, unknown>
 }
 
 interface Props {
@@ -78,11 +77,13 @@ watch(
 
 watch(activeTab, (newValue) => {
   emit('update:modelValue', newValue)
-  emit('tab-change', newValue, props.tabs[newValue])
+  if (props.tabs[newValue]) {
+    emit('tab-change', newValue, props.tabs[newValue])
+  }
 })
 
 const handleTabClick = (index: number) => {
-  if (!props.disabled) {
+  if (!props.disabled && props.tabs[index]) {
     activeTab.value = index
   }
 }
@@ -223,26 +224,7 @@ const handleTabClick = (index: number) => {
   overflow: auto;
   padding: 2rem;
   background: #ffffff;
-}
-
-.tab-panel {
-  height: 100%;
-}
-
-/* Panel Transitions */
-.panel-transition-enter-active,
-.panel-transition-leave-active {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.panel-transition-enter-from {
-  opacity: 0;
-  transform: translateX(20px);
-}
-
-.panel-transition-leave-to {
-  opacity: 0;
-  transform: translateX(-20px);
+  min-height: 400px;
 }
 
 /* Responsive Design */

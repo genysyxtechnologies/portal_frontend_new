@@ -155,8 +155,7 @@ const tabsConfig = computed<TabItem[]>(() => [
     label: 'Bio Info',
     icon: 'fas fa-user',
     component: BioInfo,
-  studentBasicInformation,
-  props: { user: user.value, loading: loading.value, studentBasicInformation: studentBasicInformation?.value }
+    props: { user: user.value, loading: loading.value, studentBasicInformation: studentBasicInformation?.value }
   },
   {
     label: 'Health Info',
@@ -392,7 +391,8 @@ const handleTabChange = (index: number, tab: TabItem) => {
   border: 1px solid transparent;
   overflow: hidden;
   position: relative;
-  height: 100%;
+  min-height: 600px;
+  height: calc(100vh - 250px);
   display: flex;
   flex-direction: column;
 }

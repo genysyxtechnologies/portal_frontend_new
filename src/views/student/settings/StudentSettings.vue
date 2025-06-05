@@ -20,10 +20,10 @@
             <div class="title-underline"></div>
           </h1>
         </div>
-        <div class="status-indicator">
-          <div class="pulse-dot"></div>
-          <span class="status-text">Online</span>
-        </div>
+<!--        <div class="status-indicator">-->
+<!--          <div class="pulse-dot"></div>-->
+<!--          <span class="status-text">Online</span>-->
+<!--        </div>-->
       </div>
     </div>
 
@@ -232,7 +232,7 @@ onMounted(async () => {
 .title-icon {
   width: 3rem;
   height: 3rem;
-  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-light-color));
   border-radius: 0.75rem;
   display: flex;
   align-items: center;
@@ -254,7 +254,7 @@ onMounted(async () => {
 .title-text {
   font-size: 2.5rem;
   font-weight: 700;
-  background: linear-gradient(135deg, #1f2937, #3b82f6, #8b5cf6);
+  background: linear-gradient(135deg, var(--primary-dark-color), var(--primary-color), var(--primary-light-color));
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -268,7 +268,7 @@ onMounted(async () => {
 
 .title-underline {
   height: 4px;
-  background: linear-gradient(90deg, #3b82f6, #8b5cf6, transparent);
+  background: linear-gradient(90deg, var(--primary-dark-color), var(--primary-light-color), transparent);
   border-radius: 2px;
   margin-top: 0.5rem;
   animation: underlineGlow 2s ease-in-out infinite;

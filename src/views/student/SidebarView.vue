@@ -17,7 +17,8 @@
               class="w-24 h-24 rounded-full object-cover border-4 border-[#0D47A1]/10 group-hover:border-[#0D47A1]/30 transition-all duration-300 ease-out z-10 relative"
               :class="{ 'w-12 h-12': collapsed }" />
             <span
-              class="status-indicator"></span>
+              class="status-indicator"
+              :class="{ 'status-online': isOnline, 'status-offline': !isOnline }"></span>
           </div>
           <div class="profile-text" :class="{ 'profile-text-collapsed': collapsed }" >
             <h1 class="username">
@@ -119,6 +120,9 @@ import { useRouter } from 'vue-router'
 import { COLLAPSE_BREAKPOINT } from '@/utils/constants.ts'
 import { useStudentDashboard } from '@/services/student/useStudentDashboard.ts'
 const { profilePicture } = useStudentDashboard()
+
+// Internet connectivity detection
+const isOnline = ref(navigator.onLine)
 
 const $router = useRouter()
 
@@ -231,7 +235,6 @@ const getPopoverStyle = (index: number) => {
 
   const menuItem = menuItems[index] as HTMLElement
   const rect = menuItem.getBoundingClientRect()
-  const sidebarWidth = collapsed.value ? 80 : 280
 
   return {
     position: 'fixed',
@@ -242,7 +245,7 @@ const getPopoverStyle = (index: number) => {
 }
 
 // Handle menu item click - different behavior for collapsed vs expanded
-const handleMenuItemClick = (item: any, index: number) => {
+const handleMenuItemClick = (item: { hasChildren?: boolean; children?: Array<{ path: string }>; path: string }, index: number) => {
   if (collapsed.value && item.hasChildren) {
     // For collapsed state with children, show/hide popover or navigate to first child
     if (hoveredCollapsedIndex.value === index) {
@@ -266,6 +269,11 @@ const handleMenuItemClick = (item: any, index: number) => {
   }
 }
 
+// Handle connectivity change
+const handleOnlineStatusChange = () => {
+  isOnline.value = navigator.onLine
+}
+
 // Initialize animations when component mounts
 onMounted(() => {
   // Set initial collapsed state based on viewport
@@ -273,6 +281,10 @@ onMounted(() => {
 
   // Add window resize listener
   window.addEventListener('resize', handleResize)
+
+  // Add connectivity listeners
+  window.addEventListener('online', handleOnlineStatusChange)
+  window.addEventListener('offline', handleOnlineStatusChange)
 
   // Add staggered animation to menu items
   const menuItems = document.querySelectorAll('.menu-item-container');
@@ -294,6 +306,8 @@ onMounted(() => {
 // Cleanup event listener on unmount
 onUnmounted(() => {
   window.removeEventListener('resize', handleResize)
+  window.removeEventListener('online', handleOnlineStatusChange)
+  window.removeEventListener('offline', handleOnlineStatusChange)
 })
 
 const currentDate = computed(() => {
@@ -499,12 +513,21 @@ const drawerVisible = computed(() => {
   right: 2px;
   width: 14px;
   height: 14px;
-  background: linear-gradient(135deg, #4ade80, #22c55e);
   border-radius: 50%;
   border: 2px solid white;
   z-index: 20;
-  box-shadow: 0 0 0 rgba(34, 197, 94, 0.4);
   animation: ping-slow 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+  transition: all 0.3s ease;
+}
+
+.status-online {
+  background: linear-gradient(135deg, #4ade80, #22c55e);
+  box-shadow: 0 0 0 rgba(34, 197, 94, 0.4);
+}
+
+.status-offline {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  box-shadow: 0 0 0 rgba(239, 68, 68, 0.4);
 }
 
 .username {
@@ -911,6 +934,7 @@ const drawerVisible = computed(() => {
   justify-content: center;
   padding: 0.75rem;
   border-radius: 12px;
+  gap: 0;
 }
 
 .sidebar-collapsed .menu-icon-wrapper {
