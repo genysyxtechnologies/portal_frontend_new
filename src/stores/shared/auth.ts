@@ -3,7 +3,7 @@ import { ref, computed } from 'vue'
 import authService from '@/services/api/authService'
 import { anyContains, setUserRole, type Role } from '@/utils/permissions/roles'
 import router from '@/router'
-import type { LoginCredentials, RegisterData, User } from '@/types/auth.ts'
+import type { LoginCredentials, PlainUser, RegisterData, User } from '@/types/auth.ts'
 
 interface ApiError extends Error {
   message: string
@@ -11,7 +11,7 @@ interface ApiError extends Error {
 
 export const useAuthStore = defineStore('auth', () => {
   // State
-  const user = ref<User | null>(null)
+  const user = ref<User | PlainUser | null>(null)
   const loading = ref(false)
   const error = ref<string | null>(null)
   const isInitialized = ref(false)

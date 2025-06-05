@@ -16,9 +16,29 @@ export interface User {
   superOption: boolean
 }
 
+export interface PlainUser {
+  id: string
+  name: string
+  username: string
+  email: string
+  roles: string[]
+  avatar?: string
+  department?: string
+  position?: string
+  matric_number?: string
+  created_at: string
+  updated_at: string
+}
+
 export interface LoginCredentials {
   email: string
   password: string
+}
+
+export interface MFASubmission {
+  userId: string,
+  code: string,
+  recovery: string | undefined | null
 }
 
 export interface RegisterData {

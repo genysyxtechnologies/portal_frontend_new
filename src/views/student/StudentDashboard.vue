@@ -46,7 +46,6 @@ const handleSidebarToggle = (collapsed?: boolean) => {
 
 onMounted(async () => {
   await getStudentInformation()
-  console.log(user.value)
 })
 </script>
 

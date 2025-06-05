@@ -21,7 +21,7 @@ defineEmits(['on-click'])
 
 <style scoped>
 .login-btn {
-  background-color: #0d47a1;
+  background-color: var(--primary-color);
   color: white;
   padding: 12px 24px;
   border-radius: 8px;
@@ -34,7 +34,7 @@ defineEmits(['on-click'])
 }
 
 .login-btn:hover {
-  background-color: #1565c0;
+  background-color: var(--primary-light-color);
   box-shadow: 0 4px 12px rgba(13, 71, 161, 0.3);
 }
 </style>

@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex flex-col p-6 sm:p-12 bg-white gap-8 rounded-xl justify-center shadow-2xl transform transition-all duration-700 hover:shadow-3xl hover:-translate-y-1 relative overflow-hidden"
+    class="flex flex-col p-6 sm:p-12 bg-white gap-8 rounded-xl justify-center shadow-2xl transform transition-all duration-700 hover:shadow-3xl hover:-translate-y-1 relative overflow-hidden w-9/10"
   >
     <!-- Background floating elements -->
     <div
@@ -13,8 +13,8 @@
       class="absolute top-1/4 right-1/4 w-16 h-16 rounded-full bg-blue-200 opacity-30 animate-float-3"
     ></div>
 
-    <Toa-st class="z-10" />
-    <div class="p-4 sm:p-8 flex flex-col gap-12 z-10">
+    <Toa-st class="z-20" />
+    <div class="p-4 sm:p-8 flex flex-col gap-12 z-10 relative">
       <div class="flex flex-col items-center space-y-2">
         <h1 class="welcome animate-text-focus-in">Welcome back</h1>
         <h3 class="sub-welcome animate-tracking-in-expand delay-100">
@@ -23,7 +23,7 @@
       </div>
 
       <div class="flex flex-col gap-6 animate-fade-in-delayed">
-        <div class="flex flex-col gap-6">
+        <div v-if="!isMfa" class="flex flex-col gap-6">
           <div class="flex flex-col space-y-2">
             <div class="relative w-full">
               <FloatLabel>
@@ -50,12 +50,13 @@
           <div class="flex flex-col space-y-2">
             <div class="relative w-full">
               <FloatLabel>
-                <InputText
-                  :type="isPassword ? 'password' : 'text'"
+                <Pass-word
                   v-model="credentials.password"
+                  :feedback="false"
+                  toggleMask
                   id="password"
                   class="w-full"
-                  :class="{
+                  :inputClass="{
                     'p-invalid': passwordError || invalidCredentials,
                     'shake-animation': passwordError || invalidCredentials,
                   }"
@@ -63,20 +64,49 @@
                 />
                 <label for="password" class="text-[#0D47A1] font-medium">Password</label>
               </FloatLabel>
-              <span @click="handlePasswordChange" v-if="!isPassword" class="absolute top-4 right-4">
-                <i class="pi pi-lock text-blue-400"></i>
-              </span>
-              <span @click="handlePasswordChange" v-else class="absolute top-4 right-4">
-                <i class="pi pi-eye text-blue-400"></i>
-              </span>
             </div>
             <small v-if="passwordError" class="p-error animate-fade-in">Password is required</small>
             <small v-if="invalidCredentials" class="p-error animate-fade-in">{{ message }}</small>
           </div>
         </div>
 
+        <!-- MFA OTP Section -->
+        <div v-if="isMfa" class="flex flex-col animate-fade-in" style="margin-top: 10px;">
+          <div class="flex flex-col items-center text-center" style="gap: 32px; padding: 40px 20px;">
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 16px;">
+              <div class="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto animate-pulse" style="margin-bottom: 8px;">
+                <i class="pi pi-shield text-3xl text-[#0D47A1]"></i>
+              </div>
+              <h3 class="text-2xl font-semibold text-[#0D47A1]" style="margin: 0; line-height: 1.3;">Two-Factor Authentication</h3>
+              <p class="text-gray-600" style="margin: 0; font-size: 16px; line-height: 1.4; max-width: 300px;">Please enter the 6-digit code from your authenticator app</p>
+            </div>
+
+            <div class="w-full max-w-sm" style="display: flex; flex-direction: column; gap: 24px;">
+              <InputOtp v-model="otpValue" :length="6" class="justify-center" style="gap: 8px;" />
+
+              <ReUsableButtons
+                :label="'Verify Code'"
+                @on-click="verifyMfa"
+                :loading="isLoading"
+                :disabled="isLoading || !otpValue || otpValue.length < 6"
+                class="w-full hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300"
+                style="margin-top: 8px;"
+              />
+            </div>
+
+            <button
+              @click="isMfa = false"
+              class="text-sm text-gray-500 hover:text-[#0D47A1] transition-colors duration-300"
+              style="margin-top: 16px; display: flex; align-items: center; gap: 6px;"
+            >
+              <i class="pi pi-arrow-left"></i>
+              Back to login
+            </button>
+          </div>
+        </div>
+
         <!-- Buttons with hover effects -->
-        <div class="flex flex-col gap-6">
+        <div v-if="!isMfa" class="flex flex-col gap-6">
           <div class="flex flex-col space-y-4">
             <ReUsableButtons
               :label="'Login'"
@@ -87,6 +117,7 @@
             />
             <router-link
               to="/forgot-password"
+              style="margin-top: 10px;"
               class="text-center text-[#0D47A1] hover:text-[#1565C0] cursor-pointer transition-colors duration-300 hover:underline"
             >
               Forget password?
@@ -137,20 +168,23 @@ import ReUsableButtons from '@/views/buttons/ReUsableButtons.vue'
 import { anyContains } from '@/utils/permissions/roles.ts'
 import { useRouter } from 'vue-router'
 import FloatLabel from 'primevue/floatlabel'
+import InputOtp from 'primevue/inputotp'
+import type { MFASubmission } from '@/types/auth.ts'
 
 const {
   handleUserLogin,
+  processMfa,
   credentials,
   message,
   usernameError,
   passwordError,
   isLoading,
-  isPassword,
-  handlePasswordChange,
 } = useAuth()
 const router = useRouter()
 
 const loginSuccess = ref(false)
+const isMfa = ref(false)
+const otpValue = ref<string>('')
 const invalidCredentials = computed(() => message.value?.toLowerCase().includes('invalid'))
 
 const resetErrors = () => {
@@ -183,10 +217,62 @@ const login = async () => {
 
   try {
     const d = await handleUserLogin()
+    // check if it's mfa
+    if(d.success){
+      console.log(d)
+      if(d.data.mfa){
+        isMfa.value = true
+      } else{
+        loginSuccess.value = true
+        if (anyContains(['student'], (d.data as { roles: string[] }).roles)) {
+
+          setTimeout(() => {
+            router.push('/student')
+          }, 1500)
+        }  else if (anyContains(['admin', 'super_admin'], (d.data as { roles: string[] }).roles)) {
+          setTimeout(() => {
+            router.push('/main')
+          }, 1500)
+        } else if (anyContains(['applicant'], (d.data as { roles: string[] }).roles)) {
+          setTimeout(() => {
+            router.push('/applications')
+          }, 1500)
+        } else{
+          setTimeout(() => {
+            router.push('/officer')
+          }, 1500)
+        }
+      }
+    }
+  } catch (error) {
+    return error
+  }
+}
+
+const verifyMfa = async () => {
+  try {
+    const r: MFASubmission = {
+      userId: credentials.value.email,
+      code: otpValue.value,
+      recovery: null
+    }
+    const d = await processMfa(r)
+    loginSuccess.value = true
     if (anyContains(['student'], (d.data as { roles: string[] }).roles)) {
-      loginSuccess.value = true
       setTimeout(() => {
         router.push('/student')
+      }, 1500)
+    } else if (anyContains(['admin', 'super_admin'], (d.data as { roles: string[] }).roles)) {
+      setTimeout(() => {
+        router.push('/main')
+      }, 1500)
+    } else if (anyContains(['applicant'], (d.data as { roles: string[] }).roles)) {
+      setTimeout(() => {
+        router.push('/applications')
+      }, 1500)
+    } else{
+      setTimeout(() => {
+        router.push('/officer')
       }, 1500)
     }
   } catch (error) {
@@ -196,6 +282,7 @@ const login = async () => {
 </script>
 
 <style scoped>
+
 .welcome {
   font-family: 'Inter', sans-serif;
   font-weight: 700;
@@ -254,6 +341,35 @@ const login = async () => {
 
 .p-error {
   color: #ef4444;
+}
+
+/* OTP Input Styling */
+:deep(.p-inputotp) {
+  gap: 0.5rem;
+}
+
+:deep(.p-inputotp-input) {
+  width: 3rem;
+  height: 3rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+  text-align: center;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+:deep(.p-inputotp-input:focus) {
+  border-color: #0d47a1;
+  box-shadow: 0 0 0 3px rgba(13, 71, 161, 0.1);
+  background: white;
+  transform: scale(1.05);
+}
+
+:deep(.p-inputotp-input:hover) {
+  border-color: #1565c0;
+  background: rgba(13, 71, 161, 0.02);
 }
 
 @keyframes shake {

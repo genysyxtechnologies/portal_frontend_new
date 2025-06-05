@@ -1,8 +1,8 @@
-import type { AuthResponse, LoginCredentials } from '@/types/auth'
+import type { AuthResponse, LoginCredentials, MFASubmission } from '@/types/auth'
 import { createSharedComposable } from '@vueuse/core'
 import { ref } from 'vue'
 import authService from '@/services/api/authService'
-import type { ApiResponse } from '@/services/api/apiClient.ts'
+import apiClient, { type ApiResponse } from '@/services/api/apiClient.ts'
 
 export const useAuth = createSharedComposable(() => {
   const isLoginPage = ref<boolean>(true)
@@ -24,11 +24,15 @@ export const useAuth = createSharedComposable(() => {
   }
 
   // handle login
-  const handleUserLogin = async (): Promise<ApiResponse> => {
+  const handleUserLogin = async (): Promise<ApiResponse<AuthResponse>> => {
     isLoading.value = true
     try {
       const response = await authService.login(credentials.value)
+      console.log(response)
       if (response.success) {
+        if(response.data.mfa){
+          return response
+        }
         isAuthenticated.value = true
         message.value = 'Successfully logged in'
         return response
@@ -38,6 +42,25 @@ export const useAuth = createSharedComposable(() => {
         return response
       }
     } catch (error) {
+      throw error
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  const processMfa = async (mfa: MFASubmission): Promise<ApiResponse<AuthResponse>> => {
+    isLoading.value = true
+    try {
+      const response = await authService.processMfa(mfa)
+      if(!response.success)
+        throw new Error()
+      if (response.data.jwt) {
+        isAuthenticated.value = true
+        message.value = 'Successfully logged in'
+        return response
+      }
+      return response
+    } catch (error){
       throw error
     } finally {
       isLoading.value = false
@@ -55,6 +78,7 @@ export const useAuth = createSharedComposable(() => {
     handlePageChange,
     handleUserLogin,
     handlePasswordChange,
+    processMfa,
     isLoading,
     isAuthenticated,
     error,

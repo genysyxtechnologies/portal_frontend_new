@@ -2,11 +2,11 @@ import { setUserRole, type Role } from '@/utils/permissions/roles'
 import apiClient, { type ApiResponse } from './apiClient'
 import type {
   AuthResponse,
-  LoginCredentials,
-  OTPVerificationData,
+  LoginCredentials, MFASubmission,
+  OTPVerificationData, PlainUser,
   RegisterData,
   ResetPasswordData,
-  User,
+  User
 } from '@/types/auth.ts'
 import type { UserResponse } from '@/types/student/dashboard_information'
 import constant from '@/stores/constant'
@@ -19,13 +19,29 @@ class AuthService {
       password: credentials.password,
     })
     if (response.data.jwt) {
-      sessionStorage.setItem('auth_token', response.data.jwt)
-      sessionStorage.setItem('isAuthenticated', 'true')
-      const roles = response.data.roles.map((e) => e.toLowerCase())
-      setUserRole(roles as Array<Role>)
-      response.data.roles = roles
-      sessionStorage.setItem('roles', JSON.stringify(roles))
+      return this.processToken(response)
     }
+    return response
+  }
+
+  public async processMfa(mfa: MFASubmission){
+    const response = await apiClient.put<AuthResponse>('/verify-mfa', {
+      ...mfa
+    })
+    if (response.data.jwt) {
+      return this.processToken(response)
+    }
+    return response
+  }
+
+  // process token
+  public async processToken(response: ApiResponse<AuthResponse>){
+    sessionStorage.setItem('auth_token', response.data.jwt)
+    sessionStorage.setItem('isAuthenticated', 'true')
+    const roles = response.data.roles.map((e) => e.toLowerCase())
+    setUserRole(roles as Array<Role>)
+    response.data.roles = roles
+    sessionStorage.setItem('roles', JSON.stringify(roles))
     return response
   }
 
@@ -36,7 +52,7 @@ class AuthService {
     if (response.data.jwt) {
       sessionStorage.setItem('auth_token', response.data.jwt)
       sessionStorage.setItem('isAuthenticated', 'true')
-      setUserRole(response.data.user.roles as Array<Role>)
+      setUserRole((response.data.user as unknown as PlainUser).roles as Array<Role>)
     }
 
     return response

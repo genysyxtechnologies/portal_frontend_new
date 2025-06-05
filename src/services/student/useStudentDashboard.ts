@@ -21,6 +21,8 @@ export const useStudentDashboard = createSharedComposable(() => {
     try {
       const response = await authService.getCurrentUser()
       user.value = response.data.user
+      // update user store
+
     } catch (err) {
       return err
     } finally {

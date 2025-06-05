@@ -1,15 +1,15 @@
 :root {
-  /* Lafia Brand Colors */
-  --primary-color: #0a3d62; /* Lafia blue */
-  --primary-color-rgb: 10, 61, 98; /* RGB values for primary color */
-  --primary-dark-color: #08304c;
-  --primary-dark-color-rgb: 8, 48, 76; /* RGB values for primary dark */
-  --primary-light-color: #4f7a94;
-  --primary-light-color-rgb: 79, 122, 148; /* RGB values for primary light */
+  /* FPN Brand Colors */
+  --primary-color: #bf9000; /* FPN green */
+  --primary-color-rgb: 0, 94, 84; /* RGB values for primary color */
+  --primary-dark-color: #9c7600;
+  --primary-dark-color-rgb: 0, 74, 66; /* RGB values for primary dark */
+  --primary-light-color: #d4ad4c;
+  --primary-light-color-rgb: 77, 140, 133; /* RGB values for primary light */
   /* Secondary Colors */
-  --secondary-color: #e84118; /* Lafia red/orange */
-  --secondary-dark-color: #c23515;
-  --secondary-light-color: #ed6e50;
+  --secondary-color: #005e54; /* FPN gold/yellow */
+  --secondary-dark-color: #004a42;
+  --secondary-light-color: #4d8c85;
 
   /* Neutral Colors */
   --surface-a: #ffffff;
@@ -31,14 +31,13 @@
   --danger-color: #d32f2f;
 
   /* Border Radius */
-  --border-radius: 6px;
+  --border-radius: 4px;
 }
 
-/* Lafia specific component overrides */
+/* FPN specific component overrides */
 .p-button {
   background-color: var(--primary-color);
   border-color: var(--primary-color);
-  border-radius: var(--border-radius);
 }
 
 .p-button:hover {
@@ -59,42 +58,20 @@
 /* Header styling */
 .p-menubar {
   background-color: var(--primary-color);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .p-menubar .p-menubar-root-list > .p-menuitem > .p-menuitem-link .p-menuitem-text,
 .p-menubar .p-menubar-root-list > .p-menuitem > .p-menuitem-link .p-menuitem-icon {
   color: white;
-  font-weight: 500;
 }
 
-/* Panel styling */
-.p-panel .p-panel-header {
-  background-color: var(--primary-light-color);
-  color: white;
-}
-
-/* Card styling */
-.p-card {
-  border-radius: var(--border-radius);
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
-}
-
-/* Custom Lafia elements */
-.lafia-header {
+/* Custom FPN elements */
+.fpn-header {
   background-color: var(--primary-color);
   color: white;
-  padding: 1rem;
 }
 
-.lafia-footer {
+.fpn-footer {
   background-color: var(--primary-dark-color);
   color: white;
-  padding: 1rem 0;
-}
-
-/* Form controls */
-.p-inputtext:focus {
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 1px var(--primary-light-color);
 }
