@@ -100,10 +100,6 @@
             <ul class="instruction-list">
               <li class="instruction-item">
                 <i class="pi pi-angle-right"></i>
-                Minimum CGPA of 2.50 required
-              </li>
-              <li class="instruction-item">
-                <i class="pi pi-angle-right"></i>
                 No outstanding academic debts
               </li>
               <li class="instruction-item">
@@ -125,7 +121,7 @@
             <div class="note-box">
               <p>
                 Programme transfer is subject to approval by the academic board. Processing may take
-                2-4 weeks.
+                1 day to 2 weeks.
               </p>
             </div>
           </div>
@@ -187,22 +183,7 @@ onMounted(async () => {
   flex: 1;
 }
 
-.page-title {
-  font-size: 2.5rem;
-  font-weight: 700;
-  color: var(--primary-light-color);
-  margin-bottom: 0.5rem;
-  background: linear-gradient(135deg, var(--primary-color), var(--primary-light-color));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.page-subtitle {
-  color: #64748b;
-  font-size: 1.1rem;
-  font-weight: 400;
-}
+/* Page title and subtitle styles are now in base.css */
 
 .filters-section {
   display: flex;
@@ -529,9 +510,7 @@ onMounted(async () => {
     padding: 1rem;
   }
 
-  .page-title {
-    font-size: 2rem;
-  }
+  /* Page title responsive styles are now in base.css */
 
   .card-header {
     padding: 1.5rem 1.5rem 1rem 1.5rem;

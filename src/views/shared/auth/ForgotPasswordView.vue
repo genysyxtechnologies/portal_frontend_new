@@ -449,7 +449,7 @@ const handleSubmit = async (): Promise<void> => {
   flex: 0 0 48%;
   position: relative;
   overflow: hidden;
-  background: linear-gradient(135deg, #4f46e5, #7c3aed, #a855f7);
+  background: linear-gradient(135deg, var(--primary-dark-color), var(--primary-color),var(--primary-light-color));
   box-shadow: inset -10px 0 20px rgba(0, 0, 0, 0.1);
 }
 
@@ -546,7 +546,7 @@ const handleSubmit = async (): Promise<void> => {
   left: 0;
   width: 60px;
   height: 3px;
-  background: linear-gradient(90deg, #4f46e5, #7c3aed);
+  background: linear-gradient(90deg, var(--secondary-color), var(--secondary-light-color));
   border-radius: 3px;
 }
 

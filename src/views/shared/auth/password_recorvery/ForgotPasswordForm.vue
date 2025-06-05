@@ -33,6 +33,7 @@
             label="VERIFY IDENTITY"
             icon="pi pi-lock-open"
             class="p-button-lg custom-button w-full"
+            style="margin-top: 20px;"
             :loading="isLoading"
             @click="handleUserVerification()"
             v-motion
@@ -184,7 +185,7 @@ const handleUserVerification = async () => {
 }
 
 .custom-button {
-  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light-color) 100%);
   border: none;
   border-radius: 10px;
   font-weight: 600;
@@ -195,14 +196,14 @@ const handleUserVerification = async () => {
 }
 
 .custom-button:hover {
-  background: linear-gradient(135deg, #4338ca 0%, #6d28d9 100%);
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light-color) 100%);
   box-shadow: 0 6px 10px rgba(124, 58, 237, 0.35);
   transform: translateY(-2px);
 }
 
 .custom-button:active {
   transform: translateY(0);
-  box-shadow: 0 2px 4px rgba(124, 58, 237, 0.2);
+  box-shadow: 0 2px 4px var(--secondary-light-color);
 }
 
 .auth-links {

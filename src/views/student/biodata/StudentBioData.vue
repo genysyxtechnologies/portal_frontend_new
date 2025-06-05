@@ -215,10 +215,8 @@ const handleTabChange = (index: number, tab: TabItem) => {
   margin-bottom: 0.5rem;
 }
 
+/* Page title styles are now in base.css */
 .page-title {
-  font-size: 1.75rem;
-  font-weight: 700;
-  color: #1f2937;
   display: flex;
   align-items: center;
   position: relative;
@@ -227,7 +225,7 @@ const handleTabChange = (index: number, tab: TabItem) => {
 .title-dot {
   width: 12px;
   height: 12px;
-  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  background: linear-gradient(135deg, var(--primary-dark-color), var(--primary-light-color));
   border-radius: 50%;
   margin-right: 0.75rem;
   display: inline-block;
@@ -324,7 +322,7 @@ const handleTabChange = (index: number, tab: TabItem) => {
 }
 
 .title-text {
-  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-light-color));
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -338,7 +336,7 @@ const handleTabChange = (index: number, tab: TabItem) => {
   left: 0;
   width: 100%;
   height: 2px;
-  background: linear-gradient(90deg, #3b82f6, transparent);
+  background: linear-gradient(90deg, var(--primary-light-color), transparent);
 }
 
 .action-buttons {

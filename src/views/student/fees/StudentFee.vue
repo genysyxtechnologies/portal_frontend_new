@@ -28,7 +28,10 @@
     </div>
     <!-- Enhanced Header with modern gradient background -->
     <div
-      class="relative overflow-hidden bg-gradient-to-br from-[#0D47A1] via-[#1976D2] to-[#90CAF9] rounded-2xl p-8 shadow-2xl border border-white/10 backdrop-blur-sm"
+      class="relative overflow-hidden rounded-2xl p-8 shadow-2xl border border-white/10 backdrop-blur-sm"
+      :style="{
+        background: `linear-gradient(to right, var(--primary-dark-color), var(--primary-light-color))`,
+      }"
       v-motion="{
         initial: { opacity: 0, y: -20 },
         enter: {

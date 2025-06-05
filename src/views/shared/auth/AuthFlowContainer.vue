@@ -262,7 +262,7 @@ onMounted(() => {
 
 .image-container {
   flex: 0 0 45%;
-  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  background: linear-gradient(135deg, var(--secondary-color) 0%, var(--secondary-light-color) 100%);
   position: relative;
   overflow: hidden;
 }
@@ -308,7 +308,7 @@ onMounted(() => {
 .overlay-content {
   background: rgba(30, 41, 59, 0.95);
   padding: 1.5rem 2rem;
-  border-top: 3px solid #4f46e5;
+  border-top: 3px solid var(--primary-color);
   box-shadow: 0 -10px 20px rgba(0, 0, 0, 0.2);
 }
 
@@ -333,7 +333,7 @@ onMounted(() => {
   left: 0;
   width: 60px;
   height: 3px;
-  background: linear-gradient(90deg, #4f46e5, #7c3aed);
+  background: linear-gradient(90deg, var(--primary-color), var(--primary-light-color));
   border-radius: 3px;
 }
 

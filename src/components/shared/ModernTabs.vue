@@ -1,39 +1,40 @@
 <template>
   <div class="tabs-container">
-    <div class="tab-list">
-      <div
-        v-for="(tab, index) in tabs"
-        :key="index"
-        class="tab-item"
-        :class="{
-          'tab-active': activeTab === index,
-          'tab-inactive': activeTab !== index,
-        }"
-        :style="{ pointerEvents: disabled ? 'none' : 'auto' }"
-        @click="handleTabClick(index)"
-      >
-        <div class="tab-content">
+    <div class="tab-header">
+      <div class="tab-list">
+        <button
+          v-for="(tab, index) in tabs"
+          :key="index"
+          class="tab-item"
+          :class="{
+            'tab-active': activeTab === index,
+            'tab-inactive': activeTab !== index,
+          }"
+          :disabled="disabled"
+          @click="handleTabClick(index)"
+        >
           <span class="tab-icon" :class="tab.icon"></span>
           <span class="tab-label">{{ tab.label }}</span>
-          <span class="tab-chevron">
-            <i class="fas fa-chevron-right"></i>
-          </span>
-        </div>
-        <span v-if="activeTab === index" class="tab-indicator"></span>
+        </button>
+      </div>
+      <div class="progress-bar">
+        <div
+          class="progress-fill"
+          :style="{ width: `${((activeTab + 1) / tabs.length) * 100}%` }"
+        ></div>
       </div>
     </div>
 
     <div class="tab-panels">
-      <transition-group name="panel-transition" mode="out-in">
+      <transition name="panel-transition" mode="out-in">
         <div
-          v-for="(tab, index) in tabs"
-          :key="index"
-          v-show="activeTab === index"
+          v-if="activeTab !== null"
+          :key="activeTab"
           class="tab-panel"
         >
-          <component :is="tab.component" v-bind="tab.props" />
+          <component :is="tabs[activeTab].component" v-bind="tabs[activeTab].props" />
         </div>
-      </transition-group>
+      </transition>
     </div>
   </div>
 </template>
@@ -88,153 +89,233 @@ const handleTabClick = (index: number) => {
 </script>
 
 <style scoped>
-/* Tabs styling */
+/* Container */
 .tabs-container {
   height: 100%;
   display: flex;
   flex-direction: column;
+  background: #ffffff;
+  border-radius: 1rem;
+  overflow: hidden;
 }
 
+/* Tab Header */
+.tab-header {
+  background: #f8fafc;
+  padding: 1rem 1rem 0;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+/* Tab List */
 .tab-list {
   display: flex;
-  border-bottom: 2px solid #e5e7eb;
-  background: linear-gradient(135deg, #f8fafc, #f1f5f9);
-  position: relative;
+  gap: 0.5rem;
   overflow-x: auto;
-  scrollbar-width: none; /* Firefox */
-  padding: 0.3rem 0.3rem 0;
+  scrollbar-width: none;
+  padding-bottom: 0.75rem;
 }
 
 .tab-list::-webkit-scrollbar {
-  display: none; /* Chrome, Safari, Edge */
+  display: none;
 }
 
+/* Tab Item */
 .tab-item {
-  padding: 0.6rem 1rem;
-  font-size: 0.85rem;
-  font-weight: 500;
-  height: 2.8rem;
-  position: relative;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  white-space: nowrap;
-  flex-shrink: 0;
-  border-radius: 0.5rem 0.5rem 0 0;
-  margin-right: 0.2rem;
-  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 50%, calc(100% - 10px) 100%, 0 100%);
-  background: linear-gradient(135deg, #f8fafc, #e2e8f0);
-  cursor: pointer;
-}
-
-.tab-active {
-  color: #4f46e5;
-  background: linear-gradient(135deg, #ffffff, #f8fafc);
-  box-shadow: 
-    0 3px 8px rgba(79, 70, 229, 0.15),
-    0 1px 3px rgba(0, 0, 0, 0.1);
-  border: 1px solid rgba(79, 70, 229, 0.2);
-  transform: translateY(-1px);
-}
-
-.tab-inactive {
-  color: #6b7280;
-}
-
-.tab-inactive:hover {
-  color: #4f46e5;
-  background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
-  transform: translateY(-0.5px);
-  box-shadow: 0 2px 6px rgba(79, 70, 229, 0.1);
-}
-
-.tab-content {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  justify-content: space-between;
-  width: 100%;
+  padding: 0.75rem 1.5rem;
+  background: transparent;
+  border: 2px solid transparent;
+  border-radius: 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  white-space: nowrap;
+  position: relative;
+  overflow: hidden;
 }
 
-.tab-chevron {
-  font-size: 0.7rem;
-  opacity: 0.6;
-  transition: all 0.3s ease;
-  transform: translateX(-6px);
+.tab-item:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
-.tab-active .tab-chevron {
-  opacity: 1;
-  color: #4f46e5;
-  transform: translateX(0);
+/* Tab States */
+.tab-active {
+  background: #ffffff;
+  color: var(--primary-color, #3b82f6);
+  border-color: var(--primary-color, #3b82f6);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
-.tab-inactive:hover .tab-chevron {
-  opacity: 0.8;
-  transform: translateX(-2px);
+.tab-inactive:not(:disabled):hover {
+  background: #f1f5f9;
+  color: #475569;
+  border-color: #e2e8f0;
 }
 
+/* Tab Icons */
 .tab-icon {
-  font-size: 0.9rem;
+  font-size: 1rem;
   transition: transform 0.3s ease;
 }
 
 .tab-active .tab-icon {
+  color: var(--primary-color, #3b82f6);
   transform: scale(1.1);
-  color: #4f46e5;
 }
 
+/* Tab Label */
 .tab-label {
-  position: relative;
+  font-weight: 500;
+  letter-spacing: -0.01em;
 }
 
-.tab-indicator {
+/* Progress Bar */
+.progress-bar {
+  height: 0.25rem;
+  background: #e2e8f0;
+  border-radius: 0.125rem;
+  overflow: hidden;
+  margin-top: -0.125rem;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary-color, #3b82f6), var(--primary-light-color, #60a5fa));
+  border-radius: 0.125rem;
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.progress-fill::after {
+  content: '';
   position: absolute;
-  bottom: 0;
+  top: 0;
   left: 0;
   right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, #4f46e5, #8b5cf6);
-  animation: indicatorGrow 0.4s cubic-bezier(0.65, 0, 0.35, 1);
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  animation: shimmer 2s ease-in-out infinite;
 }
 
-@keyframes indicatorGrow {
-  from {
-    transform: scaleX(0);
-    transform-origin: left;
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
   }
-  to {
-    transform: scaleX(1);
+  100% {
+    transform: translateX(100%);
   }
 }
 
+/* Tab Panels */
 .tab-panels {
   flex: 1;
   overflow: auto;
-  padding: 1.5rem;
-  position: relative;
+  padding: 2rem;
+  background: #ffffff;
 }
 
 .tab-panel {
   height: 100%;
 }
 
-/* Panel transition animations */
+/* Panel Transitions */
 .panel-transition-enter-active,
 .panel-transition-leave-active {
-  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-  position: absolute;
-  width: 100%;
-  top: 0;
-  left: 0;
-  padding: 1.5rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .panel-transition-enter-from {
   opacity: 0;
-  transform: translateX(30px) scale(0.95);
+  transform: translateX(20px);
 }
 
 .panel-transition-leave-to {
   opacity: 0;
-  transform: translateX(-30px) scale(0.95);
+  transform: translateX(-20px);
 }
-</style>
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .tab-header {
+    padding: 0.75rem 0.75rem 0;
+  }
+
+  .tab-list {
+    gap: 0.375rem;
+  }
+
+  .tab-item {
+    padding: 0.625rem 1rem;
+    font-size: 0.8125rem;
+  }
+
+  .tab-icon {
+    font-size: 0.875rem;
+  }
+
+  .tab-panels {
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .tab-header {
+    padding: 0.5rem 0.5rem 0;
+  }
+
+  .tab-item {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.75rem;
+  }
+
+  .tab-panels {
+    padding: 1rem;
+  }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  .tabs-container {
+    background: #1e293b;
+  }
+
+  .tab-header {
+    background: #0f172a;
+    border-bottom-color: #334155;
+  }
+
+  .tab-item {
+    color: #94a3b8;
+  }
+
+  .tab-active {
+    background: #1e293b;
+    color: #60a5fa;
+    border-color: #60a5fa;
+  }
+
+  .tab-inactive:not(:disabled):hover {
+    background: #1e293b;
+    color: #cbd5e1;
+    border-color: #334155;
+  }
+
+  .progress-bar {
+    background: #334155;
+  }
+
+  .tab-panels {
+    background: #1e293b;
+  }
+}</style>

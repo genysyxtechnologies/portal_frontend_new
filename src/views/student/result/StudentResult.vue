@@ -231,7 +231,7 @@ watch(
 .icon-wrapper {
   width: 3.5rem;
   height: 3.5rem;
-  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  background: linear-gradient(135deg, var(--primary-dark-color), var(--primary-light-color));
   border-radius: 1rem;
   display: flex;
   align-items: center;
@@ -253,22 +253,7 @@ watch(
   gap: 0.25rem;
 }
 
-.page-title {
-  font-size: 2rem;
-  font-weight: 700;
-  background: linear-gradient(135deg, #1f2937, #3b82f6);
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  margin: 0;
-}
-
-.page-subtitle {
-  font-size: 0.875rem;
-  color: #6b7280;
-  margin: 0;
-  font-weight: 500;
-}
+/* Page title and subtitle styles are now in base.css */
 
 /* Controls Panel */
 .controls-panel {
@@ -636,13 +621,7 @@ watch(
     font-size: 1.25rem;
   }
 
-  .page-title {
-    font-size: 1.75rem;
-  }
-
-  .page-subtitle {
-    font-size: 0.8rem;
-  }
+  /* Page title responsive styles are now in base.css */
 
   .controls-panel {
     gap: 1rem;

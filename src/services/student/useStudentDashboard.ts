@@ -5,6 +5,7 @@ import { ref } from 'vue'
 import authService from '../api/authService'
 import type { UserResponse } from '@/types/student/dashboard_information'
 import { type Session } from '@/types/student/sessions'
+import urlUtil from '@/utils/urlUtil.ts'
 const { session, user: users } = constant
 
 export const useStudentDashboard = createSharedComposable(() => {
@@ -13,6 +14,7 @@ export const useStudentDashboard = createSharedComposable(() => {
   const loading = ref(false)
   const error = ref<string | null>(null)
   const profile = ref<string | null>(null)
+  const profilePicture = ref<string>('')
 
   // fetch user information
   async function getStudentInformation() {
@@ -21,6 +23,7 @@ export const useStudentDashboard = createSharedComposable(() => {
     try {
       const response = await authService.getCurrentUser()
       user.value = response.data.user
+      profilePicture.value = urlUtil.getBaseUrl() + '/api/profile-picture/fetch?user=' + user.value?.userId
       // update user store
 
     } catch (err) {
@@ -90,5 +93,6 @@ export const useStudentDashboard = createSharedComposable(() => {
     loading,
     error,
     profile,
+    profilePicture
   }
 })

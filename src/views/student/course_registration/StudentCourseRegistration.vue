@@ -11,7 +11,7 @@
             <div class="header-glow"></div>
           </div>
           <div class="header-text">
-            <h1 class="page-title">Course Registration & Documents</h1>
+            <h1 class="page-title">Semester Registration</h1>
             <p class="page-subtitle">Complete your course registration and download required documents</p>
           </div>
         </div>
@@ -428,7 +428,7 @@ const clearSearch = () => {
 .header-icon-container {
   width: 4rem;
   height: 4rem;
-  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  background: linear-gradient(135deg, var(--primary-dark-color), var(--primary-light-color));
   border-radius: 1.25rem;
   display: flex;
   align-items: center;
@@ -461,23 +461,14 @@ const clearSearch = () => {
   animation: glowPulse 4s ease-in-out infinite;
 }
 
+/* Page title and subtitle styles are now in base.css */
 .page-title {
-  font-size: 2.5rem;
-  font-weight: 800;
-  background: linear-gradient(135deg, #1e293b, #3b82f6);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  margin-bottom: 0.5rem;
   animation: titleSlideIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards;
   opacity: 0;
   transform: translateY(20px);
 }
 
 .page-subtitle {
-  color: #64748b;
-  font-size: 1.125rem;
-  font-weight: 500;
   animation: subtitleFadeIn 0.8s ease-out 0.4s forwards;
   opacity: 0;
 }
@@ -1218,9 +1209,7 @@ const clearSearch = () => {
     padding: 1.5rem;
   }
 
-  .page-title {
-    font-size: 2rem;
-  }
+  /* Page title responsive styles are now in base.css */
 
   .status-indicators {
     grid-template-columns: 1fr;
@@ -1255,9 +1244,7 @@ const clearSearch = () => {
     align-items: flex-start;
   }
 
-  .page-title {
-    font-size: 1.75rem;
-  }
+  /* Page title responsive styles are now in base.css */
 
   .course-item {
     flex-direction: column;

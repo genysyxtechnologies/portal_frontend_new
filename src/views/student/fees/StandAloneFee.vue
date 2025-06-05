@@ -2,7 +2,10 @@
   <div class="flex flex-col gap-6">
     <!-- Header with gradient background -->
     <div
-      class="bg-gradient-to-r from-[#0D47A1] to-[#90CAF9] rounded-xl p-6 shadow-lg"
+      class="rounded-xl p-6 shadow-lg"
+      :style="{
+        background: `linear-gradient(to right, var(--primary-dark-color), var(--primary-light-color))`,
+      }"
       v-motion="{
         initial: { opacity: 0, y: -20 },
         enter: {

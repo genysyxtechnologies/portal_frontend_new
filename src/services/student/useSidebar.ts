@@ -57,16 +57,16 @@ export const useStudentSideBar = createSharedComposable(() => {
         },
       ],
     },
-    {
-      title: 'My Accommodation',
-      icon: image6,
-      path: '/student/my-accomodation',
-    },
-    {
-      title: 'My Document',
-      icon: image8,
-      path: 'my-documents',
-    },
+    // {
+    //   title: 'My Accommodation',
+    //   icon: image6,
+    //   path: '/student/my-accomodation',
+    // },
+    // {
+    //   title: 'My Document',
+    //   icon: image8,
+    //   path: 'my-documents',
+    // },
     {
       title: 'Self Service',
       icon: image9,

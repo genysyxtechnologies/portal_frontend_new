@@ -13,7 +13,7 @@
           <div class="relative mb-4 group profile-image-container">
             <div class="profile-image-glow"></div>
             <div class="profile-image-ring"></div>
-            <img :src="profile" alt="Profile"
+            <img :src="profilePicture" alt="Profile"
               class="w-24 h-24 rounded-full object-cover border-4 border-[#0D47A1]/10 group-hover:border-[#0D47A1]/30 transition-all duration-300 ease-out z-10 relative"
               :class="{ 'w-12 h-12': collapsed }" />
             <span
@@ -114,10 +114,11 @@
 
 <script setup lang="ts">
 import { computed, ref, onMounted, onUnmounted, watch, nextTick } from 'vue'
-import profile from '../../assets/images/student/profile.png'
 import { useStudentSideBar } from '@/services/student/useSidebar'
 import { useRouter } from 'vue-router'
 import { COLLAPSE_BREAKPOINT } from '@/utils/constants.ts'
+import { useStudentDashboard } from '@/services/student/useStudentDashboard.ts'
+const { profilePicture } = useStudentDashboard()
 
 const $router = useRouter()
 

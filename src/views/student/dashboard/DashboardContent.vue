@@ -160,7 +160,7 @@
               <div
                 class="w-24 h-24 rounded-full bg-white/30 backdrop-blur-sm flex items-center justify-center p-1 border-2 border-white/50"
               >
-                <img :src="profile" alt="profile" class="w-full h-full rounded-full object-cover shadow-inner" />
+                <img :src="profilePicture" alt="profile" class="w-full h-full rounded-full object-cover shadow-inner" />
               </div>
               <div
                 class="absolute -bottom-2 -right-2 bg-green-500 rounded-full p-2 border-2 border-white shadow-md"
@@ -367,13 +367,12 @@
 import { onMounted, ref } from 'vue'
 import { useStudentDashboard } from '@/services/student/useStudentDashboard'
 import SpinningAnimation from '@/views/spinner/SpinningAnimation.vue'
-import profile from '../../../assets/images/student/profile.png'
 import Tag from 'primevue/tag'
 import Badge from 'primevue/badge'
 import { useStudentResult } from '@/services/student/useStudentResult'
 import { useStudentCourses } from '@/services/student/useStudentCourses'
 
-const { user, getStudentInformation, getSessions, sessions, loading } = useStudentDashboard()
+const { user, getStudentInformation, getSessions, sessions, loading, profilePicture } = useStudentDashboard()
 const { fetchStudentResult, studentResult } = useStudentResult()
 const { fetchAllCoursesForStudent, courses } = useStudentCourses()
 const currentSession = ref<string>('')
