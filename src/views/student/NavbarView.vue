@@ -4,27 +4,44 @@
       <i :class="sidebarCollapsed ? 'pi pi-angle-right' : 'pi pi-angle-left'" class="toggle-icon"></i>
     </button>
     <div class="current-date">{{ currentDate }}</div>
-    <router-link to="/" class="logout-btn">
-      <div class="logout-container">
-        <div class="logout-icon-wrapper">
-          <div class="logout-glow"></div>
-          <div class="logout-ring"></div>
-          <svg class="logout-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M15 3H19C20.1046 3 21 3.89543 21 5V19C21 20.1046 20.1046 21 19 21H15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M10 17L15 12L10 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M15 12H3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          <div class="logout-pulse"></div>
+
+    <div class="flex justify-end flex-nowrap">
+      <!-- Online/Offline Status -->
+      <div class="status-container" style="margin-right: 10px;">
+        <div class="status-indicator-wrapper">
+        <span
+          class="status-indicator"
+          :class="{ 'status-online': isOnline, 'status-offline': !isOnline }"
+        ></span>
+          <span class="status-text" :class="{ 'text-online': isOnline, 'text-offline': !isOnline }">
+          {{ isOnline ? 'Online' : 'Offline' }}
+        </span>
         </div>
-        <span class="logout-text">Logout</span>
       </div>
-    </router-link>
+
+      <router-link to="/" class="logout-btn">
+        <div class="logout-container">
+          <div class="logout-icon-wrapper">
+            <div class="logout-glow"></div>
+            <div class="logout-ring"></div>
+            <svg class="logout-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M15 3H19C20.1046 3 21 3.89543 21 5V19C21 20.1046 20.1046 21 19 21H15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M10 17L15 12L10 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M15 12H3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <div class="logout-pulse"></div>
+          </div>
+          <span class="logout-text">Logout</span>
+        </div>
+      </router-link>
+    </div>
+
 <!--    <ThemeToggle />-->
   </header>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref, onMounted, onUnmounted } from 'vue'
 import { storeToRefs } from 'pinia'
 // import ThemeToggle from '@/components/shared/ThemeToggle.vue'
 import { useThemeStore } from '@/stores/shared/theme'
@@ -41,6 +58,9 @@ const emit = defineEmits(['toggle-sidebar'])
 const themeStore = useThemeStore()
 const { isDarkMode } = storeToRefs(themeStore)
 
+// Internet connectivity detection
+const isOnline = ref(navigator.onLine)
+
 const toggleSidebar = () => {
   emit('toggle-sidebar')
 }
@@ -53,6 +73,23 @@ const currentDate = computed(() => {
     month: 'short',
     year: 'numeric',
   })
+})
+
+// Handle connectivity change
+const handleOnlineStatusChange = () => {
+  isOnline.value = navigator.onLine
+}
+
+onMounted(() => {
+  // Add connectivity listeners
+  window.addEventListener('online', handleOnlineStatusChange)
+  window.addEventListener('offline', handleOnlineStatusChange)
+})
+
+// Cleanup event listener on unmount
+onUnmounted(() => {
+  window.removeEventListener('online', handleOnlineStatusChange)
+  window.removeEventListener('offline', handleOnlineStatusChange)
 })
 </script>
 <style scoped>
@@ -319,6 +356,103 @@ const currentDate = computed(() => {
   font-weight: 500;
   color: #333;
   transition: color 0.3s ease;
+}
+
+/* Status Container */
+.status-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.status-indicator-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  background: rgba(0, 0, 0, 0.02);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  transition: all 0.3s ease;
+  backdrop-filter: blur(4px);
+}
+
+.status-indicator-wrapper:hover {
+  background: rgba(0, 0, 0, 0.04);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.status-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.status-indicator::before {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  animation: ping-slow 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+.status-online {
+  background: linear-gradient(135deg, #4ade80, #22c55e);
+  box-shadow: 0 0 8px rgba(34, 197, 94, 0.4);
+}
+
+.status-online::before {
+  background: rgba(34, 197, 94, 0.4);
+}
+
+.status-offline {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.4);
+}
+
+.status-offline::before {
+  background: rgba(239, 68, 68, 0.4);
+}
+
+.status-text {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.025em;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+}
+
+.text-online {
+  color: #22c55e;
+}
+
+.text-offline {
+  color: #ef4444;
+}
+
+@keyframes ping-slow {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.8);
+    opacity: 0;
+  }
+}
+
+/* Dark mode styles for status */
+.dark-mode .status-indicator-wrapper {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.dark-mode .status-indicator-wrapper:hover {
+  background: rgba(255, 255, 255, 0.08);
 }
 
 @media (max-width: 768px) {
