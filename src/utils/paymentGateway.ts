@@ -245,9 +245,9 @@ export class PaymentGateway {
       throw new Error('No gateway defined. Call initializeGateway first.')
     }
 
-    if (!this.component) {
-      throw new Error('No component reference provided')
-    }
+    // if (!this.component) {
+    //   throw new Error('No component reference provided')
+    // }
 
     if (!paymentData.email || !paymentData.amount || !paymentData.currency) {
       throw new Error('Missing required payment data')

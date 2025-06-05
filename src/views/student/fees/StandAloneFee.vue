@@ -280,7 +280,11 @@
 
                   <!-- Payment status indicator -->
                   <div class="flex-shrink-0 ml-4">
-                    <div class="w-3 h-3 bg-yellow-400 rounded-full animate-pulse" title="Pending Payment"></div>
+                    <div
+                      class="w-3 h-3 rounded-full"
+                      :class="getPaymentStatus(item).color"
+                      :title="getPaymentStatus(item).title"
+                    ></div>
                   </div>
                 </div>
 
@@ -328,14 +332,17 @@
 
                 <!-- Action button -->
                 <div class="pt-2">
-                  <button 
-                    class="w-full px-4 py-3 text-white rounded-xl transition-all duration-200 font-medium flex items-center justify-center gap-2 group pay-now-button"
+                  <button
+                    @click="handlePayment(item)"
+                    :disabled="loading"
+                    class="w-full px-4 py-3 text-white rounded-xl transition-all duration-200 font-medium flex items-center justify-center gap-2 group pay-now-button disabled:opacity-50 disabled:cursor-not-allowed"
                     :style="{ background: `var(--secondary-color)` }"
                   >
-                    <svg class="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg v-if="!loading" class="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
                     </svg>
-                    Pay Now
+                    <div v-else class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    {{ getPaymentButtonText(item) }}
                   </button>
                 </div>
               </div>
@@ -354,7 +361,17 @@ import { ref, onMounted, watch, computed } from 'vue'
 import Dropdown from 'primevue/dropdown'
 
 const { user, getStudentInformation, getSessions, sessions } = useStudentDashboard()
-const { standalones, loading, getStandaloneFees } = useStudentFee()
+const {
+  standalones,
+  loading,
+  getStandaloneFees,
+  initializeTransaction,
+  loadPaymentGateway,
+  message,
+  messageType,
+  messageShow,
+  closeMessage
+} = useStudentFee()
 
 const selectedSession = ref()
 const searchQuery = ref('')
@@ -397,6 +414,75 @@ const filteredStandalones = computed(() => {
 const clearFilters = () => {
   searchQuery.value = ''
   filterBy.value = ''
+}
+
+// Handle payment initialization or payment processing
+const handlePayment = async (item: any) => {
+  if (!user.value) return
+
+  try {
+    if (item.payment == null) {
+      // Generate invoice first
+      const payment = await initializeTransaction(item.fee, item.payment, String(user.value.userId))
+      if (payment) {
+        // Refresh the fees list to get updated payment info
+        await getStandaloneFees(String(user.value.username), selectedSession.value.id)
+      }
+    } else {
+      // Payment exists, check if it's cleared
+      if (item.payment.cleared) {
+        // Already paid, maybe download receipt or show message
+        message.value = 'This fee has already been paid'
+        messageType.value = 'warning'
+        messageShow.value = true
+        return
+      }
+      // Payment exists but not cleared, proceed with payment
+      await loadPaymentGateway(item.payment, item.fee, user.value.email)
+    }
+  } catch (error) {
+    console.error('Payment error:', error)
+    message.value = 'Payment processing failed. Please try again.'
+    messageType.value = 'error'
+    messageShow.value = true
+  }
+}
+
+// Generate/Print invoice
+const generateInvoice = async (item: any) => {
+  if (!user.value) return
+
+  try {
+    await initializeTransaction(item.fee, item.payment, String(user.value.userId))
+    // Refresh the fees list after generating invoice
+    await getStandaloneFees(String(user.value.username), selectedSession.value.id)
+  } catch (error) {
+    console.error('Invoice generation error:', error)
+  }
+}
+
+// Get payment button text based on payment status
+const getPaymentButtonText = (item: any) => {
+  if (loading.value) return 'Processing...'
+
+  if (item.payment == null) {
+    return 'Generate Invoice'
+  } else if (item.payment.cleared) {
+    return 'Paid ✓'
+  } else {
+    return 'Pay Now'
+  }
+}
+
+// Get payment status for indicator
+const getPaymentStatus = (item: any) => {
+  if (item.payment == null) {
+    return { status: 'pending', color: 'bg-gray-400', title: 'Invoice Not Generated' }
+  } else if (item.payment.cleared) {
+    return { status: 'paid', color: 'bg-green-400', title: 'Payment Completed' }
+  } else {
+    return { status: 'unpaid', color: 'bg-yellow-400 animate-pulse', title: 'Pending Payment' }
+  }
 }
 
 onMounted(async () => {
