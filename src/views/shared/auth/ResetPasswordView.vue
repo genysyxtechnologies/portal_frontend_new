@@ -310,7 +310,7 @@ input[type='text']:focus {
 }
 
 .btn-submit {
-  background-color: #4c9aff;
+  background-color: var(--secondary-color);
   color: white;
   border: none;
   border-radius: 6px;
@@ -326,7 +326,7 @@ input[type='text']:focus {
 }
 
 .btn-submit:hover {
-  background-color: #3a85ff;
+  background-color: var(--secondary-dark-color);
 }
 
 .btn-submit:disabled {

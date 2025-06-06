@@ -251,7 +251,7 @@ export const useStudentFee = createSharedComposable(() => {
       if (paymentGateway.value) {
         paymentConfig.value = response.data
 
-        if (response.data.inline) {
+        if ((response.data as any).inline) {
           setTimeout(() => {
             paymentGateway.value.initializeGateway(response.data, () => {
               makePayment(payment, userEmail)

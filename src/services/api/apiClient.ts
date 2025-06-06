@@ -6,6 +6,7 @@ import axios, {
 } from 'axios'
 import { processError } from '@/utils/apiErrorResolver'
 import { useToast } from 'vue-toast-notification'
+import urlUtil from '@/utils/urlUtil.ts'
 const toast = useToast()
 
 // Define response type structure
@@ -231,7 +232,7 @@ class ApiClient {
 
 // Create and export default API client instance
 const apiConfig: ApiClientConfig = {
-  baseURL: (import.meta.env.VITE_API_BASE_URL || 'https://test.nsuk.edu.ng') + '/api',
+  baseURL: urlUtil.getBaseUrl() + "/api"
 }
 
 export const apiClient = new ApiClient(apiConfig)

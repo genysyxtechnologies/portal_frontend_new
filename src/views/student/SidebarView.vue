@@ -39,8 +39,8 @@
       </div>
 
       <!-- Navigation Menu -->
-      <ul class="menu-list">
-        <li v-for="(item, index) in items" :key="index" class="menu-item-container"
+      <ul class="menu-list" :class="{ 'menu-list-collapsed': collapsed }">
+        <li v-for="(item, index) in menuItemsWithoutSettings" :key="index" class="menu-item-container"
           :style="`--delay: ${index * 0.05}s`">
           <span
             @click="handleMenuItemClick(item, index)"
@@ -81,6 +81,23 @@
 
         </li>
       </ul>
+
+      <!-- Settings Item at Bottom -->
+      <div v-if="settingsItem" class="settings-container" :class="{ 'settings-collapsed': collapsed }">
+        <span
+          @click="handleRoute(settingsItem.path)"
+          class="menu-item-wrapper"
+        >
+          <div
+            :class="['menu-item', 'settings-item', $router.currentRoute.value.path === settingsItem.path ? 'active' : '']">
+            <div class="menu-icon-wrapper">
+              <img :src="settingsItem.icon" class="menu-icon" />
+            </div>
+            <span class="menu-text" v-show="!collapsed">{{ settingsItem.title }}</span>
+            <div class="menu-indicator"></div>
+          </div>
+        </span>
+      </div>
     </div>
   </Drawer>
 
@@ -179,6 +196,15 @@ const handleResize = () => {
 }
 
 const { items } = useStudentSideBar()
+
+// Separate settings item from other menu items
+const settingsItem = computed(() => {
+  return items.value.find(item => item.path === '/student/student-settings')
+})
+
+const menuItemsWithoutSettings = computed(() => {
+  return items.value.filter(item => item.path !== '/student/student-settings')
+})
 
 // Track which dropdowns are open
 const openDropdowns = ref<Record<number, boolean>>({})
@@ -457,6 +483,8 @@ const drawerVisible = computed(() => {
   border-radius: 16px;
   overflow: hidden;
   transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  display: flex;
+  flex-direction: column;
 }
 
 .sidebar:hover {
@@ -627,6 +655,11 @@ const drawerVisible = computed(() => {
   max-height: 60vh;
   padding-right: 0.5rem;
   margin-top: 0.5rem;
+  flex: 1;
+}
+
+.menu-list-collapsed {
+  max-height: calc(100vh - 280px);
 }
 
 .menu-item-container {
@@ -1207,6 +1240,21 @@ const drawerVisible = computed(() => {
     min-width: 160px;
     max-width: 200px;
   }
+}
+
+/* Settings Container Styles */
+.settings-container {
+  margin-top: auto;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(13, 71, 161, 0.1);
+}
+
+.settings-collapsed {
+  padding-top: 0.5rem;
+}
+
+.settings-item {
+  margin-bottom: 0;
 }
 
 /* Global transition properties */

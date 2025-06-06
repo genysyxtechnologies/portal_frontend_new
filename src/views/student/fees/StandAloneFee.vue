@@ -330,20 +330,36 @@
                   </span>
                 </div>
 
-                <!-- Action button -->
+                <!-- Action buttons -->
                 <div class="pt-2">
-                  <button
-                    @click="handlePayment(item)"
-                    :disabled="loading"
-                    class="w-full px-4 py-3 text-white rounded-xl transition-all duration-200 font-medium flex items-center justify-center gap-2 group pay-now-button disabled:opacity-50 disabled:cursor-not-allowed"
-                    :style="{ background: `var(--secondary-color)` }"
-                  >
-                    <svg v-if="!loading" class="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
-                    </svg>
-                    <div v-else class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    {{ getPaymentButtonText(item) }}
-                  </button>
+                  <div class="flex flex-col sm:flex-row gap-2">
+                    <!-- Primary action button -->
+                    <button
+                      @click="handlePayment(item)"
+                      :disabled="loading"
+                      class="flex-1 px-4 py-3 text-white rounded-xl transition-all duration-200 font-medium flex items-center justify-center gap-2 group pay-now-button disabled:opacity-50 disabled:cursor-not-allowed"
+                      :style="{ background: `var(--secondary-color)` }"
+                    >
+                      <svg v-if="!loading" class="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
+                      </svg>
+                      <div v-else class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      {{ getPaymentButtonText(item) }}
+                    </button>
+                    
+                    <!-- Download invoice button (show when invoice exists) -->
+                    <button
+                      v-if="shouldShowDownloadButton(item)"
+                      @click="handleDownloadInvoice(item)"
+                      :disabled="loading"
+                      class="flex-1 sm:flex-initial sm:min-w-[160px] px-4 py-3 border-2 border-gray-300 text-gray-700 bg-white rounded-xl hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 font-medium flex items-center justify-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <svg class="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3M3 17V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+                      </svg>
+                      Download Invoice
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -367,6 +383,7 @@ const {
   getStandaloneFees,
   initializeTransaction,
   loadPaymentGateway,
+  downloadStandaloneInvoice,
   message,
   messageType,
   messageShow,
@@ -448,16 +465,17 @@ const handlePayment = async (item: any) => {
   }
 }
 
-// Generate/Print invoice
-const generateInvoice = async (item: any) => {
-  if (!user.value) return
-
+// Handle invoice download
+const handleDownloadInvoice = async (item: any) => {
+  if (!user.value || !item.payment) return
+  
   try {
-    await initializeTransaction(item.fee, item.payment, String(user.value.userId))
-    // Refresh the fees list after generating invoice
-    await getStandaloneFees(String(user.value.username), selectedSession.value.id)
+    await downloadStandaloneInvoice(item.payment)
   } catch (error) {
-    console.error('Invoice generation error:', error)
+    console.error('Invoice download error:', error)
+    message.value = 'Failed to download invoice. Please try again.'
+    messageType.value = 'error'
+    messageShow.value = true
   }
 }
 
@@ -483,6 +501,11 @@ const getPaymentStatus = (item: any) => {
   } else {
     return { status: 'unpaid', color: 'bg-yellow-400 animate-pulse', title: 'Pending Payment' }
   }
+}
+
+// Check if download button should be shown
+const shouldShowDownloadButton = (item: any) => {
+  return item.payment != null // Show download button if invoice exists (payment record exists)
 }
 
 onMounted(async () => {

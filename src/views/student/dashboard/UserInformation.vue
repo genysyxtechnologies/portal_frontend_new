@@ -4,7 +4,7 @@
     <div class="profile-image-container">
       <div class="profile-image-wrapper">
         <div class="profile-image-overlay"></div>
-        <img :src="profile" alt="profile" class="profile-image" />
+        <img :src="profilePicture" alt="profile" class="profile-image" />
         <div class="profile-image-glow"></div>
       </div>
     </div>
@@ -45,8 +45,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
 import InputText from 'primevue/inputtext'
+import { useStudentDashboard } from '@/services/student/useStudentDashboard.ts'
 
 defineProps({
   firstInput: String,
@@ -57,9 +57,8 @@ defineProps({
   thirdLabel: String,
 })
 
-const profile = ref(
-  'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8dXNlciUyMHByb2ZpbGV8ZW58MHx8MHx8fDA%3D&w=1000&q=80',
-)
+const { profilePicture } = useStudentDashboard()
+
 </script>
 
 <style scoped>

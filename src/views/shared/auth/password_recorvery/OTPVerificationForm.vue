@@ -457,7 +457,7 @@ onMounted(() => {
 }
 
 .custom-button {
-  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  background: linear-gradient(135deg, var(--secondary-dark-color) 0%, var(--secondary-light-color) 100%);
   border: none;
   border-radius: 10px;
   font-weight: 600;
@@ -468,7 +468,7 @@ onMounted(() => {
 }
 
 .custom-button:hover {
-  background: linear-gradient(135deg, #4338ca 0%, #6d28d9 100%);
+  background: linear-gradient(135deg, var(--secondary-color) 0%, var(--secondary-light-color) 100%);
   box-shadow: 0 6px 10px rgba(124, 58, 237, 0.35);
   transform: translateY(-2px);
 }
