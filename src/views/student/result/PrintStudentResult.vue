@@ -2,8 +2,7 @@
   <div class="print-result-container">
     <!-- Header with animation -->
     <div class="header-section">
-      <h1 class="university-name">NASARAWA STATE UNIVERSITY, KEFFI</h1>
-      <h2 class="result-title">Student's Result</h2>
+
     </div>
 
     <!-- Student Information Section -->

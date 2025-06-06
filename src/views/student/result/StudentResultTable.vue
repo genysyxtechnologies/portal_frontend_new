@@ -377,8 +377,7 @@ const printTable = () => {
     <body>
       <div class="print-container">
         <div class="university-header">
-          <h1>NASARAWA STATE UNIVERSITY, KEFFI</h1>
-          <h2>STUDENT ACADEMIC RECORD</h2>
+
         </div>
 
         <div class="student-profile">
@@ -761,7 +760,6 @@ const getStatusTextByGrade = (grade: string) => {
 }
 
 .course-code {
-  font-family: "Monaco", monospace;
   font-weight: bold;
   color: #2563eb;
 }

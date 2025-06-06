@@ -38,11 +38,19 @@
 
 <!--    <ThemeToggle />-->
   </header>
+  
+  <!-- Global Loading Bar -->
+  <div v-if="isLoading" class="loading-bar" :class="{ 'dark-mode': isDarkMode }">
+    <div class="loading-progress">
+      <div class="loading-shimmer"></div>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
 import { computed, ref, onMounted, onUnmounted } from 'vue'
 import { storeToRefs } from 'pinia'
+import { useRouter } from 'vue-router'
 // import ThemeToggle from '@/components/shared/ThemeToggle.vue'
 import { useThemeStore } from '@/stores/shared/theme'
 
@@ -55,11 +63,15 @@ defineProps({
 
 const emit = defineEmits(['toggle-sidebar'])
 
+const router = useRouter()
 const themeStore = useThemeStore()
 const { isDarkMode } = storeToRefs(themeStore)
 
 // Internet connectivity detection
 const isOnline = ref(navigator.onLine)
+
+// Loading state for page transitions
+const isLoading = ref(false)
 
 const toggleSidebar = () => {
   emit('toggle-sidebar')
@@ -84,6 +96,19 @@ onMounted(() => {
   // Add connectivity listeners
   window.addEventListener('online', handleOnlineStatusChange)
   window.addEventListener('offline', handleOnlineStatusChange)
+  
+  // Add router navigation guards for loading states
+  router.beforeEach((_, __, next) => {
+    isLoading.value = true
+    next()
+  })
+  
+  router.afterEach(() => {
+    // Add a small delay to show the loading animation
+    setTimeout(() => {
+      isLoading.value = false
+    }, 300)
+  })
 })
 
 // Cleanup event listener on unmount
@@ -459,6 +484,103 @@ onUnmounted(() => {
   .navbar {
     margin: 0;
     border-radius: 0;
+  }
+}
+
+/* Modern Global Loading Bar */
+.loading-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: transparent;
+  z-index: 9999;
+  overflow: hidden;
+  backdrop-filter: blur(8px);
+}
+
+.loading-progress {
+  position: relative;
+  height: 100%;
+  width: 30%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(13, 71, 161, 0.8) 25%,
+    rgba(21, 101, 192, 1) 50%,
+    rgba(13, 71, 161, 0.8) 75%,
+    transparent 100%
+  );
+  border-radius: 2px;
+  animation: modernSlide 1.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  box-shadow: 
+    0 0 20px rgba(13, 71, 161, 0.6),
+    0 0 40px rgba(13, 71, 161, 0.3);
+}
+
+.loading-shimmer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.6) 50%,
+    transparent 100%
+  );
+  animation: shimmer 1.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+/* Dark mode styles */
+.loading-bar.dark-mode .loading-progress {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(96, 165, 250, 0.8) 25%,
+    rgba(147, 187, 252, 1) 50%,
+    rgba(96, 165, 250, 0.8) 75%,
+    transparent 100%
+  );
+  box-shadow: 
+    0 0 20px rgba(96, 165, 250, 0.6),
+    0 0 40px rgba(96, 165, 250, 0.3);
+}
+
+.loading-bar.dark-mode .loading-shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.4) 50%,
+    transparent 100%
+  );
+}
+
+@keyframes modernSlide {
+  0% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(400%);
+    opacity: 0;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(200%);
   }
 }
 </style>
