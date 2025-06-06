@@ -26,17 +26,21 @@
           </Column>
           <Column field="ca" header="CA">
             <template #body="{ data }">
-              <span :class="['score', getScoreClass(data.ca)]">{{
+              <span :class="['credit-badge']">{{
                 formatScore(data.ca)
               }}</span>
-              <span v-if="data.ca2" :class="['score', getScoreClass(data.ca2)]">{{
-                formatScore(data.ca2)
-              }}</span>
+            </template>
+          </Column>
+          <Column field="ca" header="CA 2">
+            <template #body="{ data }">
+              <span v-if="data.ca2" :class="['credit-badge']">{{
+                  formatScore(data.ca2)
+                }}</span>
             </template>
           </Column>
           <Column field="exam" header="Exam">
             <template #body="{ data }">
-              <span :class="['score', getScoreClass(data.exam)]">{{
+              <span :class="['credit-badge']">{{
                 data.exam
               }}</span>
             </template>
@@ -58,7 +62,7 @@
           <Column header="Status">
             <template #body="{ data }">
               <span class="status-badge" :class="getStatusClass(data.total)">
-                {{ getStatusText(data.total) }}
+                {{ getStatusTextByGrade(data.grade) }}
               </span>
             </template>
           </Column>
@@ -528,7 +532,7 @@ const printTable = () => {
                   </td>
                   <td>
                     <div class="status-${getStatusText(result.total).toLowerCase().replace(' ', '-')}">
-                      ${getStatusText(result.total)}
+                      ${getStatusTextByGrade(result.grade)}
                     </div>
                   </td>
                 </tr>
@@ -580,21 +584,21 @@ const props = defineProps({
 
 
 const formatScore = (score: null | number) => {
-  return score ? Number(score).toFixed(1) : '-';
+  return score //? Number(score).toFixed(1) : '-';
 };
 
-const getScoreClass = (score: string | number) => {
+const getScoreClass = (score: string | number, grade: string | null = null) => {
   const num = score === "-" ? 0 : Number(score);
-  if (num >= 70) return "score-excellent";
-  if (num >= 60) return "score-good";
-  if (num >= 50) return "score-average";
+  if (num >= 60) return "score-excellent";
+  if (num >= 50) return "score-good";
+  if (num >= 45 && grade && grade !== 'F') return "score-average";
   return "score-poor";
 };
 
 const getGradeClass = (grade: string) => {
-  if (grade === "A") return "grade-a";
-  if (grade === "B") return "grade-b";
-  if (grade === "C") return "grade-c";
+  if (grade === "A" || grade === 'B') return "grade-a";
+  if (grade === "C") return "grade-b";
+  if (grade === "D") return "grade-c";
   return "grade-f";
 };
 
@@ -607,6 +611,14 @@ const getStatusClass = (total: number) => {
 const getStatusText = (total: number) => {
   if (total >= 70) return "Excellent";
   if (total >= 50) return "Passed";
+  return "Failed";
+};
+
+const getStatusTextByGrade = (grade: string) => {
+  if (grade == 'A' || grade == 'B') return "Excellent";
+  if (grade == 'C') return "Good";
+  if (grade == 'D') return "Pass";
+  if (grade == 'E') return "Considerable";
   return "Failed";
 };
 </script>
@@ -891,7 +903,7 @@ const getStatusText = (total: number) => {
     align-items: flex-start;
     gap: 1rem;
   }
-  
+
   .gpa-container {
     align-self: flex-start;
     gap: 1rem;
@@ -903,84 +915,84 @@ const getStatusText = (total: number) => {
     padding: 0 0 1rem 0;
     margin-bottom: 1rem;
   }
-  
+
   .section-title {
     font-size: 1.1rem;
   }
-  
+
   .gpa-container {
     width: 100%;
     justify-content: space-between;
   }
-  
+
   .gpa-display {
     flex-direction: column;
     gap: 0.25rem;
     text-align: center;
   }
-  
+
   .gpa-label {
     font-size: 0.75rem;
   }
-  
+
   .gpa-value {
     font-size: 1.1rem;
   }
-  
+
   .loading-container {
     padding: 2rem 1rem;
   }
-  
+
   .loading-text {
     font-size: 0.8rem;
   }
-  
+
   /* Mobile Table Styles */
   :deep(.academic-table) {
     font-size: 0.875rem;
   }
-  
+
   :deep(.academic-table .p-datatable-tbody > tr > td) {
     padding: 0.75rem 0.5rem;
   }
-  
+
   :deep(.academic-table .p-datatable-thead > tr > th) {
     padding: 0.75rem 0.5rem;
     font-size: 0.75rem;
   }
-  
+
   .course-code {
     font-size: 0.8rem;
   }
-  
+
   .credit-badge {
     width: 1.5rem;
     height: 1.5rem;
     font-size: 0.75rem;
   }
-  
+
   .grade-badge {
     width: 1.5rem;
     height: 1.5rem;
     font-size: 0.75rem;
   }
-  
+
   .status-badge {
     padding: 0.125rem 0.5rem;
     font-size: 0.7rem;
   }
-  
+
   .score {
     font-size: 0.875rem;
   }
-  
+
   /* Mobile Paginator */
   :deep(.academic-table .p-paginator) {
     padding: 0.75rem 0.5rem;
     flex-wrap: wrap;
     gap: 0.5rem;
   }
-  
+
   :deep(.academic-table .p-paginator .p-paginator-current) {
     order: -1;
     width: 100%;
@@ -994,12 +1006,12 @@ const getStatusText = (total: number) => {
   .section-title {
     font-size: 1rem;
   }
-  
+
   .gpa-container {
     flex-direction: column;
     gap: 0.75rem;
   }
-  
+
   .gpa-display {
     flex-direction: row;
     justify-content: space-between;
@@ -1007,12 +1019,12 @@ const getStatusText = (total: number) => {
     background: rgba(59, 130, 246, 0.05);
     border-radius: 0.5rem;
   }
-  
+
   /* Stack table horizontally on very small screens */
   :deep(.academic-table .p-datatable-wrapper) {
     overflow-x: auto;
   }
-  
+
   :deep(.academic-table) {
     min-width: 600px;
   }
@@ -1023,69 +1035,69 @@ const getStatusText = (total: number) => {
     padding: 0 0 0.75rem 0;
     margin-bottom: 0.75rem;
   }
-  
+
   .section-title {
     font-size: 0.9rem;
     gap: 0.375rem;
   }
-  
+
   .section-title i {
     font-size: 0.8rem;
   }
-  
+
   .gpa-label {
     font-size: 0.7rem;
   }
-  
+
   .gpa-value {
     font-size: 1rem;
   }
-  
+
   .loading-container {
     padding: 1.5rem 0.75rem;
   }
-  
+
   .spinner-ring {
     width: 32px;
     height: 32px;
     border-width: 2px;
   }
-  
+
   .loading-text {
     font-size: 0.75rem;
   }
-  
+
   /* Very small mobile adjustments */
   :deep(.academic-table) {
     font-size: 0.8rem;
     min-width: 550px;
   }
-  
+
   :deep(.academic-table .p-datatable-thead > tr > th) {
     padding: 0.5rem 0.25rem;
     font-size: 0.7rem;
   }
-  
+
   :deep(.academic-table .p-datatable-tbody > tr > td) {
     padding: 0.5rem 0.25rem;
   }
-  
+
   .credit-badge,
   .grade-badge {
     width: 1.25rem;
     height: 1.25rem;
     font-size: 0.7rem;
   }
-  
+
   .status-badge {
     padding: 0.125rem 0.375rem;
     font-size: 0.65rem;
   }
-  
+
   .course-code {
     font-size: 0.75rem;
   }
-  
+
   .score {
     font-size: 0.8rem;
   }
