@@ -22,11 +22,11 @@ const baseRoutes = [
 
   {
     path: '/login',
-    name: 'Login',
+    name: 'LoginPage',
     component: () => import('@/views/shared/auth/LoginView.vue'),
     meta: {
       requiresAuth: false,
-      title: 'Login',
+      title: 'Login Page',
     },
   },
 

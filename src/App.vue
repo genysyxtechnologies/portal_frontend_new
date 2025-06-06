@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
 import ThemeDebug from '@/components/debug/ThemeDebug.vue'
-import Toast from 'primevue/toast'
+import ModernToast from '@/components/shared/ModernToast.vue'
 
 // Only show the debug component in development mode
 const isDevelopment = import.meta.env.DEV
@@ -10,7 +10,7 @@ const isDevelopment = import.meta.env.DEV
 <template>
   <div class="bg-[#E9F5FF]">
     <router-view />
-    <Toast />
+    <ModernToast />
     <ThemeDebug v-if="isDevelopment" />
   </div>
 </template>

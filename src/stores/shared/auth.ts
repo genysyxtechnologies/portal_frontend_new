@@ -4,6 +4,7 @@ import authService from '@/services/api/authService'
 import { anyContains, setUserRole, type Role } from '@/utils/permissions/roles'
 import router from '@/router'
 import type { LoginCredentials, PlainUser, RegisterData, User } from '@/types/auth.ts'
+import { checkAuth } from '@/utils/authUtil.ts'
 
 interface ApiError extends Error {
   message: string
@@ -26,6 +27,9 @@ export const useAuthStore = defineStore('auth', () => {
   // Actions
   async function initialize() {
     if (isInitialized.value) return
+
+    // check auth
+    checkAuth()
 
     loading.value = true
     error.value = null

@@ -91,7 +91,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, nextTick } from 'vue'
-import { useToast } from 'primevue/usetoast'
+import { toastService } from '@/services/toastService'
 import Card from 'primevue/card'
 import Button from 'primevue/button'
 import usePasswordRecorvery from './usePasswordRecorvery'
@@ -106,7 +106,6 @@ const emit = defineEmits<{
   (e: 'prev-step'): void
 }>()
 
-const toast = useToast()
 const otpDigits = ref(Array(6).fill(''))
 const otpInputs = ref<HTMLInputElement[]>([])
 const otpError = ref('')
@@ -236,11 +235,9 @@ const handleOTPVerification = async () => {
       }, 2000)
     } else {
       otpError.value = (response as { message: string }).message || 'Invalid verification code'
-      toast.add({
-        severity: 'error',
-        summary: 'Verification Failed',
-        detail: otpError.value,
-        life: 3000,
+      toastService.error(otpError.value, {
+        title: 'Verification Failed',
+        duration: 3000
       })
     }
   } catch (_) {
@@ -269,11 +266,9 @@ const resendOTP = async () => {
       startTimer()
 
       // Show success message
-      toast.add({
-        severity: 'success',
-        summary: 'Code Resent',
-        detail: 'A new verification code has been sent',
-        life: 3000,
+      toastService.success('A new verification code has been sent', {
+        title: 'Code Resent',
+        duration: 3000
       })
 
       // Focus on first input
@@ -281,19 +276,15 @@ const resendOTP = async () => {
         otpInputs.value[0]?.focus()
       })
     } else {
-      toast.add({
-        severity: 'error',
-        summary: 'Failed',
-        detail: response.message || 'Failed to resend code',
-        life: 3000,
+      toastService.error((response as any).message || 'Failed to resend code', {
+        title: 'Failed',
+        duration: 3000
       })
     }
-  } catch (error) {
-    toast.add({
-      severity: 'error',
-      summary: 'Error',
-      detail: 'An error occurred while resending the code',
-      life: 3000,
+  } catch (_) {
+    toastService.error('An error occurred while resending the code', {
+      title: 'Error',
+      duration: 3000
     })
   } finally {
     isResending.value = false

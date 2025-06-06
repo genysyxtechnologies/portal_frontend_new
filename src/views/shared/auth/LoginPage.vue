@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex flex-col p-6 sm:p-12 bg-white gap-8 rounded-xl justify-center shadow-2xl transform transition-all duration-700 hover:shadow-3xl hover:-translate-y-1 relative overflow-hidden w-9/10"
+    class="flex flex-col p-6 sm:p-12 bg-white gap-8 rounded-xl justify-center shadow-2xl transform transition-all duration-700 hover:shadow-3xl hover:-translate-y-1 relative overflow-hidden lg:w-9/10"
   >
     <!-- Background floating elements -->
     <div

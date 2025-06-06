@@ -4,7 +4,7 @@ import ReUsableButtons from '@/views/buttons/ReUsableButtons.vue'
 
 <template>
   <div
-    class="flex flex-col p-6 sm:p-12 bg-white gap-8 rounded-xl justify-center shadow-2xl transform transition-all duration-700 hover:shadow-3xl hover:-translate-y-1"
+    class="flex flex-col p-6 sm:p-12 bg-white gap-8 rounded-xl justify-center shadow-2xl transform transition-all duration-700 hover:shadow-3xl hover:-translate-y-1 lg:w-9/10"
   >
     <div class="p-4 sm:p-8 flex flex-col gap-8">
       <div class="flex flex-col items-center space-y-2">

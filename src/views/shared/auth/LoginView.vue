@@ -9,6 +9,10 @@
       <!-- Left hand side -->
       <div
         class="hidden w-9/10 lg:flex flex-col items-center justify-center gap-8 left-text transform transition-all duration-1000 ease-in-out relative overflow-hidden"
+        @mousemove="handleMouseMove"
+        @mouseenter="handleMouseEnter"
+        @mouseleave="handleMouseLeave"
+        ref="leftSideRef"
       >
         <!-- Background pattern -->
 
@@ -19,6 +23,16 @@
                :style="`background-image: url('${backgroundSvg}'); background-repeat: repeat; background-size: 1200px 1200px; background-position: center;`">
           </div>
         </div>
+
+        <!-- Cursor Glow -->
+        <div 
+          class="cursor-glow"
+          :style="{
+            left: `${cursorX}px`,
+            top: `${cursorY}px`,
+            opacity: isHovering ? 1 : 0
+          }"
+        ></div>
 
         <!-- Animated Elements Container -->
         <div class="absolute inset-0 pointer-events-none">
@@ -77,7 +91,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import LoginPage from './LoginPage.vue'
 import RegistrationPage from './RegistrationPage.vue'
@@ -89,16 +103,48 @@ const { isLoginPage, handlePageChange } = useAuth()
 
 const $router = useRouter()
 
+const leftSideRef = ref<HTMLElement>()
+const cursorX = ref(0)
+const cursorY = ref(0)
+const targetX = ref(0)
+const targetY = ref(0)
+const isHovering = ref(false)
+
 const handleButtonClick = () => {
   $router.push('/student')
 }
 
 const image1 = urlUtil.getBaseUrl() + '/api/global/logo'
 
+const handleMouseMove = (e: MouseEvent) => {
+  if (!leftSideRef.value) return
+  const rect = leftSideRef.value.getBoundingClientRect()
+  targetX.value = e.clientX - rect.left
+  targetY.value = e.clientY - rect.top
+}
+
+const handleMouseEnter = () => {
+  isHovering.value = true
+}
+
+const handleMouseLeave = () => {
+  isHovering.value = false
+}
+
 onMounted(() => {
   document.querySelectorAll('.animate-on-scroll').forEach((el) => {
     el.classList.add('animate-fade-in-up')
   })
+
+  // Smooth cursor animation loop
+  function animateCursor() {
+    cursorX.value += (targetX.value - cursorX.value) * 0.1
+    cursorY.value += (targetY.value - cursorY.value) * 0.1
+    
+    requestAnimationFrame(animateCursor)
+  }
+
+  animateCursor()
 })
 
 
@@ -507,6 +553,61 @@ onMounted(() => {
   50% {
     opacity: 0.6;
     transform: scale(1.1);
+  }
+}
+
+/* Cursor Glow Effect */
+.cursor-glow {
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.15) 30%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 20;
+  filter: blur(20px);
+  mix-blend-mode: screen;
+  transform: translate(-50%, -50%);
+}
+
+.cursor-glow::before {
+  content: '';
+  position: absolute;
+  inset: 20px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.5) 0%, transparent 50%);
+  border-radius: 50%;
+  animation: cursorPulse 2s ease-in-out infinite;
+}
+
+.cursor-glow::after {
+  content: '';
+  position: absolute;
+  inset: 40px;
+  background: radial-gradient(circle, var(--primary-color) 0%, transparent 40%);
+  border-radius: 50%;
+  opacity: 0.3;
+  animation: cursorRotate 3s linear infinite;
+}
+
+@keyframes cursorPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.4;
+  }
+}
+
+@keyframes cursorRotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
   }
 }
 </style>

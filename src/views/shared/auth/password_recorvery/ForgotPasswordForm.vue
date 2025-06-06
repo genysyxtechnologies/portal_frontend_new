@@ -63,7 +63,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useToast } from 'primevue/usetoast'
+import { toastService } from '@/services/toastService'
 import Card from 'primevue/card'
 import Button from 'primevue/button'
 import InputText from 'primevue/inputtext'
@@ -76,7 +76,6 @@ const emit = defineEmits<{
   (e: 'next-step', data: { userId: string }): void
 }>()
 
-const toast = useToast()
 const userIdError = ref('')
 const isLoading = ref(false)
 
@@ -94,11 +93,9 @@ const handleUserVerification = async () => {
     const { success, message } = response as { success: boolean; message?: string }
 
     if (success) {
-      toast.add({
-        severity: 'success',
-        summary: 'Success',
-        detail: message || 'Verification code sent successfully!',
-        life: 3000,
+      toastService.success(message || 'Verification code sent successfully!', {
+        title: 'Success',
+        duration: 3000
       })
 
       // Move to next step
@@ -106,11 +103,9 @@ const handleUserVerification = async () => {
     }
   } catch (_) {
     userIdError.value = 'An error occurred. Please try again.'
-    toast.add({
-      severity: 'error',
-      summary: 'Error',
-      detail: 'Failed to process your request',
-      life: 3000,
+    toastService.error('Failed to process your request', {
+      title: 'Error',
+      duration: 3000
     })
   } finally {
     isLoading.value = false

@@ -125,7 +125,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { useToast } from 'primevue/usetoast'
+import { toastService } from '@/services/toastService'
 import Card from 'primevue/card'
 import Button from 'primevue/button'
 import InputText from 'primevue/inputtext'
@@ -141,7 +141,6 @@ const emit = defineEmits<{
 
 const route = useRoute()
 const router = useRouter()
-const toast = useToast()
 const password = ref('')
 const confirmPassword = ref('')
 const passwordError = ref('')
@@ -223,19 +222,15 @@ const resetPassword = async () => {
     })
     if (response) {
       resetSuccess.value = true
-      toast.add({
-        severity: 'success',
-        summary: 'Success',
-        detail: 'Your password has been reset successfully!',
-        life: 3000,
+      toastService.success('Your password has been reset successfully!', {
+        title: 'Success',
+        duration: 3000
       })
     }
   } catch (_) {
-    toast.add({
-      severity: 'error',
-      summary: 'Error',
-      detail: 'Failed to process your request',
-      life: 3000,
+    toastService.error('Failed to process your request', {
+      title: 'Error',
+      duration: 3000
     })
   } finally {
     isResetting.value = false

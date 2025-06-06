@@ -5,9 +5,8 @@ import axios, {
   type AxiosResponse,
 } from 'axios'
 import { processError } from '@/utils/apiErrorResolver'
-import { useToast } from 'vue-toast-notification'
+import { toastService } from '@/services/toastService'
 import urlUtil from '@/utils/urlUtil.ts'
-const toast = useToast()
 
 // Define response type structure
 export interface ApiResponse<T = unknown> {
@@ -114,8 +113,13 @@ class ApiClient {
       }
     } catch (error: unknown) {
       const errorMessage = await processError(error)
-      if (!errorMessage.includes('Student') && !errorMessage.includes('student')) {
-        toast.error(errorMessage)
+      if(window.location.href.endsWith('dashboard') && config.url?.includes('/result')){
+        // do nothing
+      } else{
+        toastService.error(errorMessage, {
+          duration: 8000,
+          title: 'Request Failed'
+        })
       }
       return {
         success: false,

@@ -28,7 +28,7 @@ import NavbarView from './NavbarView.vue'
 import SidebarView from './SidebarView.vue'
 import { useStudentDashboard } from '@/services/student/useStudentDashboard'
 import { COLLAPSE_BREAKPOINT } from '@/utils/constants.ts'
-
+import { checkAuth } from '@/utils/authUtil'
 const { user, getStudentInformation } = useStudentDashboard()
 const sidebarCollapsed = ref(false)
 
