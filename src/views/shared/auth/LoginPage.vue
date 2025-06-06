@@ -231,15 +231,15 @@ const login = async () => {
           }, 1500)
         }  else if (anyContains(['admin', 'super_admin'], (d.data as { roles: string[] }).roles)) {
           setTimeout(() => {
-            router.push('/main')
+            window.location.href = '/main'
           }, 1500)
         } else if (anyContains(['applicant'], (d.data as { roles: string[] }).roles)) {
           setTimeout(() => {
-            router.push('/applications')
+            window.location.href = '/applications'
           }, 1500)
         } else{
           setTimeout(() => {
-            router.push('/officer')
+            window.location.href = '/officer'
           }, 1500)
         }
       }
@@ -264,15 +264,15 @@ const verifyMfa = async () => {
       }, 1500)
     } else if (anyContains(['admin', 'super_admin'], (d.data as { roles: string[] }).roles)) {
       setTimeout(() => {
-        router.push('/main')
+        window.location.href = '/main'
       }, 1500)
     } else if (anyContains(['applicant'], (d.data as { roles: string[] }).roles)) {
       setTimeout(() => {
-        router.push('/applications')
+        window.location.href = '/applications'
       }, 1500)
     } else{
       setTimeout(() => {
-        router.push('/officer')
+        window.location.href = '/officer'
       }, 1500)
     }
   } catch (error) {

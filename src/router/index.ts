@@ -21,6 +21,16 @@ const baseRoutes = [
   },
 
   {
+    path: '/login',
+    name: 'Login',
+    component: () => import('@/views/shared/auth/LoginView.vue'),
+    meta: {
+      requiresAuth: false,
+      title: 'Login',
+    },
+  },
+
+  {
     path: '/auth/login',
     name: 'Login',
     component: () => import('@/views/shared/auth/LoginView.vue'),
