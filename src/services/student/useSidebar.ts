@@ -14,53 +14,53 @@ export const useStudentSideBar = createSharedComposable(() => {
     {
       title: 'Dashboard',
       icon: image4,
-      path: '/student',
+      path: '/dashboard',
     },
     {
       title: 'Fees',
       icon: image2,
-      path: '/student/feesss',
+      path: '/dashboard/feesss',
       hasChildren: true,
       children: [
         {
           title: 'School Fee',
-          path: '/student/fees',
+          path: '/dashboard/fees',
         },
         {
           title: 'Standalone',
-          path: '/student/stand-alone-fee',
+          path: '/dashboard/stand-alone-fee',
         },
       ],
     },
     {
       title: 'Bio Data',
       icon: image3,
-      path: '/student/bio-data',
+      path: '/dashboard/bio-data',
     },
     {
       title: 'Academics',
       icon: image4,
-      path: '/student/academics',
+      path: '/dashboard/academics',
       hasChildren: true,
       children: [
         {
           title: 'Registration',
-          path: '/student/course-registration',
+          path: '/dashboard/course-registration',
         },
         {
           title: 'Results',
-          path: '/student/my-results',
+          path: '/dashboard/my-results',
         },
         {
           title: 'Choice of programme',
-          path: '/student/change-programme',
+          path: '/dashboard/change-programme',
         },
       ],
     },
     {
       title: 'My Accommodation',
       icon: image6,
-      path: '/student/my-accomodation',
+      path: '/dashboard/my-accomodation',
     },
     // {
     //   title: 'My Document',
@@ -70,12 +70,12 @@ export const useStudentSideBar = createSharedComposable(() => {
     {
       title: 'Self Service',
       icon: image9,
-      path: '/student/self-service',
+      path: '/dashboard/self-service',
     },
     {
       title: 'Account',
       icon: image10,
-      path: '/student/student-settings',
+      path: '/dashboard/student-settings',
     },
   ])
 

@@ -3,7 +3,7 @@ import type { RouteRecordRaw } from 'vue-router'
 
 const studentRoutes: RouteRecordRaw[] = [
   {
-    path: '/student',
+    path: '/dashboard',
     component: StudentDashboard,
     meta: {
       requiresAuth: true,

@@ -227,7 +227,7 @@ const login = async () => {
         if (anyContains(['student'], (d.data as { roles: string[] }).roles)) {
 
           setTimeout(() => {
-            router.push('/student')
+            router.push('/dashboard')
           }, 1500)
         }  else if (anyContains(['admin', 'super_admin'], (d.data as { roles: string[] }).roles)) {
           setTimeout(() => {
@@ -258,7 +258,7 @@ const verifyMfa = async () => {
     }
     const d = await processMfa(r)
     loginSuccess.value = true
-    if (anyContains(['student'], (d.data as { roles: string[] }).roles)) {
+    if (anyContains(['dashboard'], (d.data as { roles: string[] }).roles)) {
       setTimeout(() => {
         router.push('/student')
       }, 1500)
