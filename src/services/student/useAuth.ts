@@ -28,7 +28,7 @@ export const useAuth = createSharedComposable(() => {
     isLoading.value = true
     try {
       const response = await authService.login(credentials.value)
-      console.log(response)
+      // console.log(response)
       if (response.success) {
         if(response.data.mfa){
           return response

@@ -48,8 +48,8 @@
         enter: { opacity: 1, y: 0, transition: { duration: 500 } },
       }"
     >
-      <ModernTabs 
-        v-model="activeTabIndex" 
+      <ModernTabs
+        v-model="activeTabIndex"
         :tabs="tabsConfig"
         @tab-change="handleTabChange"
       />
@@ -134,7 +134,7 @@ const tabsConfig = ref([
 
 // Tab change handler
 const handleTabChange = (index: number, tab: any) => {
-  console.log('Tab changed to:', index, tab.label)
+  // console.log('Tab changed to:', index, tab.label)
 }
 </script>
 

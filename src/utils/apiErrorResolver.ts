@@ -1,6 +1,6 @@
 const processError = async (error: any) => {
   let message = ''
-  // console.log(error.response)
+  // // console.log(error.response)
   if (error.response) {
     //user is not signed in
     if (error.response.status === 401) {

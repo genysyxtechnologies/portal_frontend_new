@@ -194,7 +194,7 @@ const handleSave = () => {
 }
 
 const handleNext = () => {
-  console.log('Proceeding to next step')
+  // console.log('Proceeding to next step')
 }
 </script>
 

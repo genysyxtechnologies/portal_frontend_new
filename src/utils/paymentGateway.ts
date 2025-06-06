@@ -165,14 +165,14 @@ const payWithRemita = (
     processRrr: true,
     extendedData: data,
     onSuccess: (response: RemitaResponse) => {
-      console.log('Remita payment success:', response)
+      // console.log('Remita payment success:', response)
       successCallback(rrr)
     },
     onError: (response: RemitaResponse) => {
       console.error('Remita payment error:', response)
     },
     onClose: () => {
-      console.log('Remita payment widget closed')
+      // console.log('Remita payment widget closed')
     }
   })
 

@@ -39,7 +39,7 @@ type SchoolKey = keyof typeof themes
 const school = (import.meta.env.VITE_SCHOOL || 'default') as SchoolKey
 
 // Adding console log to debug theme loading
-// console.log('Loading theme for school:', school)
+// // console.log('Loading theme for school:', school)
 
 // Dynamically import the theme CSS
 if (school === 'fpn') {

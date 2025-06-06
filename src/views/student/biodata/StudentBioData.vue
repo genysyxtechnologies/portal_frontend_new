@@ -179,7 +179,7 @@ const tabsConfig = computed<TabItem[]>(() => [
 
 // Handle tab change events
 const handleTabChange = (index: number, tab: TabItem) => {
-  console.log(`Switched to tab: ${tab.label}`)
+  // console.log(`Switched to tab: ${tab.label}`)
 }
 </script>
 

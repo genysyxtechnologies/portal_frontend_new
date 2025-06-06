@@ -219,7 +219,7 @@ const login = async () => {
     const d = await handleUserLogin()
     // check if it's mfa
     if(d.success){
-      console.log(d)
+      // console.log(d)
       if(d.data.mfa){
         isMfa.value = true
       } else{

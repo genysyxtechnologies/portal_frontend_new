@@ -136,7 +136,7 @@ class ApiClient {
 
   // POST method
   public async post<T = unknown>(url: string, data?: unknown): Promise<ApiResponse<T>> {
-    console.log("RUN THIS CODE: ", url)
+    // console.log("RUN THIS CODE: ", url)
     return this.request<T>({
       method: 'POST',
       url,
@@ -224,7 +224,7 @@ class ApiClient {
       document.body.removeChild(link)
       return true
     } catch (error) {
-      console.log('Download failed', error)
+      // console.log('Download failed', error)
       return false
     }
   }
