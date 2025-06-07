@@ -606,6 +606,7 @@ export default {
     deleteInvoice: '/payments/delete-invoice',
     moveStandaloneInvoice: '/payments/move-standalone-payment',
     downloadProjection: '/payments/get-projection-report',
+    verifyInvoice: '/payments/verify-invoice',
   },
 
   applicants: {

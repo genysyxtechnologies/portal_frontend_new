@@ -589,10 +589,11 @@
                       <button
                         v-if="payment.invoice"
                         @click="() => downloadInvoice(payment.invoice)"
-                        class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200"
+                        :disabled="loading"
+                        class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                         title="Download Invoice"
                       >
-                        <i class="pi pi-download"></i>
+                        <i :class="['pi', loading ? 'pi-spin pi-spinner' : 'pi-download']"></i>
                       </button>
                     </div>
                   </div>
@@ -622,7 +623,7 @@
                   :disabled="loading"
                   class="group flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#0D47A1] to-[#1976D2] hover:from-[#1976D2] hover:to-[#0D47A1] disabled:from-gray-400 disabled:to-gray-500 text-white rounded-lg transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 disabled:cursor-not-allowed font-medium"
                 >
-                  <i class="pi pi-download group-hover:animate-bounce"></i>
+                  <i :class="['pi', loading ? 'pi-spin pi-spinner' : 'pi-download group-hover:animate-bounce']"></i>
                   <span>{{ loading ? 'Downloading...' : 'Download Invoice' }}</span>
                 </button>
 
@@ -639,8 +640,8 @@
                   >
                     <template #default>
                       <div class="group flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#0D47A1] to-[#1976D2] hover:from-[#1976D2] hover:to-[#0D47A1] disabled:from-gray-400 disabled:to-gray-500 text-white rounded-lg transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 disabled:cursor-not-allowed font-medium">
-                        <i class="pi pi-download group-hover:animate-bounce"></i>
-                        <span>Download Invoice</span>
+                        <i :class="['pi', loading ? 'pi-spin pi-spinner' : 'pi-download group-hover:animate-bounce']"></i>
+                        <span>{{ loading ? 'Downloading...' : 'Download Invoice' }}</span>
                         <i class="pi pi-chevron-down ml-1"></i>
                       </div>
                     </template>

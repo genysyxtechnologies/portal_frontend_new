@@ -196,6 +196,14 @@
                   Your payment has been received but is still being processed. This typically takes
                   24-48 hours. Please check back later.
                 </p>
+                <button
+                  @click="verifyInvoicePayment"
+                  :disabled="isVerifying"
+                  class="mt-4 w-full sm:w-auto bg-amber-600 hover:bg-amber-700 text-white py-2 px-6 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <i class="pi" :class="isVerifying ? 'pi-spinner animate-spin' : 'pi-verified'"></i>
+                  <span>{{ isVerifying ? 'Verifying...' : 'Verify Payment' }}</span>
+                </button>
               </div>
             </div>
           </div>
@@ -273,9 +281,10 @@
 import { ref, computed } from 'vue'
 import { useStudentSelfService } from '@/services/student/useStudentSelfService'
 
-const { isLoading, searchStudentInvoice, service } = useStudentSelfService()
+const { isLoading, searchStudentInvoice, service, verifyInvoice } = useStudentSelfService()
 const invoiceNumber = ref('')
 const showResults = ref(false)
+const isVerifying = ref(false)
 
 // Payment verification status
 const paymentFound = computed(() => service.value?.found || false)
@@ -290,7 +299,7 @@ const verifyPayment = async () => {
     showResults.value = false
 
     // Call API with the user's invoice number
-    await searchStudentInvoice(invoiceNumber.value)
+    const data = await searchStudentInvoice(invoiceNumber.value)
 
     // Show results after verification (success or error)
     showResults.value = true
@@ -302,6 +311,21 @@ const verifyPayment = async () => {
 const resetForm = () => {
   invoiceNumber.value = ''
   showResults.value = false
+}
+
+const verifyInvoicePayment = async () => {
+  if (!paymentInvoice.value) return
+  
+  isVerifying.value = true
+  try {
+    await verifyInvoice(paymentInvoice.value)
+    // Re-search to get updated status
+    await searchStudentInvoice(paymentInvoice.value)
+  } catch (error) {
+    console.error('Error verifying payment:', error)
+  } finally {
+    isVerifying.value = false
+  }
 }
 </script>
 

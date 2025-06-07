@@ -1,13 +1,13 @@
 import apiClient, { type ApiResponse } from '@/services/api/apiClient'
 import constant from '@/stores/constant.ts'
 import type { StandaloneFee, StandaloneItem } from '@/services/student/useStudentFee.ts'
+import type { StudentInvoiceSearch } from '@/services/student/useStudentSelfService.ts'
 
 const { schoolFees } = constant
 class StudentDashboardRepositories {
-  public async getInformation(endPoint: string) {
+  public async getInformation(endPoint: string): Promise<ApiResponse<StudentInvoiceSearch>> {
     try {
-      const response = await apiClient.get(endPoint)
-      return Promise.resolve(response)
+      return apiClient.get(endPoint)
     } catch (error) {
       return Promise.reject(error)
     }
