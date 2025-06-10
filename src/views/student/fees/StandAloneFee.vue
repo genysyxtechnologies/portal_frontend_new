@@ -190,8 +190,18 @@
                 <option value="beforeRegistration">Before Registration</option>
                 <option value="beforeSchoolFee">Before School Fee</option>
               </select>
+              <select 
+                v-if="selectedSession?.semesters?.length > 0" 
+                v-model="selectedSemester" 
+                class="px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white font-medium"
+              >
+                <option value="">All Semesters</option>
+                <option v-for="semester in selectedSession.semesters" :key="semester.id" :value="semester.id">
+                  {{ semester.title }}
+                </option>
+              </select>
               <button
-                v-if="searchQuery || filterBy"
+                v-if="searchQuery || filterBy || selectedSemester"
                 @click="clearFilters"
                 class="px-4 py-3 bg-gray-100 text-gray-600 rounded-xl hover:bg-gray-200 transition-colors font-medium"
               >
@@ -306,6 +316,10 @@
                     <p class="text-gray-500 font-medium">Category</p>
                     <p class="text-gray-900">{{ item.fee.studentCategory }}</p>
                   </div>
+                  <div v-if="item.payment?.transactionId" class="space-y-1">
+                    <p class="text-gray-500 font-medium">Invoice Number</p>
+                    <p class="text-gray-900 font-mono text-xs">{{ item.payment.transactionId }}</p>
+                  </div>
                 </div>
 
                 <!-- Tags -->
@@ -337,8 +351,8 @@
                     <button
                       @click="handlePayment(item)"
                       :disabled="loading"
-                      class="flex-1 px-4 py-3 text-white rounded-xl transition-all duration-200 font-medium flex items-center justify-center gap-2 group pay-now-button disabled:opacity-50 disabled:cursor-not-allowed"
-                      :style="{ background: `var(--secondary-color)` }"
+                      :class="getButtonClass(item)"
+                      class="flex-1 px-4 py-3 text-white rounded-xl transition-all duration-200 font-medium flex items-center justify-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <svg v-if="!loading" class="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
@@ -393,6 +407,7 @@ const {
 const selectedSession = ref()
 const searchQuery = ref('')
 const filterBy = ref('')
+const selectedSemester = ref('')
 
 const filteredStandalones = computed(() => {
   if (!standalones.value) return []
@@ -425,12 +440,20 @@ const filteredStandalones = computed(() => {
     })
   }
 
+  // Apply semester filter
+  if (selectedSemester.value) {
+    filtered = filtered.filter(item => 
+      item.fee.semester?.id === selectedSemester.value
+    )
+  }
+
   return filtered
 })
 
 const clearFilters = () => {
   searchQuery.value = ''
   filterBy.value = ''
+  selectedSemester.value = ''
 }
 
 // Handle payment initialization or payment processing
@@ -508,6 +531,20 @@ const shouldShowDownloadButton = (item: any) => {
   return item.payment != null // Show download button if invoice exists (payment record exists)
 }
 
+// Get button class based on payment status
+const getButtonClass = (item: any) => {
+  if (item.payment == null) {
+    // Generate Invoice - Blue/Primary color
+    return 'bg-blue-600 hover:bg-blue-700 generate-invoice-button'
+  } else if (item.payment.cleared) {
+    // Paid - Green color
+    return 'bg-green-600 hover:bg-green-700 paid-button'
+  } else {
+    // Pay Now - Orange/Secondary color
+    return 'pay-now-button'
+  }
+}
+
 onMounted(async () => {
   await getStudentInformation()
   await getSessions()
@@ -515,6 +552,8 @@ onMounted(async () => {
 
 watch(selectedSession, async (newSession) => {
   if (newSession && user.value) {
+    // Clear semester filter when session changes
+    selectedSemester.value = ''
     await getStandaloneFees(String(user.value.username), newSession.id)
   }
 })
@@ -533,10 +572,26 @@ watch(selectedSession, async (newSession) => {
   transform: scale(0.95);
 }
 
-/* Pay Now button hover effect */
+/* Pay Now button styles */
+.pay-now-button {
+  background: var(--secondary-color);
+}
+
 .pay-now-button:hover {
   filter: brightness(1.1);
   transform: translateY(-1px);
   box-shadow: 0 8px 25px -8px var(--secondary-color);
+}
+
+/* Generate Invoice button hover effect */
+.generate-invoice-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 25px -8px rgba(37, 99, 235, 0.4);
+}
+
+/* Paid button hover effect */
+.paid-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 25px -8px rgba(34, 197, 94, 0.4);
 }
 </style>

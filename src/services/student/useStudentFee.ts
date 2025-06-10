@@ -183,16 +183,16 @@ export const useStudentFee = createSharedComposable(() => {
       if (!transactionId) {
         throw new Error('No invoice ID provided')
       }
-      
+
       const result = await studentFeeRepository.downloadInvoice(
         schoolFees.invoice + '?invoice=' + transactionId,
         transactionId,
       )
-      
+
       if (!result) {
         throw new Error('Failed to download invoice')
       }
-      
+
       return result
     } catch (error) {
       console.error('Error downloading invoice:', error)
@@ -239,16 +239,6 @@ export const useStudentFee = createSharedComposable(() => {
     loading.value = true
     try {
       const response = await studentFeeRepository.downloadStandaloneInvoice(payment.id)
-      const fileURL = window.URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }))
-      const fileLink = document.createElement('a')
-
-      fileLink.href = fileURL
-      fileLink.setAttribute('download', 'invoice.pdf')
-      document.body.appendChild(fileLink)
-
-      fileLink.click()
-      fileLink.remove()
-      window.URL.revokeObjectURL(fileURL)
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Failed to download invoice'
       messageType.value = 'error'
@@ -304,7 +294,7 @@ export const useStudentFee = createSharedComposable(() => {
           currency: 'NGN',
           invoice: payment.transactionId,
           paymentId: payment.id
-        }, (data: any) => {
+        }, (data: never) => {
           window.location.reload()
         }, async (invoice: string) => {
           try {

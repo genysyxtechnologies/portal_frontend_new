@@ -30,7 +30,7 @@ class StudentFeeRepository extends StudentDashboardRepositories {
   // download standalone invoice
   async downloadStandaloneInvoice(paymentId: number) {
     try {
-      const response = await apiClient.downloads(`/api/payment/download-standalone-invoice/${paymentId}`, 'invoice.pdf')
+      const response = await apiClient.downloads(payments.downloadStandaloneInvoice + "?payment=" + paymentId, 'invoice.pdf')
       return response
     } catch (error) {
       throw error

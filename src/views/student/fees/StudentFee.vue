@@ -770,15 +770,15 @@
               </div>
 
               <!-- Refresh Transaction Button -->
-              <button
-                v-if="fee?.feePayment && !fee?.feePayment?.cleared"
-                @click="() => refreshTransaction()"
-                :disabled="loading"
-                class="group flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-500 disabled:from-gray-400 disabled:to-gray-500 text-white rounded-lg transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 disabled:cursor-not-allowed font-medium"
-              >
-                <i class="pi pi-refresh group-hover:animate-spin"></i>
-                <span>{{ loading ? 'Refreshing...' : 'Refresh Status' }}</span>
-              </button>
+<!--              <button-->
+<!--                v-if="fee?.feePayment && !fee?.feePayment?.cleared"-->
+<!--                @click="() => refreshTransaction()"-->
+<!--                :disabled="loading"-->
+<!--                class="group flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-500 disabled:from-gray-400 disabled:to-gray-500 text-white rounded-lg transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 disabled:cursor-not-allowed font-medium"-->
+<!--              >-->
+<!--                <i class="pi pi-refresh group-hover:animate-spin"></i>-->
+<!--                <span>{{ loading ? 'Refreshing...' : 'Refresh Status' }}</span>-->
+<!--              </button>-->
             </div>
           </div>
         </div>
