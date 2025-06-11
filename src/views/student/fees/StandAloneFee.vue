@@ -274,9 +274,9 @@
               <div class="absolute top-0 left-0 w-full h-1" :style="{ background: `linear-gradient(to right, var(--secondary-color), var(--secondary-color))` }"></div>
 
               <!-- Card content -->
-              <div class="space-y-4">
+              <div class="flex flex-col h-full">
                 <!-- Header -->
-                <div class="flex items-start justify-between">
+                <div class="flex items-start justify-between mb-4">
                   <div class="flex-1 min-w-0">
                     <h3 class="text-lg font-bold text-gray-900 truncate group-hover:text-blue-700 transition-colors">
                       {{ item.fee.feeItemTitle.title }}
@@ -299,7 +299,7 @@
                 </div>
 
                 <!-- Details grid -->
-                <div class="grid grid-cols-2 gap-3 text-sm">
+                <div class="grid grid-cols-2 gap-3 text-sm mb-4 flex-grow">
                   <div v-if="item.fee.faculty" class="space-y-1">
                     <p class="text-gray-500 font-medium">Faculty</p>
                     <p class="text-gray-900 truncate">{{ item.fee.faculty.name }}</p>
@@ -316,14 +316,14 @@
                     <p class="text-gray-500 font-medium">Category</p>
                     <p class="text-gray-900">{{ item.fee.studentCategory }}</p>
                   </div>
-                  <div v-if="item.payment?.transactionId" class="space-y-1">
+                  <div v-if="item.payment?.transactionId" class="space-y-1 col-span-2">
                     <p class="text-gray-500 font-medium">Invoice Number</p>
                     <p class="text-gray-900 font-mono text-xs">{{ item.payment.transactionId }}</p>
                   </div>
                 </div>
 
                 <!-- Tags -->
-                <div class="flex flex-wrap gap-2">
+                <div class="flex flex-wrap gap-2 mb-4 min-h-[2rem]">
                   <span v-if="item.fee.generic" class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">
                     <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
                       <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -345,7 +345,7 @@
                 </div>
 
                 <!-- Action buttons -->
-                <div class="pt-2">
+                <div class="mt-auto">
                   <div class="flex flex-col sm:flex-row gap-2">
                     <!-- Primary action button -->
                     <button
