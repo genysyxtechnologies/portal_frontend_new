@@ -1,9 +1,13 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-// Removed unused PrimeVue imports - now using native HTML elements for better control
 import { useApplicant } from '@/composables/useApplicant'
 import type { Admission, RegisterData, ValidateUTMEData } from '@/composables/useApplicant'
+// PrimeVue components
+import Dropdown from 'primevue/dropdown'
+import InputText from 'primevue/inputtext'
+import Password from 'primevue/password'
+import Button from 'primevue/button'
 
 const router = useRouter()
 const {
@@ -230,7 +234,7 @@ onMounted(() => {
         </button>
       </div>
     </div>
-    
+
     <div class="p-4 sm:p-8 flex flex-col gap-12 z-10 relative">
       <!-- Registration Form -->
       <div v-if="registering" class="form-container">
@@ -243,25 +247,31 @@ onMounted(() => {
           <div class="flex flex-col gap-6">
             <!-- Application Selection -->
             <div class="flex flex-col space-y-2">
+              <label for="application" class="text-[#0D47A1] font-medium text-sm">Application</label>
               <div class="relative w-full">
-                <select
+                <Dropdown
                   v-model="admission"
-                  class="w-full p-3 border border-gray-300 rounded-lg transition-all duration-300 bg-white hover:border-blue-600 focus:border-blue-600 focus:ring-2 focus:ring-blue-200 outline-none"
-                  :class="{'border-red-500': admission === null && admissions.length > 0}"
-                  required
+                  :options="admissions"
+                  optionLabel="name"
+                  placeholder="Select Application"
+                  id="application"
+                  class="w-full"
+                  :class="{'p-invalid': admission === null && admissions.length > 0}"
                 >
-                  <option value="" disabled>Select Application</option>
-                  <option
-                    v-for="adm in admissions"
-                    :key="adm.id"
-                    :value="adm"
-                  >
-                    {{ adm.applicationType.name }} {{ adm.session.name }}
-                  </option>
-                </select>
-                <span class="absolute top-3 right-3">
-                  <i class="pi pi-chevron-down text-blue-400"></i>
-                </span>
+                  <template #value="slotProps">
+                    <div v-if="slotProps.value">
+                      {{ slotProps.value.applicationType.name }} {{ slotProps.value.session.name }}
+                    </div>
+                    <span v-else>
+                      {{ slotProps.placeholder }}
+                    </span>
+                  </template>
+                  <template #option="slotProps">
+                    <div>
+                      {{ slotProps.option.applicationType.name }} {{ slotProps.option.session.name }}
+                    </div>
+                  </template>
+                </Dropdown>
               </div>
             </div>
 
@@ -270,16 +280,16 @@ onMounted(() => {
               v-if="admission != null && admission.applicationType.autoLoadUtme === true"
               class="flex flex-col space-y-2"
             >
+              <label for="utme" class="text-[#0D47A1] font-medium text-sm">UTME No. or User ID</label>
               <div class="relative w-full">
-                <input
+                <InputText
                   v-model="jambRegNumber"
-                  type="text"
-                  class="w-full p-3 pl-12 border border-gray-300 rounded-lg transition-all duration-300 bg-white hover:border-blue-600 focus:border-blue-600 focus:ring-2 focus:ring-blue-200 outline-none"
+                  id="utme"
                   placeholder="Enter UTME No. or User ID"
-                  :class="{'border-red-500': !jambRegNumber && admission?.applicationType?.autoLoadUtme}"
-                  required
+                  class="w-full pl-12"
+                  :class="{'p-invalid': !jambRegNumber && admission?.applicationType?.autoLoadUtme}"
                 />
-                <span class="absolute top-3 left-3">
+                <span class="absolute top-1/2 left-4 transform -translate-y-1/2">
                   <i class="pi pi-id-card text-blue-400"></i>
                 </span>
               </div>
@@ -290,92 +300,78 @@ onMounted(() => {
               v-if="admission != null && admission.applicationType.modeOfEntryEnabled === true"
               class="flex flex-col space-y-2"
             >
+              <label for="modeOfEntry" class="text-[#0D47A1] font-medium text-sm">Mode of Entry</label>
               <div class="relative w-full">
-                <select
+                <Dropdown
                   v-model="obj.modeOfEntryId"
-                  class="w-full p-3 border border-gray-300 rounded-lg transition-all duration-300 bg-white hover:border-blue-600 focus:border-blue-600 focus:ring-2 focus:ring-blue-200 outline-none"
-                  :class="{'border-red-500': !obj.modeOfEntryId && admission?.applicationType?.modeOfEntryEnabled}"
-                  required
-                >
-                  <option value="" disabled>Select Mode of Entry</option>
-                  <option
-                    v-for="mode in modeOfEntries"
-                    :key="mode.id"
-                    :value="mode.id"
-                  >
-                    {{ mode.title }}
-                  </option>
-                </select>
-                <span class="absolute top-3 right-3">
-                  <i class="pi pi-chevron-down text-blue-400"></i>
-                </span>
+                  :options="modeOfEntries"
+                  optionLabel="title"
+                  optionValue="id"
+                  placeholder="Select Mode of Entry"
+                  id="modeOfEntry"
+                  class="w-full"
+                  :class="{'p-invalid': !obj.modeOfEntryId && admission?.applicationType?.modeOfEntryEnabled}"
+                />
               </div>
             </div>
 
             <!-- Email -->
             <div class="flex flex-col space-y-2">
+              <label for="email" class="text-[#0D47A1] font-medium text-sm">Email</label>
               <div class="relative w-full">
-                <input
+                <InputText
                   v-model="obj.emailAddress"
                   type="email"
-                  class="w-full p-3 pl-12 border border-gray-300 rounded-lg transition-all duration-300 bg-white hover:border-blue-600 focus:border-blue-600 focus:ring-2 focus:ring-blue-200 outline-none"
+                  id="email"
                   placeholder="Enter your email"
-                  :class="{'border-red-500': obj.emailAddress && validateEmail(obj.emailAddress) !== true}"
+                  class="w-full pl-12"
+                  :class="{'p-invalid': obj.emailAddress && validateEmail(obj.emailAddress) !== true}"
                   @blur="validateEmail(obj.emailAddress)"
-                  required
                 />
-                <span class="absolute top-3 left-3">
+                <span class="absolute top-1/2 left-4 transform -translate-y-1/2">
                   <i class="pi pi-envelope text-blue-400"></i>
                 </span>
               </div>
-              <small v-if="obj.emailAddress && validateEmail(obj.emailAddress) !== true" class="text-red-500 animate-fade-in">
+              <small v-if="obj.emailAddress && validateEmail(obj.emailAddress) !== true" class="p-error animate-fade-in">
                 {{ validateEmail(obj.emailAddress) }}
               </small>
             </div>
 
             <!-- Password -->
             <div class="flex flex-col space-y-2">
+              <label for="password" class="text-[#0D47A1] font-medium text-sm">Password</label>
               <div class="relative w-full">
-                <input
-                  :type="showPassword ? 'text' : 'password'"
+                <Password
                   v-model="obj.password"
-                  class="w-full p-3 pl-12 pr-12 border border-gray-300 rounded-lg transition-all duration-300 bg-white hover:border-blue-600 focus:border-blue-600 focus:ring-2 focus:ring-blue-200 outline-none"
+                  :feedback="false"
+                  toggleMask
+                  id="password"
                   placeholder="Enter your password"
-                  :class="{'border-red-500': obj.password && validatePassword(obj.password) !== true}"
+                  class="w-full"
+                  :inputClass="{'p-invalid': obj.password && validatePassword(obj.password) !== true}"
                   @blur="validatePassword(obj.password)"
-                  required
                 />
-                <span class="absolute top-3 left-3">
-                  <i class="pi pi-lock text-blue-400"></i>
-                </span>
-                <span class="absolute top-3 right-3 cursor-pointer hover:text-blue-600" @click="showPassword = !showPassword">
-                  <i :class="showPassword ? 'pi pi-eye-slash' : 'pi pi-eye'" class="text-blue-400"></i>
-                </span>
               </div>
-              <small v-if="obj.password && validatePassword(obj.password) !== true" class="text-red-500 animate-fade-in">
+              <small v-if="obj.password && validatePassword(obj.password) !== true" class="p-error animate-fade-in">
                 {{ validatePassword(obj.password) }}
               </small>
             </div>
 
             <!-- Confirm Password -->
             <div class="flex flex-col space-y-2">
+              <label for="confirmPassword" class="text-[#0D47A1] font-medium text-sm">Confirm Password</label>
               <div class="relative w-full">
-                <input
-                  :type="showPasswordC ? 'text' : 'password'"
+                <Password
                   v-model="obj.confirmPassword"
-                  class="w-full p-3 pl-12 pr-12 border border-gray-300 rounded-lg transition-all duration-300 bg-white hover:border-blue-600 focus:border-blue-600 focus:ring-2 focus:ring-blue-200 outline-none"
+                  :feedback="false"
+                  toggleMask
+                  id="confirmPassword"
                   placeholder="Confirm your password"
-                  :class="{'border-red-500': obj.confirmPassword && obj.password !== obj.confirmPassword}"
-                  required
+                  class="w-full"
+                  :inputClass="{'p-invalid': obj.confirmPassword && obj.password !== obj.confirmPassword}"
                 />
-                <span class="absolute top-3 left-3">
-                  <i class="pi pi-lock text-blue-400"></i>
-                </span>
-                <span class="absolute top-3 right-3 cursor-pointer hover:text-blue-600" @click="showPasswordC = !showPasswordC">
-                  <i :class="showPasswordC ? 'pi pi-eye-slash' : 'pi pi-eye'" class="text-blue-400"></i>
-                </span>
               </div>
-              <small v-if="obj.confirmPassword && obj.password !== obj.confirmPassword" class="text-red-500 animate-fade-in">
+              <small v-if="obj.confirmPassword && obj.password !== obj.confirmPassword" class="p-error animate-fade-in">
                 Passwords do not match
               </small>
             </div>
@@ -384,14 +380,13 @@ onMounted(() => {
           <!-- Submit Button -->
           <div class="flex flex-col gap-6">
             <div class="flex flex-col space-y-4">
-              <button
+              <Button
                 type="submit"
-                class="w-full bg-blue-700 hover:bg-blue-800 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-300 hover:shadow-lg transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                label="Proceed"
+                :loading="loading"
                 :disabled="!isFormValid || loading"
-              >
-                <span v-if="loading" class="inline-block w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></span>
-                <span v-else>Proceed</span>
-              </button>
+                class="w-full hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300"
+              />
             </div>
 
             <!-- Switch to Login -->
@@ -431,16 +426,16 @@ onMounted(() => {
             <div class="flex flex-col gap-6">
               <!-- Username -->
               <div class="flex flex-col space-y-2">
+                <label for="username" class="text-[#0D47A1] font-medium text-sm">Username</label>
                 <div class="relative w-full">
-                  <input
+                  <InputText
                     v-model="user.username"
-                    type="text"
-                    class="w-full p-3 pl-12 border border-gray-300 rounded-lg transition-all duration-300 bg-white hover:border-blue-600 focus:border-blue-600 focus:ring-2 focus:ring-blue-200 outline-none"
+                    id="username"
                     placeholder="Enter your username"
+                    class="w-full pl-12"
                     @keyup.enter="login"
-                    required
                   />
-                  <span class="absolute top-3 left-3">
+                  <span class="absolute top-1/2 left-4 transform -translate-y-1/2">
                     <i class="pi pi-user text-blue-400"></i>
                   </span>
                 </div>
@@ -448,21 +443,17 @@ onMounted(() => {
 
               <!-- Password -->
               <div class="flex flex-col space-y-2">
+                <label for="loginPassword" class="text-[#0D47A1] font-medium text-sm">Password</label>
                 <div class="relative w-full">
-                  <input
-                    :type="showPasswordLogin ? 'text' : 'password'"
+                  <Password
                     v-model="user.password"
-                    class="w-full p-3 pl-12 pr-12 border border-gray-300 rounded-lg transition-all duration-300 bg-white hover:border-blue-600 focus:border-blue-600 focus:ring-2 focus:ring-blue-200 outline-none"
+                    :feedback="false"
+                    toggleMask
+                    id="loginPassword"
                     placeholder="Enter your password"
+                    class="w-full"
                     @keyup.enter="login"
-                    required
                   />
-                  <span class="absolute top-3 left-3">
-                    <i class="pi pi-lock text-blue-400"></i>
-                  </span>
-                  <span class="absolute top-3 right-3 cursor-pointer hover:text-blue-600" @click="showPasswordLogin = !showPasswordLogin">
-                    <i :class="showPasswordLogin ? 'pi pi-eye-slash' : 'pi pi-eye'" class="text-blue-400"></i>
-                  </span>
                 </div>
               </div>
             </div>
@@ -470,14 +461,13 @@ onMounted(() => {
             <!-- Submit Button -->
             <div class="flex flex-col gap-6">
               <div class="flex flex-col space-y-4">
-                <button
+                <Button
                   type="submit"
-                  class="w-full bg-blue-700 hover:bg-blue-800 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-300 hover:shadow-lg transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                  label="Login"
+                  :loading="loginLoading"
                   :disabled="!user.username || !user.password || loginLoading"
-                >
-                  <span v-if="loginLoading" class="inline-block w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></span>
-                  <span v-else>Login</span>
-                </button>
+                  class="w-full hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300"
+                />
                 <a
                   href="/login"
                   class="text-center text-blue-700 hover:text-blue-800 cursor-pointer transition-colors duration-300 hover:underline"
@@ -725,6 +715,97 @@ onMounted(() => {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* Input field fixes */
+:deep(.p-inputtext) {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.8);
+}
+
+:deep(.p-inputtext.pl-12) {
+  padding-left: 3rem;
+}
+
+:deep(.p-inputtext:enabled:hover) {
+  border-color: #0d47a1;
+}
+
+:deep(.p-inputtext:enabled:focus) {
+  border-color: #0d47a1;
+  box-shadow: 0 0 0 2px rgba(13, 71, 161, 0.2);
+  outline: none;
+  background: white;
+}
+
+:deep(.p-dropdown) {
+  width: 100%;
+}
+
+:deep(.p-dropdown .p-dropdown-label) {
+  padding: 0.75rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.8);
+}
+
+:deep(.p-dropdown:not(.p-disabled):hover .p-dropdown-label) {
+  border-color: #0d47a1;
+}
+
+:deep(.p-dropdown:not(.p-disabled).p-focus .p-dropdown-label) {
+  border-color: #0d47a1;
+  box-shadow: 0 0 0 2px rgba(13, 71, 161, 0.2);
+  outline: none;
+  background: white;
+}
+
+:deep(.p-password-input) {
+  width: 100%;
+}
+
+:deep(.p-password) {
+  width: 100%;
+}
+
+:deep(.p-password .p-password-input) {
+  padding-left: 3rem;
+}
+
+:deep(.p-invalid) {
+  border-color: #ef4444 !important;
+}
+
+:deep(.p-invalid:enabled:focus) {
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2) !important;
+}
+
+:deep(.p-button) {
+  background: #0d47a1;
+  border: 1px solid #0d47a1;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+:deep(.p-button:not(:disabled):hover) {
+  background: #1565c0;
+  border-color: #1565c0;
+}
+
+:deep(.p-button:not(:disabled):active) {
+  background: #0d47a1;
+  border-color: #0d47a1;
+}
+
+.p-error {
+  color: #ef4444;
 }
 
 /* Responsive Design */
