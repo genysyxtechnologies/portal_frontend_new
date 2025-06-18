@@ -190,9 +190,9 @@
                 <option value="beforeRegistration">Before Registration</option>
                 <option value="beforeSchoolFee">Before School Fee</option>
               </select>
-              <select 
-                v-if="selectedSession?.semesters?.length > 0" 
-                v-model="selectedSemester" 
+              <select
+                v-if="selectedSession?.semesters?.length > 0"
+                v-model="selectedSemester"
                 class="px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white font-medium"
               >
                 <option value="">All Semesters</option>
@@ -283,8 +283,11 @@
                     </h3>
                     <div class="mt-1 flex items-center gap-2">
                       <span class="text-2xl font-bold text-blue-600">
-                        ₦{{ item.fee.amount.toLocaleString() }}
+                        {{ formatCurrency(item.fee.amount) }}
                       </span>
+                      <div v-if="item.payment && calculatePaidAmount(item) > 0" class="text-sm text-emerald-600 font-medium">
+                        {{ calculatePaymentPercentage(item) }}% paid
+                      </div>
                     </div>
                   </div>
 
@@ -319,6 +322,14 @@
                   <div v-if="item.payment?.transactionId" class="space-y-1 col-span-2">
                     <p class="text-gray-500 font-medium">Invoice Number</p>
                     <p class="text-gray-900 font-mono text-xs">{{ item.payment.transactionId }}</p>
+                  </div>
+                  <div v-if="item.payment && calculatePaidAmount(item) > 0" class="space-y-1">
+                    <p class="text-gray-500 font-medium">Amount Paid</p>
+                    <p class="text-emerald-600 font-semibold">{{ formatCurrency(calculatePaidAmount(item)) }}</p>
+                  </div>
+                  <div v-if="item.payment && calculateOutstandingBalance(item) > 0" class="space-y-1">
+                    <p class="text-gray-500 font-medium">Outstanding</p>
+                    <p class="text-amber-600 font-semibold">{{ formatCurrency(calculateOutstandingBalance(item)) }}</p>
                   </div>
                 </div>
 
@@ -360,7 +371,7 @@
                       <div v-else class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                       {{ getPaymentButtonText(item) }}
                     </button>
-                    
+
                     <!-- Download invoice button (show when invoice exists) -->
                     <button
                       v-if="shouldShowDownloadButton(item)"
@@ -386,7 +397,7 @@
 
 <script setup lang="ts">
 import { useStudentDashboard } from '@/services/student/useStudentDashboard'
-import { useStudentFee } from '@/services/student/useStudentFee'
+import { type StandaloneItem, useStudentFee } from '@/services/student/useStudentFee'
 import { ref, onMounted, watch, computed } from 'vue'
 import Dropdown from 'primevue/dropdown'
 
@@ -442,7 +453,7 @@ const filteredStandalones = computed(() => {
 
   // Apply semester filter
   if (selectedSemester.value) {
-    filtered = filtered.filter(item => 
+    filtered = filtered.filter(item =>
       item.fee.semester?.id === selectedSemester.value
     )
   }
@@ -459,6 +470,7 @@ const clearFilters = () => {
 // Handle payment initialization or payment processing
 const handlePayment = async (item: any) => {
   if (!user.value) return
+
 
   try {
     if (item.payment == null) {
@@ -477,8 +489,22 @@ const handlePayment = async (item: any) => {
         messageShow.value = true
         return
       }
-      // Payment exists but not cleared, proceed with payment
-      await loadPaymentGateway(item.payment, item.fee, user.value.email)
+
+
+      // Check if this is a balance payment (partial payments exist with outstanding balance)
+      if (isBalancePayment(item) && calculateOutstandingBalance(item) > 0 && noPendingParts(item)) {
+
+        // Generate a new invoice for the outstanding balance
+        const balancePayment = await initializeTransaction(item.fee, item.payment, String(user.value.userId))
+        // now here
+        if (balancePayment) {
+          // Refresh the fees list to get updated payment info
+          await getStandaloneFees(String(user.value.username), selectedSession.value.id)
+        }
+      } else {
+        // Payment exists but not cleared, proceed with payment
+        await loadPaymentGateway(item.payment, item.fee, user.value.email)
+      }
     }
   } catch (error) {
     console.error('Payment error:', error)
@@ -491,7 +517,7 @@ const handlePayment = async (item: any) => {
 // Handle invoice download
 const handleDownloadInvoice = async (item: any) => {
   if (!user.value || !item.payment) return
-  
+
   try {
     await downloadStandaloneInvoice(item.payment)
   } catch (error) {
@@ -502,6 +528,51 @@ const handleDownloadInvoice = async (item: any) => {
   }
 }
 
+// Calculate amount already paid from parts (matches extracted logic)
+function calculatePaidAmount(item: any): number {
+  // If the fee payment is cleared, consider all items as paid
+  if (item.payment?.cleared) return item.fee.amount
+
+  // If no payment parts exist, no amount has been paid
+  if (!item.payment?.partPayments || item.payment.partPayments.length < 1) return 0
+
+  // Sum all amounts paid from part payments
+  return item.payment.partPayments
+    .map((e: any) => e.amountPaid || 0)
+    .reduce((prev: number, curr: number) => prev + curr, 0)
+}
+
+function calculateOutstandingBalance(item: StandaloneItem): number {
+  return item.fee.amount - calculatePaidAmount(item)
+}
+
+function noPendingParts(item: StandaloneItem): boolean {
+  // console.log("Test", (item.payment?.partPayments?.length ?? 0) > 0  && (item.payment?.partPayments?.filter((e: any) => !e.success)?.length ?? 0) < 1)
+  return (item.payment?.partPayments?.length ?? 0) > 0  && (item.payment?.partPayments?.filter((e: any) => !e.success)?.length ?? 0) < 1
+}
+
+// Check if balance payment is available (from extracted logic)
+function isBalancePayment(item: any): boolean {
+  return (item.payment?.partPayments?.length > 0 && !item.payment?.cleared) ||
+    (calculatePaidAmount(item) < item.fee.amount && item.payment?.partPayments?.length > 0)
+}
+
+function calculatePaymentPercentage(item: any): number {
+  const total = item.fee.amount
+  if (total === 0) return 0
+  return Math.floor((calculatePaidAmount(item) / total) * 100)
+}
+
+function formatCurrency(amount: number): string {
+  if (!amount || amount === 0) return '₦0'
+  return new Intl.NumberFormat('en-NG', {
+    style: 'currency',
+    currency: 'NGN',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(amount)
+}
+
 // Get payment button text based on payment status
 const getPaymentButtonText = (item: any) => {
   if (loading.value) return 'Processing...'
@@ -510,6 +581,8 @@ const getPaymentButtonText = (item: any) => {
     return 'Generate Invoice'
   } else if (item.payment.cleared) {
     return 'Paid ✓'
+  } else if (isBalancePayment(item) && calculateOutstandingBalance(item) > 0) {
+    return `Balance Invoice (${formatCurrency(calculateOutstandingBalance(item))})`
   } else {
     return 'Pay Now'
   }
@@ -539,6 +612,9 @@ const getButtonClass = (item: any) => {
   } else if (item.payment.cleared) {
     // Paid - Green color
     return 'bg-green-600 hover:bg-green-700 paid-button'
+  } else if (isBalancePayment(item) && calculateOutstandingBalance(item) > 0) {
+    // Balance Payment - Emerald color
+    return 'bg-emerald-600 hover:bg-emerald-700 balance-payment-button'
   } else {
     // Pay Now - Orange/Secondary color
     return 'pay-now-button'
@@ -593,5 +669,11 @@ watch(selectedSession, async (newSession) => {
 .paid-button:hover {
   transform: translateY(-1px);
   box-shadow: 0 8px 25px -8px rgba(34, 197, 94, 0.4);
+}
+
+/* Balance Payment button hover effect */
+.balance-payment-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 25px -8px rgba(16, 185, 129, 0.4);
 }
 </style>

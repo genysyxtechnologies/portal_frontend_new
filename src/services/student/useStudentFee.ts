@@ -4,7 +4,7 @@ import { createSharedComposable } from '@vueuse/core'
 import { onMounted, ref } from 'vue'
 import type { Level, UserResponse } from '@/types/student/dashboard_information'
 import { type Session } from '@/types/student/sessions'
-import type { FeeItem, FeePayment } from '@/types/student/fee.information'
+import type { FeeItem, FeePayment, PaymentPart } from '@/types/student/fee.information'
 const { studentInformation, payments, paymentPlatforms, schoolFees } = constant
 import dayjs from 'dayjs'
 import type { ApiResponse } from '@/services/api/apiClient.ts'
@@ -99,6 +99,7 @@ export interface Payment {
   invoiceAmount: number
   paymentLink: string
   cleared: boolean
+  partPayments: PaymentPart[]
 }
 
 export interface StandaloneItem {
@@ -209,7 +210,7 @@ export const useStudentFee = createSharedComposable(() => {
   // Initialize transaction for standalone fee
   async function initializeTransaction(feeItem: StandaloneFee, payment: Payment | null, userId: string) {
     if (userId && feeItem) {
-      if (payment == null) {
+      if (payment == null || !payment.cleared) {
         loading.value = true
         try {
           const response = await studentFeeRepository.initializeStandalone(userId, feeItem.id)
@@ -292,7 +293,7 @@ export const useStudentFee = createSharedComposable(() => {
           email: userEmail,
           amount: payment.invoiceAmount,
           currency: 'NGN',
-          invoice: payment.transactionId,
+          invoice: !payment.partPayments?.length ? payment.transactionId : payment.partPayments.filter(e => !e.success)[0]?.invoice,
           paymentId: payment.id
         }, (data: never) => {
           window.location.reload()

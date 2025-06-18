@@ -25,7 +25,7 @@
         </div>
 
         <!-- Cursor Glow -->
-        <div 
+        <div
           class="cursor-glow"
           :style="{
             left: `${cursorX}px`,
@@ -40,19 +40,19 @@
           <div class="floating-circle circle-1"></div>
           <div class="floating-circle circle-2"></div>
           <div class="floating-circle circle-3"></div>
-          
+
           <!-- Animated Lines -->
           <div class="animated-line line-1"></div>
           <div class="animated-line line-2"></div>
           <div class="animated-line line-3"></div>
-          
+
           <!-- Particle Effects -->
           <div class="particle particle-1"></div>
           <div class="particle particle-2"></div>
           <div class="particle particle-3"></div>
           <div class="particle particle-4"></div>
           <div class="particle particle-5"></div>
-          
+
           <!-- Orbit Animation -->
           <div class="orbit-container">
             <div class="orbit orbit-1">
@@ -140,7 +140,7 @@ onMounted(() => {
   function animateCursor() {
     cursorX.value += (targetX.value - cursorX.value) * 0.1
     cursorY.value += (targetY.value - cursorY.value) * 0.1
-    
+
     requestAnimationFrame(animateCursor)
   }
 
@@ -149,7 +149,7 @@ onMounted(() => {
 
 
 {
-  /* NSU/NAS/CMP/0696/17/18 */
+
 }
 </script>
 

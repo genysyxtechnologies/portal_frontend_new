@@ -252,7 +252,7 @@ export default {
     approvalResultsSenate: '/results/approve-senate',
     disApprovalResultsSenate: '/results/disapprove-senate',
 
-    forStudent: '/results/student/',
+    forStudent: '/results/student',
     uploadSheetAdmin: '/results/upload/result-scores',
     approveAllResults: '/results/approve-all-results',
     searchResult: '/results/search',
@@ -355,8 +355,8 @@ export default {
 
   // GET STUDENT INFORMATION
   studentInformation: {
-    getInformation: 'student-information/get/',
-    updateInformation: 'student-information/update/',
+    getInformation: 'student-information/get',
+    updateInformation: 'student-information/update',
     getIDCardDetails: 'student-information/get-id-card-details/',
     download: 'student-information/download',
     downloadMigrationReport: 'student-information/migration-report',
