@@ -495,12 +495,12 @@ const handlePayment = async (item: any) => {
       if (isBalancePayment(item) && calculateOutstandingBalance(item) > 0 && noPendingParts(item)) {
 
         // Generate a new invoice for the outstanding balance
-        const balancePayment = await initializeTransaction(item.fee, item.payment, String(user.value.userId))
+        await initializeTransaction(item.fee, item.payment, String(user.value.userId))
         // now here
-        if (balancePayment) {
+        //if (balancePayment) {
           // Refresh the fees list to get updated payment info
           await getStandaloneFees(String(user.value.username), selectedSession.value.id)
-        }
+        //}
       } else {
         // Payment exists but not cleared, proceed with payment
         await loadPaymentGateway(item.payment, item.fee, user.value.email)
