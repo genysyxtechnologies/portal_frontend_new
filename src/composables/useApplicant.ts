@@ -5,7 +5,7 @@ import type { Admission, RegisterData, ValidateUTMEData } from '@/repositories/a
 
 export function useApplicant() {
   const applicationRepo = new ApplicationRepository()
-  
+
   // Reactive state
   const loading = ref(false)
   const error = ref<string | null>(null)
@@ -14,7 +14,7 @@ export function useApplicant() {
   const getActiveAdmissions = async () => {
     loading.value = true
     error.value = null
-    
+
     try {
       const response = await applicationRepo.getActiveAdmissions()
       return response
@@ -30,7 +30,7 @@ export function useApplicant() {
   const getModeOfEntries = async (programmeTypeId: number) => {
     loading.value = true
     error.value = null
-    
+
     try {
       const response = await applicationRepo.getModeOfEntries(programmeTypeId)
       return response
@@ -46,13 +46,14 @@ export function useApplicant() {
   const validateUTME = async (data: ValidateUTMEData) => {
     loading.value = true
     error.value = null
-    
+
     try {
       const response = await applicationRepo.validateUTME(data)
+      if(!response.success){
+        error.value = response.message ?? response.data.message
+        throw Error(response.message ?? response.data.message)
+      }
       return response
-    } catch (err) {
-      error.value = err instanceof Error ? err.message : 'UTME validation failed'
-      throw err
     } finally {
       loading.value = false
     }
@@ -62,7 +63,7 @@ export function useApplicant() {
   const register = async (data: RegisterData) => {
     loading.value = true
     error.value = null
-    
+
     try {
       const response = await applicationRepo.register(data)
       return response
@@ -78,7 +79,7 @@ export function useApplicant() {
   const login = async (credentials: { email: string; password: string }) => {
     loading.value = true
     error.value = null
-    
+
     try {
       const response = await authService.login(credentials)
       return response
@@ -94,7 +95,7 @@ export function useApplicant() {
   const updatePersonalDetails = async (data: any) => {
     loading.value = true
     error.value = null
-    
+
     try {
       const response = await applicationRepo.updatePersonalDetails(data)
       return response
@@ -110,7 +111,7 @@ export function useApplicant() {
   const updateContactDetails = async (data: any) => {
     loading.value = true
     error.value = null
-    
+
     try {
       const response = await applicationRepo.updateContactDetails(data)
       return response
@@ -126,7 +127,7 @@ export function useApplicant() {
   const updateUTMEDetails = async (data: any) => {
     loading.value = true
     error.value = null
-    
+
     try {
       const response = await applicationRepo.updateUTMEDetails(data)
       return response
@@ -142,7 +143,7 @@ export function useApplicant() {
   const initializeApplicationFeePayment = async (data: any) => {
     loading.value = true
     error.value = null
-    
+
     try {
       const response = await applicationRepo.initializeApplicationFeePayment(data)
       return response
@@ -158,7 +159,7 @@ export function useApplicant() {
   const verifyApplicationFeePayment = async (reference: string) => {
     loading.value = true
     error.value = null
-    
+
     try {
       const response = await applicationRepo.verifyApplicationFeePayment(reference)
       return response
@@ -174,7 +175,7 @@ export function useApplicant() {
   const getApplicationSummary = async () => {
     loading.value = true
     error.value = null
-    
+
     try {
       const response = await applicationRepo.getApplicationSummary()
       return response
@@ -190,7 +191,7 @@ export function useApplicant() {
   const acceptAdmission = async (data: any) => {
     loading.value = true
     error.value = null
-    
+
     try {
       const response = await applicationRepo.acceptAdmission(data)
       return response
@@ -206,7 +207,7 @@ export function useApplicant() {
   const downloadApplicationInvoice = async (filename?: string) => {
     loading.value = true
     error.value = null
-    
+
     try {
       const response = await applicationRepo.downloadApplicationInvoice(filename)
       return response
@@ -222,7 +223,7 @@ export function useApplicant() {
     // State
     loading,
     error,
-    
+
     // Methods
     getActiveAdmissions,
     getModeOfEntries,

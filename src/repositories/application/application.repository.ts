@@ -104,7 +104,7 @@ class ApplicationRepository {
     try {
       return await apiClient.post<{ message: string }>(applicants.validateUTME, data)
     } catch (error) {
-      return Promise.reject(error)
+      throw error
     }
   }
 

@@ -37,7 +37,7 @@
                   }"
                   @input="resetErrors"
                 />
-                <label for="username" class="text-[#0D47A1] font-medium">Username</label>
+                <label for="username" class="text-[#0D47A1] font-medium">Username or Email</label>
               </FloatLabel>
               <span class="absolute top-4 right-4">
                 <i class="pi pi-user text-blue-400"></i>

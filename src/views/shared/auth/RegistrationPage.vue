@@ -55,6 +55,7 @@ const user = ref({
 })
 const usingOldReg = ref(false)
 const newRegMessage = ref('')
+const utmeValidated = ref(false)
 
 // Validation rules
 // Removed unused validation rule imports
@@ -90,7 +91,8 @@ const loadModeOfEntries = () => {
 const submitData = () => {
   if (
     admission.value != null &&
-    admission.value.applicationType.autoLoadUtme === true
+    admission.value.applicationType.autoLoadUtme === true &&
+    !utmeValidated.value
   ) {
     // validate utme first
     loading.value = true
@@ -99,6 +101,7 @@ const submitData = () => {
         admissionId: admission.value.id
       })
       .then(() => {
+        utmeValidated.value = true
         registerUser()
       })
       .catch((err) => {
@@ -121,7 +124,9 @@ const registerUser = () => {
       messageType.value = 'success'
       messageShow.value = true
       registering.value = false
+      router.push('/')
     })
+
     .catch((err) => {
       handleError(err)
     })
@@ -197,6 +202,13 @@ watch(admission, (val) => {
   if (val != null && val.applicationType.modeOfEntryEnabled) {
     modeOfEntries.value = val.applicationType.modeOfEntries || []
   }
+  // Reset UTME validation when admission changes
+  utmeValidated.value = false
+})
+
+watch(jambRegNumber, () => {
+  // Reset UTME validation when JAMB registration number changes
+  //utmeValidated.value = false
 })
 
 // Keep references to avoid unused variable warnings
@@ -207,8 +219,8 @@ void validateRequired
 void loadModeOfEntries
 
 // Stepper navigation
-const nextStep = () => {
-  if (canProceedToNextStep()) {
+const nextStep = async () => {
+  if (await canProceedToNextStep()) {
     activeStep.value++
   }
 }
@@ -219,13 +231,14 @@ const previousStep = () => {
   }
 }
 
-const canProceedToNextStep = () => {
+// Check if current step data is valid (for button enable/disable)
+const isCurrentStepValid = computed(() => {
   const hasConditionalStep = admission.value?.applicationType?.autoLoadUtme || admission.value?.applicationType?.modeOfEntryEnabled
-  
+
   switch (activeStep.value) {
     case 0: // Application selection
       return admission.value !== null
-    case 1: 
+    case 1:
       if (hasConditionalStep) {
         // UTME/Mode of Entry step
         const utmeValid = !admission.value?.applicationType?.autoLoadUtme || jambRegNumber.value
@@ -241,24 +254,56 @@ const canProceedToNextStep = () => {
         return obj.value.emailAddress && validateEmail(obj.value.emailAddress) === true
       } else {
         // Password step (when no conditional step)
-        return obj.value.password && validatePassword(obj.value.password) === true && 
+        return obj.value.password && validatePassword(obj.value.password) === true &&
                obj.value.confirmPassword && obj.value.password === obj.value.confirmPassword
       }
     case 3: // Password step (when conditional step exists)
-      return obj.value.password && validatePassword(obj.value.password) === true && 
+      return obj.value.password && validatePassword(obj.value.password) === true &&
              obj.value.confirmPassword && obj.value.password === obj.value.confirmPassword
     default:
       return false
   }
+})
+
+// Process step transition with UTME validation if needed
+const canProceedToNextStep = async () => {
+  const hasConditionalStep = admission.value?.applicationType?.autoLoadUtme || admission.value?.applicationType?.modeOfEntryEnabled
+
+  // For UTME step, validate UTME if required
+  if (activeStep.value === 1 && hasConditionalStep &&
+      admission.value?.applicationType?.autoLoadUtme &&
+      jambRegNumber.value && !utmeValidated.value) {
+    try {
+      loading.value = true
+      await validateUTME({
+        registrationNumber: jambRegNumber.value,
+        admissionId: admission.value.id
+      })
+      utmeValidated.value = true
+      loading.value = false
+      return true
+    } catch (err) {
+      //handleError(err)
+      console.log('Err', err)
+      loading.value = false
+      return false
+    }
+  }
+
+  return isCurrentStepValid.value
 }
 
-const isStepValid = (stepIndex: number) => {
+const isStepValid = async (stepIndex: number) => {
   const currentActive = activeStep.value
   activeStep.value = stepIndex
-  const valid = canProceedToNextStep()
+  const valid = await canProceedToNextStep()
   activeStep.value = currentActive
   return valid
 }
+
+defineEmits([
+  'onSwitch',
+])
 
 // Computed for dynamic steps
 const registrationSteps = computed(() => {
@@ -267,12 +312,12 @@ const registrationSteps = computed(() => {
     { label: 'Email', key: 'email' },
     { label: 'Password', key: 'password' }
   ]
-  
+
   // Insert UTME/Mode step if needed
   if (admission.value?.applicationType?.autoLoadUtme || admission.value?.applicationType?.modeOfEntryEnabled) {
     steps.splice(1, 0, { label: 'Details', key: 'details' })
   }
-  
+
   return steps
 })
 
@@ -309,20 +354,20 @@ onMounted(() => {
 
     <div class="p-4 sm:p-8 flex flex-col gap-12 z-10 relative">
       <!-- Registration Form -->
-      <div v-if="registering" class="form-container">
+      <div class="form-container">
         <div class="flex flex-col items-center space-y-2">
           <h1 class="welcome animate-text-focus-in">Apply</h1>
-          <h3 class="sub-welcome animate-tracking-in-expand delay-100">Start your application below</h3>
+          <h3 class="sub-welcome animate-tracking-in-expand delay-100 mt-8" style="margin-top: 1em;">Start your application below</h3>
         </div>
 
         <!-- Steps Navigation -->
-        <div class="mb-8">
-          <Steps
-            :model="registrationSteps"
-            :activeStep="activeStep"
-            class="custom-steps"
-          />
-        </div>
+<!--        <div class="mb-8">-->
+<!--          <Steps-->
+<!--            :model="registrationSteps"-->
+<!--            :activeStep="activeStep"-->
+<!--            class="custom-steps"-->
+<!--          />-->
+<!--        </div>-->
 
         <form class="flex flex-col gap-6 animate-fade-in-delayed" @submit.prevent="activeStep === registrationSteps.length - 1 ? submitData() : nextStep()">
           <!-- Step 0: Application Selection -->
@@ -364,7 +409,7 @@ onMounted(() => {
               v-if="admission.applicationType.autoLoadUtme === true"
               class="flex flex-col space-y-2 mb-6"
             >
-              <label for="utme" class="text-[#0D47A1] font-medium text-sm">UTME No. or User ID</label>
+              <label for="utme" class="text-[#0D47A1] font-medium text-sm">UTME No.</label>
               <div class="relative w-full">
                 <InputText
                   v-model="jambRegNumber"
@@ -448,7 +493,7 @@ onMounted(() => {
               </div>
 
               <!-- Confirm Password -->
-              <div class="flex flex-col space-y-2">
+              <div class="flex flex-col space-y-2" style="margin-top: 1.5rem;">
                 <label for="confirmPassword" class="text-[#0D47A1] font-medium text-sm">Confirm Password</label>
                 <div class="relative w-full">
                   <Password
@@ -480,12 +525,12 @@ onMounted(() => {
               class="transition-all duration-300"
             />
             <div v-else></div>
-            
+
             <Button
               type="submit"
               :label="activeStep === registrationSteps.length - 1 ? 'Complete Registration' : 'Next'"
               :loading="loading"
-              :disabled="!canProceedToNextStep() || loading"
+              :disabled="!isCurrentStepValid || loading"
               class="hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300"
             />
           </div>
@@ -495,7 +540,7 @@ onMounted(() => {
             <span class="text-gray-400">Already applied?</span>
             <div class="flex self-center items-center gap-2">
               <span
-                @click="registering = false"
+                @click="$emit('onSwitch')"
                 class="text-blue-700 font-medium hover:text-blue-800 cursor-pointer transition-colors duration-300"
               >
                 Login here
@@ -506,94 +551,6 @@ onMounted(() => {
             </div>
           </div>
         </form>
-      </div>
-
-      <!-- Login Form -->
-      <div v-else class="form-container">
-        <div class="flex flex-col items-center space-y-2">
-          <h1 class="welcome animate-text-focus-in">Welcome back</h1>
-          <h3 class="sub-welcome animate-tracking-in-expand delay-100">Access your application</h3>
-        </div>
-
-        <div class="flex flex-col gap-6 animate-fade-in-delayed">
-          <!-- Login Alert for Old Registration -->
-          <div v-if="usingOldReg" class="bg-blue-50 border border-blue-300 rounded-lg p-3 flex items-center gap-2 text-blue-700">
-            <i class="pi pi-info-circle"></i>
-            <span>{{ newRegMessage }}</span>
-          </div>
-
-          <form class="flex flex-col gap-6" @submit.prevent="login">
-            <div class="flex flex-col gap-6">
-              <!-- Username -->
-              <div class="flex flex-col space-y-2">
-                <label for="username" class="text-[#0D47A1] font-medium text-sm">Username</label>
-                <div class="relative w-full">
-                  <InputText
-                    v-model="user.username"
-                    id="username"
-                    placeholder="Enter your username"
-                    class="w-full pl-12"
-                    @keyup.enter="login"
-                  />
-                  <span class="absolute top-1/2 left-4 transform -translate-y-1/2">
-                    <i class="pi pi-user text-blue-400"></i>
-                  </span>
-                </div>
-              </div>
-
-              <!-- Password -->
-              <div class="flex flex-col space-y-2">
-                <label for="loginPassword" class="text-[#0D47A1] font-medium text-sm">Password</label>
-                <div class="relative w-full">
-                  <Password
-                    v-model="user.password"
-                    :feedback="false"
-                    toggleMask
-                    id="loginPassword"
-                    placeholder="Enter your password"
-                    class="w-full"
-                    @keyup.enter="login"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <!-- Submit Button -->
-            <div class="flex flex-col gap-6">
-              <div class="flex flex-col space-y-4">
-                <Button
-                  type="submit"
-                  label="Login"
-                  :loading="loginLoading"
-                  :disabled="!user.username || !user.password || loginLoading"
-                  class="w-full hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300"
-                />
-                <a
-                  href="/login"
-                  class="text-center text-blue-700 hover:text-blue-800 cursor-pointer transition-colors duration-300 hover:underline"
-                >
-                  Forgot password?
-                </a>
-              </div>
-
-              <!-- Application link -->
-              <div class="flex flex-col text-center space-y-1">
-                <span class="text-gray-400">Start your application</span>
-                <div class="flex self-center items-center gap-2">
-                  <span
-                    @click="registering = true"
-                    class="text-blue-700 font-medium hover:text-blue-800 cursor-pointer transition-colors duration-300"
-                  >
-                    Apply here
-                  </span>
-                  <span class="flex transition-transform duration-300 hover:translate-x-1">
-                    <i class="pi pi-arrow-right"></i>
-                  </span>
-                </div>
-              </div>
-            </div>
-          </form>
-        </div>
       </div>
     </div>
   </div>
@@ -950,11 +907,13 @@ onMounted(() => {
   font-weight: 500;
   font-size: 0.875rem;
   transition: all 0.3s ease;
+  display: none;
 }
 
 :deep(.p-steps .p-steps-item.p-highlight .p-steps-title) {
   color: #0d47a1;
   font-weight: 600;
+  display: block;
 }
 
 /* Step Content Animation */
