@@ -207,7 +207,12 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="auth-background">
+  <div class="flex flex-col p-6 sm:p-12 bg-white gap-8 rounded-xl justify-center shadow-2xl transform transition-all duration-700 hover:shadow-3xl hover:-translate-y-1 relative overflow-hidden lg:w-9/10">
+    <!-- Background floating elements -->
+    <div class="absolute -top-20 -left-20 w-40 h-40 rounded-full bg-blue-50 opacity-70 animate-float-1"></div>
+    <div class="absolute -bottom-10 -right-10 w-32 h-32 rounded-full bg-blue-100 opacity-50 animate-float-2"></div>
+    <div class="absolute top-1/4 right-1/4 w-16 h-16 rounded-full bg-blue-200 opacity-30 animate-float-3"></div>
+
     <!-- Loading Spinner -->
     <div v-if="loading" class="loading-overlay">
       <div class="loading-spinner">
@@ -226,559 +231,302 @@ onMounted(() => {
       </div>
     </div>
     
-    <!-- Registration Form -->
-    <div v-if="registering" class="form-container">
-        <div class="form-header">
-          <h1 class="form-title">Apply</h1>
-          <p class="form-subtitle">Start your application below</p>
+    <div class="p-4 sm:p-8 flex flex-col gap-12 z-10 relative">
+      <!-- Registration Form -->
+      <div v-if="registering" class="form-container">
+        <div class="flex flex-col items-center space-y-2">
+          <h1 class="welcome animate-text-focus-in">Apply</h1>
+          <h3 class="sub-welcome animate-tracking-in-expand delay-100">Start your application below</h3>
         </div>
 
-        <form class="form-content" @submit.prevent="submitData">
-          <!-- Application Selection -->
-          <div class="form-group">
-            <label class="form-label">Application</label>
-            <div class="select-wrapper">
-              <select
-                v-model="admission"
-                class="form-select"
-                :class="{'error': admission === null && admissions.length > 0}"
-                required
-              >
-                <option value="" disabled>Select Application</option>
-                <option
-                  v-for="adm in admissions"
-                  :key="adm.id"
-                  :value="adm"
+        <form class="flex flex-col gap-6 animate-fade-in-delayed" @submit.prevent="submitData">
+          <div class="flex flex-col gap-6">
+            <!-- Application Selection -->
+            <div class="flex flex-col space-y-2">
+              <div class="relative w-full">
+                <select
+                  v-model="admission"
+                  class="w-full p-3 border border-gray-300 rounded-lg transition-all duration-300 bg-white hover:border-blue-600 focus:border-blue-600 focus:ring-2 focus:ring-blue-200 outline-none"
+                  :class="{'border-red-500': admission === null && admissions.length > 0}"
+                  required
                 >
-                  {{ adm.applicationType.name }} {{ adm.session.name }}
-                </option>
-              </select>
-              <i class="pi pi-chevron-down select-icon"></i>
+                  <option value="" disabled>Select Application</option>
+                  <option
+                    v-for="adm in admissions"
+                    :key="adm.id"
+                    :value="adm"
+                  >
+                    {{ adm.applicationType.name }} {{ adm.session.name }}
+                  </option>
+                </select>
+                <span class="absolute top-3 right-3">
+                  <i class="pi pi-chevron-down text-blue-400"></i>
+                </span>
+              </div>
             </div>
-          </div>
 
-          <!-- UTME Number Field (conditional) -->
-          <div
-            v-if="admission != null && admission.applicationType.autoLoadUtme === true"
-            class="form-group"
-          >
-            <label class="form-label">UTME No. or User ID</label>
-            <div class="input-wrapper">
-              <input
-                v-model="jambRegNumber"
-                type="text"
-                class="form-input"
-                placeholder="Enter UTME No. or User ID"
-                :class="{'error': !jambRegNumber && admission?.applicationType?.autoLoadUtme}"
-                required
-              />
-              <i class="pi pi-id-card input-icon"></i>
+            <!-- UTME Number Field (conditional) -->
+            <div
+              v-if="admission != null && admission.applicationType.autoLoadUtme === true"
+              class="flex flex-col space-y-2"
+            >
+              <div class="relative w-full">
+                <input
+                  v-model="jambRegNumber"
+                  type="text"
+                  class="w-full p-3 pl-12 border border-gray-300 rounded-lg transition-all duration-300 bg-white hover:border-blue-600 focus:border-blue-600 focus:ring-2 focus:ring-blue-200 outline-none"
+                  placeholder="Enter UTME No. or User ID"
+                  :class="{'border-red-500': !jambRegNumber && admission?.applicationType?.autoLoadUtme}"
+                  required
+                />
+                <span class="absolute top-3 left-3">
+                  <i class="pi pi-id-card text-blue-400"></i>
+                </span>
+              </div>
             </div>
-          </div>
 
-          <!-- Mode of Entry (conditional) -->
-          <div
-            v-if="admission != null && admission.applicationType.modeOfEntryEnabled === true"
-            class="form-group"
-          >
-            <label class="form-label">Mode of Entry</label>
-            <div class="select-wrapper">
-              <select
-                v-model="obj.modeOfEntryId"
-                class="form-select"
-                :class="{'error': !obj.modeOfEntryId && admission?.applicationType?.modeOfEntryEnabled}"
-                required
-              >
-                <option value="" disabled>Select Mode of Entry</option>
-                <option
-                  v-for="mode in modeOfEntries"
-                  :key="mode.id"
-                  :value="mode.id"
+            <!-- Mode of Entry (conditional) -->
+            <div
+              v-if="admission != null && admission.applicationType.modeOfEntryEnabled === true"
+              class="flex flex-col space-y-2"
+            >
+              <div class="relative w-full">
+                <select
+                  v-model="obj.modeOfEntryId"
+                  class="w-full p-3 border border-gray-300 rounded-lg transition-all duration-300 bg-white hover:border-blue-600 focus:border-blue-600 focus:ring-2 focus:ring-blue-200 outline-none"
+                  :class="{'border-red-500': !obj.modeOfEntryId && admission?.applicationType?.modeOfEntryEnabled}"
+                  required
                 >
-                  {{ mode.title }}
-                </option>
-              </select>
-              <i class="pi pi-chevron-down select-icon"></i>
+                  <option value="" disabled>Select Mode of Entry</option>
+                  <option
+                    v-for="mode in modeOfEntries"
+                    :key="mode.id"
+                    :value="mode.id"
+                  >
+                    {{ mode.title }}
+                  </option>
+                </select>
+                <span class="absolute top-3 right-3">
+                  <i class="pi pi-chevron-down text-blue-400"></i>
+                </span>
+              </div>
             </div>
-          </div>
 
-          <!-- Email -->
-          <div class="form-group">
-            <label class="form-label">Email</label>
-            <div class="input-wrapper">
-              <input
-                v-model="obj.emailAddress"
-                type="email"
-                class="form-input"
-                placeholder="Enter your email"
-                :class="{'error': obj.emailAddress && validateEmail(obj.emailAddress) !== true}"
-                @blur="validateEmail(obj.emailAddress)"
-                required
-              />
-              <i class="pi pi-envelope input-icon"></i>
+            <!-- Email -->
+            <div class="flex flex-col space-y-2">
+              <div class="relative w-full">
+                <input
+                  v-model="obj.emailAddress"
+                  type="email"
+                  class="w-full p-3 pl-12 border border-gray-300 rounded-lg transition-all duration-300 bg-white hover:border-blue-600 focus:border-blue-600 focus:ring-2 focus:ring-blue-200 outline-none"
+                  placeholder="Enter your email"
+                  :class="{'border-red-500': obj.emailAddress && validateEmail(obj.emailAddress) !== true}"
+                  @blur="validateEmail(obj.emailAddress)"
+                  required
+                />
+                <span class="absolute top-3 left-3">
+                  <i class="pi pi-envelope text-blue-400"></i>
+                </span>
+              </div>
+              <small v-if="obj.emailAddress && validateEmail(obj.emailAddress) !== true" class="text-red-500 animate-fade-in">
+                {{ validateEmail(obj.emailAddress) }}
+              </small>
             </div>
-            <span v-if="obj.emailAddress && validateEmail(obj.emailAddress) !== true" class="error-message">
-              {{ validateEmail(obj.emailAddress) }}
-            </span>
-          </div>
 
-          <!-- Password -->
-          <div class="form-group">
-            <label class="form-label">Password</label>
-            <div class="input-wrapper">
-              <input
-                :type="showPassword ? 'text' : 'password'"
-                v-model="obj.password"
-                class="form-input"
-                placeholder="Enter your password"
-                :class="{'error': obj.password && validatePassword(obj.password) !== true}"
-                @blur="validatePassword(obj.password)"
-                required
-              />
-              <i
-                :class="showPassword ? 'pi pi-eye-slash' : 'pi pi-eye'"
-                class="input-icon clickable"
-                @click="showPassword = !showPassword"
-              ></i>
+            <!-- Password -->
+            <div class="flex flex-col space-y-2">
+              <div class="relative w-full">
+                <input
+                  :type="showPassword ? 'text' : 'password'"
+                  v-model="obj.password"
+                  class="w-full p-3 pl-12 pr-12 border border-gray-300 rounded-lg transition-all duration-300 bg-white hover:border-blue-600 focus:border-blue-600 focus:ring-2 focus:ring-blue-200 outline-none"
+                  placeholder="Enter your password"
+                  :class="{'border-red-500': obj.password && validatePassword(obj.password) !== true}"
+                  @blur="validatePassword(obj.password)"
+                  required
+                />
+                <span class="absolute top-3 left-3">
+                  <i class="pi pi-lock text-blue-400"></i>
+                </span>
+                <span class="absolute top-3 right-3 cursor-pointer hover:text-blue-600" @click="showPassword = !showPassword">
+                  <i :class="showPassword ? 'pi pi-eye-slash' : 'pi pi-eye'" class="text-blue-400"></i>
+                </span>
+              </div>
+              <small v-if="obj.password && validatePassword(obj.password) !== true" class="text-red-500 animate-fade-in">
+                {{ validatePassword(obj.password) }}
+              </small>
             </div>
-            <span v-if="obj.password && validatePassword(obj.password) !== true" class="error-message">
-              {{ validatePassword(obj.password) }}
-            </span>
-          </div>
 
-          <!-- Confirm Password -->
-          <div class="form-group">
-            <label class="form-label">Confirm password</label>
-            <div class="input-wrapper">
-              <input
-                :type="showPasswordC ? 'text' : 'password'"
-                v-model="obj.confirmPassword"
-                class="form-input"
-                placeholder="Confirm your password"
-                :class="{'error': obj.confirmPassword && obj.password !== obj.confirmPassword}"
-                required
-              />
-              <i
-                :class="showPasswordC ? 'pi pi-eye-slash' : 'pi pi-eye'"
-                class="input-icon clickable"
-                @click="showPasswordC = !showPasswordC"
-              ></i>
+            <!-- Confirm Password -->
+            <div class="flex flex-col space-y-2">
+              <div class="relative w-full">
+                <input
+                  :type="showPasswordC ? 'text' : 'password'"
+                  v-model="obj.confirmPassword"
+                  class="w-full p-3 pl-12 pr-12 border border-gray-300 rounded-lg transition-all duration-300 bg-white hover:border-blue-600 focus:border-blue-600 focus:ring-2 focus:ring-blue-200 outline-none"
+                  placeholder="Confirm your password"
+                  :class="{'border-red-500': obj.confirmPassword && obj.password !== obj.confirmPassword}"
+                  required
+                />
+                <span class="absolute top-3 left-3">
+                  <i class="pi pi-lock text-blue-400"></i>
+                </span>
+                <span class="absolute top-3 right-3 cursor-pointer hover:text-blue-600" @click="showPasswordC = !showPasswordC">
+                  <i :class="showPasswordC ? 'pi pi-eye-slash' : 'pi pi-eye'" class="text-blue-400"></i>
+                </span>
+              </div>
+              <small v-if="obj.confirmPassword && obj.password !== obj.confirmPassword" class="text-red-500 animate-fade-in">
+                Passwords do not match
+              </small>
             </div>
-            <span v-if="obj.confirmPassword && obj.password !== obj.confirmPassword" class="error-message">
-              Passwords do not match
-            </span>
           </div>
 
           <!-- Submit Button -->
-          <button
-            type="submit"
-            class="submit-button"
-            :disabled="!isFormValid || loading"
-          >
-            <span v-if="loading" class="button-spinner"></span>
-            <span v-else>Proceed</span>
-          </button>
+          <div class="flex flex-col gap-6">
+            <div class="flex flex-col space-y-4">
+              <button
+                type="submit"
+                class="w-full bg-blue-700 hover:bg-blue-800 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-300 hover:shadow-lg transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                :disabled="!isFormValid || loading"
+              >
+                <span v-if="loading" class="inline-block w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></span>
+                <span v-else>Proceed</span>
+              </button>
+            </div>
 
-          <!-- Switch to Login -->
-          <div class="form-switch">
-            <span class="switch-text">Already applied?</span>
-            <button
-              type="button"
-              @click="registering = false"
-              class="switch-link"
-            >
-              Login <i class="pi pi-arrow-right"></i>
-            </button>
+            <!-- Switch to Login -->
+            <div class="flex flex-col text-center space-y-1">
+              <span class="text-gray-400">Already applied?</span>
+              <div class="flex self-center items-center gap-2">
+                <span
+                  @click="registering = false"
+                  class="text-blue-700 font-medium hover:text-blue-800 cursor-pointer transition-colors duration-300"
+                >
+                  Login here
+                </span>
+                <span class="flex transition-transform duration-300 hover:translate-x-1">
+                  <i class="pi pi-arrow-right"></i>
+                </span>
+              </div>
+            </div>
           </div>
         </form>
       </div>
 
-    <!-- Login Form -->
-    <div v-else class="form-container">
-        <div class="form-header">
-          <h1 class="form-title">Login</h1>
-          <p class="form-subtitle">Access your application</p>
+      <!-- Login Form -->
+      <div v-else class="form-container">
+        <div class="flex flex-col items-center space-y-2">
+          <h1 class="welcome animate-text-focus-in">Welcome back</h1>
+          <h3 class="sub-welcome animate-tracking-in-expand delay-100">Access your application</h3>
         </div>
 
-        <!-- Login Alert for Old Registration -->
-        <div v-if="usingOldReg" class="alert-banner">
-          <i class="pi pi-info-circle"></i>
-          <span>{{ newRegMessage }}</span>
+        <div class="flex flex-col gap-6 animate-fade-in-delayed">
+          <!-- Login Alert for Old Registration -->
+          <div v-if="usingOldReg" class="bg-blue-50 border border-blue-300 rounded-lg p-3 flex items-center gap-2 text-blue-700">
+            <i class="pi pi-info-circle"></i>
+            <span>{{ newRegMessage }}</span>
+          </div>
+
+          <form class="flex flex-col gap-6" @submit.prevent="login">
+            <div class="flex flex-col gap-6">
+              <!-- Username -->
+              <div class="flex flex-col space-y-2">
+                <div class="relative w-full">
+                  <input
+                    v-model="user.username"
+                    type="text"
+                    class="w-full p-3 pl-12 border border-gray-300 rounded-lg transition-all duration-300 bg-white hover:border-blue-600 focus:border-blue-600 focus:ring-2 focus:ring-blue-200 outline-none"
+                    placeholder="Enter your username"
+                    @keyup.enter="login"
+                    required
+                  />
+                  <span class="absolute top-3 left-3">
+                    <i class="pi pi-user text-blue-400"></i>
+                  </span>
+                </div>
+              </div>
+
+              <!-- Password -->
+              <div class="flex flex-col space-y-2">
+                <div class="relative w-full">
+                  <input
+                    :type="showPasswordLogin ? 'text' : 'password'"
+                    v-model="user.password"
+                    class="w-full p-3 pl-12 pr-12 border border-gray-300 rounded-lg transition-all duration-300 bg-white hover:border-blue-600 focus:border-blue-600 focus:ring-2 focus:ring-blue-200 outline-none"
+                    placeholder="Enter your password"
+                    @keyup.enter="login"
+                    required
+                  />
+                  <span class="absolute top-3 left-3">
+                    <i class="pi pi-lock text-blue-400"></i>
+                  </span>
+                  <span class="absolute top-3 right-3 cursor-pointer hover:text-blue-600" @click="showPasswordLogin = !showPasswordLogin">
+                    <i :class="showPasswordLogin ? 'pi pi-eye-slash' : 'pi pi-eye'" class="text-blue-400"></i>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="flex flex-col gap-6">
+              <div class="flex flex-col space-y-4">
+                <button
+                  type="submit"
+                  class="w-full bg-blue-700 hover:bg-blue-800 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-300 hover:shadow-lg transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                  :disabled="!user.username || !user.password || loginLoading"
+                >
+                  <span v-if="loginLoading" class="inline-block w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></span>
+                  <span v-else>Login</span>
+                </button>
+                <a
+                  href="/login"
+                  class="text-center text-blue-700 hover:text-blue-800 cursor-pointer transition-colors duration-300 hover:underline"
+                >
+                  Forgot password?
+                </a>
+              </div>
+
+              <!-- Application link -->
+              <div class="flex flex-col text-center space-y-1">
+                <span class="text-gray-400">Start your application</span>
+                <div class="flex self-center items-center gap-2">
+                  <span
+                    @click="registering = true"
+                    class="text-blue-700 font-medium hover:text-blue-800 cursor-pointer transition-colors duration-300"
+                  >
+                    Apply here
+                  </span>
+                  <span class="flex transition-transform duration-300 hover:translate-x-1">
+                    <i class="pi pi-arrow-right"></i>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </form>
         </div>
-
-        <form class="form-content" @submit.prevent="login">
-          <!-- Username -->
-          <div class="form-group">
-            <label class="form-label">Username</label>
-            <div class="input-wrapper">
-              <input
-                v-model="user.username"
-                type="text"
-                class="form-input"
-                placeholder="Enter your username"
-                @keyup.enter="login"
-                required
-              />
-              <i class="pi pi-user input-icon"></i>
-            </div>
-          </div>
-
-          <!-- Password -->
-          <div class="form-group">
-            <label class="form-label">Password</label>
-            <div class="input-wrapper">
-              <input
-                :type="showPasswordLogin ? 'text' : 'password'"
-                v-model="user.password"
-                class="form-input"
-                placeholder="Enter your password"
-                @keyup.enter="login"
-                required
-              />
-              <i
-                :class="showPasswordLogin ? 'pi pi-eye-slash' : 'pi pi-eye'"
-                class="input-icon clickable"
-                @click="showPasswordLogin = !showPasswordLogin"
-              ></i>
-            </div>
-          </div>
-
-          <!-- Submit Button -->
-          <button
-            type="submit"
-            class="submit-button"
-            :disabled="!user.username || !user.password || loginLoading"
-          >
-            <span v-if="loginLoading" class="button-spinner"></span>
-            <span v-else>Login</span>
-          </button>
-
-          <!-- Form Footer -->
-          <div class="form-footer">
-            <button
-              type="button"
-              @click="registering = true"
-              class="footer-link"
-            >
-              Apply
-            </button>
-            <span class="footer-divider">or</span>
-            <a
-              href="/login"
-              class="footer-link"
-            >
-              Reset password
-            </a>
-          </div>
-        </form>
+      </div>
     </div>
   </div>
 </template>
 
 <style scoped>
-/* Background - This is now the card container */
-.auth-background {
-  background: #ffffff;
-  min-height: 100vh;
-  width: 100%;
-  padding: 40px 32px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  border: 1px solid #f3f4f6;
-  border-radius: 24px;
-  transition: all 0.3s ease;
-  position: relative;
-  max-width: 500px;
-  margin: 20px auto;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-.auth-background:hover {
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-}
-
-/* Form Container */
-.form-container {
-  width: 100%;
-}
-
-/* Form Header */
-.form-header {
-  text-align: center;
-  margin-bottom: 32px;
-}
-
-.form-title {
-  font-size: 2.5rem;
+.welcome {
+  font-family: 'Inter', sans-serif;
   font-weight: 700;
-  color: #2563eb;
-  margin: 0 0 8px 0;
-  background: linear-gradient(135deg, #2563eb, #3b82f6);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.form-subtitle {
-  font-size: 1rem;
-  color: #64748b;
-  margin: 0;
-  font-weight: 400;
-}
-
-/* Form Content */
-.form-content {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-}
-
-/* Form Groups */
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.form-label {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: #374151;
-  margin-bottom: 4px;
-}
-
-/* Input Wrapper */
-.input-wrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.form-input {
-  width: 100%;
-  padding: 16px 20px 16px 48px;
-  border: 2px solid #e5e7eb;
-  border-radius: 16px;
-  font-size: 1rem;
-  background: #ffffff;
-  transition: all 0.3s ease;
-  outline: none;
-}
-
-.form-input:focus {
-  border-color: #2563eb;
-  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
-  transform: translateY(-1px);
-}
-
-.form-input.error {
-  border-color: #ef4444;
-  background: #fef2f2;
-}
-
-.form-input.error:focus {
-  box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.1);
-}
-
-.form-input::placeholder {
-  color: #9ca3af;
-  font-weight: 400;
-}
-
-/* Input Icons */
-.input-icon {
-  position: absolute;
-  left: 16px;
-  color: #6b7280;
-  font-size: 1.1rem;
-  z-index: 1;
-  transition: color 0.3s ease;
-}
-
-.input-icon.clickable {
-  cursor: pointer;
-  right: 16px;
-  left: auto;
-}
-
-.input-icon.clickable:hover {
-  color: #2563eb;
-}
-
-.form-input:focus + .input-icon {
-  color: #2563eb;
-}
-
-/* Select Wrapper */
-.select-wrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.form-select {
-  width: 100%;
-  padding: 16px 48px 16px 20px;
-  border: 2px solid #e5e7eb;
-  border-radius: 16px;
-  font-size: 1rem;
-  background: #ffffff;
-  transition: all 0.3s ease;
-  outline: none;
-  appearance: none;
-  cursor: pointer;
-}
-
-.form-select:focus {
-  border-color: #2563eb;
-  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
-  transform: translateY(-1px);
-}
-
-.form-select.error {
-  border-color: #ef4444;
-  background: #fef2f2;
-}
-
-.select-icon {
-  position: absolute;
-  right: 16px;
-  color: #6b7280;
-  font-size: 1rem;
-  pointer-events: none;
-  transition: color 0.3s ease;
-}
-
-.form-select:focus + .select-icon {
-  color: #2563eb;
-}
-
-/* Submit Button */
-.submit-button {
-  background: linear-gradient(135deg, #f59e0b, #d97706);
-  color: white;
-  border: none;
-  border-radius: 16px;
-  padding: 16px 24px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-  margin-top: 8px;
-}
-
-.submit-button:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 24px rgba(245, 158, 11, 0.4);
-}
-
-.submit-button:active:not(:disabled) {
-  transform: translateY(0);
-}
-
-.submit-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  transform: none;
-}
-
-/* Button Spinner */
-.button-spinner {
-  display: inline-block;
-  width: 20px;
-  height: 20px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-radius: 50%;
-  border-top-color: white;
-  animation: spin 1s ease-in-out infinite;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-/* Form Switch */
-.form-switch {
+  font-size: 40px;
+  line-height: 48px;
   text-align: center;
-  margin-top: 8px;
+  color: #0d47a1;
+  text-shadow: 0 2px 4px rgba(13, 71, 161, 0.1);
 }
 
-.switch-text {
-  color: #9ca3af;
-  font-size: 0.875rem;
-  margin-right: 8px;
-}
-
-.switch-link {
-  color: #2563eb;
-  font-weight: 600;
-  text-decoration: none;
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 0.875rem;
-  transition: color 0.3s ease;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.switch-link:hover {
-  color: #1d4ed8;
-}
-
-/* Form Footer */
-.form-footer {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  margin-top: 8px;
-}
-
-.footer-link {
-  color: #2563eb;
-  font-weight: 600;
-  text-decoration: none;
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 0.875rem;
-  transition: color 0.3s ease;
-}
-
-.footer-link:hover {
-  color: #1d4ed8;
-}
-
-.footer-divider {
-  color: #9ca3af;
-  font-size: 0.875rem;
-}
-
-/* Error Message */
-.error-message {
-  color: #ef4444;
-  font-size: 0.75rem;
-  font-weight: 500;
-  margin-top: 4px;
-}
-
-/* Alert Banner */
-.alert-banner {
-  background: #dbeafe;
-  border: 1px solid #3b82f6;
-  border-radius: 12px;
-  padding: 12px 16px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 24px;
-  color: #1e40af;
-  font-size: 0.875rem;
+.sub-welcome {
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 24px;
+  text-align: center;
+  color: #434343;
 }
 
 /* Loading Overlay */
@@ -807,9 +555,13 @@ onMounted(() => {
   width: 40px;
   height: 40px;
   border: 3px solid #e5e7eb;
-  border-top: 3px solid #2563eb;
+  border-top: 3px solid #0d47a1;
   border-radius: 50%;
   animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
 /* Message Container */
@@ -870,24 +622,133 @@ onMounted(() => {
   }
 }
 
+/* Floating animations */
+@keyframes float-1 {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  50% {
+    transform: translate(20px, 20px) rotate(180deg);
+  }
+  100% {
+    transform: translate(0, 0) rotate(360deg);
+  }
+}
+
+@keyframes float-2 {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  50% {
+    transform: translate(-15px, -15px) rotate(-180deg);
+  }
+  100% {
+    transform: translate(0, 0) rotate(-360deg);
+  }
+}
+
+@keyframes float-3 {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(10px, -10px) scale(1.2);
+  }
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+}
+
+.animate-float-1 {
+  animation: float-1 15s ease-in-out infinite;
+}
+
+.animate-float-2 {
+  animation: float-2 12s ease-in-out infinite;
+}
+
+.animate-float-3 {
+  animation: float-3 10s ease-in-out infinite;
+}
+
+/* Text animations */
+.animate-text-focus-in {
+  animation: text-focus-in 1s cubic-bezier(0.55, 0.085, 0.68, 0.53) both;
+}
+
+@keyframes text-focus-in {
+  0% {
+    filter: blur(12px);
+    opacity: 0;
+    letter-spacing: -0.5em;
+  }
+  100% {
+    filter: blur(0);
+    opacity: 1;
+    letter-spacing: normal;
+  }
+}
+
+.animate-tracking-in-expand {
+  animation: tracking-in-expand 0.7s cubic-bezier(0.215, 0.61, 0.355, 1) both;
+}
+
+@keyframes tracking-in-expand {
+  0% {
+    letter-spacing: -0.5em;
+    opacity: 0;
+  }
+  40% {
+    opacity: 0.6;
+  }
+  100% {
+    opacity: 1;
+    letter-spacing: normal;
+  }
+}
+
+.animate-fade-in-delayed {
+  animation: fade-in 1.2s cubic-bezier(0.39, 0.575, 0.565, 1) both;
+  animation-delay: 0.3s;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease both;
+}
+
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* Responsive Design */
+@media (max-width: 1024px) {
+  .welcome {
+    font-size: 32px;
+    line-height: 40px;
+  }
+
+  .sub-welcome {
+    font-size: 18px;
+    line-height: 22px;
+  }
+}
+
 @media (max-width: 480px) {
-  .auth-background {
-    padding: 32px 24px;
-    border-radius: 20px;
-    margin: 10px;
+  .welcome {
+    font-size: 28px;
+    line-height: 36px;
   }
 
-  .form-title {
-    font-size: 2rem;
-  }
-
-  .form-input, .form-select {
-    padding: 14px 18px 14px 44px;
-  }
-
-  .submit-button {
-    padding: 14px 20px;
+  .sub-welcome {
+    font-size: 16px;
+    line-height: 20px;
   }
 
   .message-container {
