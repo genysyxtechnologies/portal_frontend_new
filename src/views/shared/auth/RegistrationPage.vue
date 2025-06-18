@@ -8,6 +8,7 @@ import Dropdown from 'primevue/dropdown'
 import InputText from 'primevue/inputtext'
 import Password from 'primevue/password'
 import Button from 'primevue/button'
+import Steps from 'primevue/steps'
 
 const router = useRouter()
 const {
@@ -39,6 +40,7 @@ const admissions = ref<Admission[]>([])
 const admission = ref<Admission | null>(null)
 const modeOfEntries = ref<Array<{ id: number; title: string }>>([])
 const registering = ref(true)
+const activeStep = ref(0)
 const years = ref<number[]>([])
 const dataValid = ref(true)
 const loginValid = ref(true)
@@ -204,6 +206,76 @@ void dataValid.value
 void validateRequired
 void loadModeOfEntries
 
+// Stepper navigation
+const nextStep = () => {
+  if (canProceedToNextStep()) {
+    activeStep.value++
+  }
+}
+
+const previousStep = () => {
+  if (activeStep.value > 0) {
+    activeStep.value--
+  }
+}
+
+const canProceedToNextStep = () => {
+  const hasConditionalStep = admission.value?.applicationType?.autoLoadUtme || admission.value?.applicationType?.modeOfEntryEnabled
+  
+  switch (activeStep.value) {
+    case 0: // Application selection
+      return admission.value !== null
+    case 1: 
+      if (hasConditionalStep) {
+        // UTME/Mode of Entry step
+        const utmeValid = !admission.value?.applicationType?.autoLoadUtme || jambRegNumber.value
+        const modeValid = !admission.value?.applicationType?.modeOfEntryEnabled || obj.value.modeOfEntryId
+        return utmeValid && modeValid
+      } else {
+        // Email step (when no conditional step)
+        return obj.value.emailAddress && validateEmail(obj.value.emailAddress) === true
+      }
+    case 2:
+      if (hasConditionalStep) {
+        // Email step (when conditional step exists)
+        return obj.value.emailAddress && validateEmail(obj.value.emailAddress) === true
+      } else {
+        // Password step (when no conditional step)
+        return obj.value.password && validatePassword(obj.value.password) === true && 
+               obj.value.confirmPassword && obj.value.password === obj.value.confirmPassword
+      }
+    case 3: // Password step (when conditional step exists)
+      return obj.value.password && validatePassword(obj.value.password) === true && 
+             obj.value.confirmPassword && obj.value.password === obj.value.confirmPassword
+    default:
+      return false
+  }
+}
+
+const isStepValid = (stepIndex: number) => {
+  const currentActive = activeStep.value
+  activeStep.value = stepIndex
+  const valid = canProceedToNextStep()
+  activeStep.value = currentActive
+  return valid
+}
+
+// Computed for dynamic steps
+const registrationSteps = computed(() => {
+  const steps = [
+    { label: 'Application', key: 'application' },
+    { label: 'Email', key: 'email' },
+    { label: 'Password', key: 'password' }
+  ]
+  
+  // Insert UTME/Mode step if needed
+  if (admission.value?.applicationType?.autoLoadUtme || admission.value?.applicationType?.modeOfEntryEnabled) {
+    steps.splice(1, 0, { label: 'Details', key: 'details' })
+  }
+  
+  return steps
+})
+
 // Lifecycle
 onMounted(() => {
   getAdmissions()
@@ -243,17 +315,26 @@ onMounted(() => {
           <h3 class="sub-welcome animate-tracking-in-expand delay-100">Start your application below</h3>
         </div>
 
-        <form class="flex flex-col gap-6 animate-fade-in-delayed" @submit.prevent="submitData">
-          <div class="flex flex-col gap-6">
-            <!-- Application Selection -->
+        <!-- Steps Navigation -->
+        <div class="mb-8">
+          <Steps
+            :model="registrationSteps"
+            :activeStep="activeStep"
+            class="custom-steps"
+          />
+        </div>
+
+        <form class="flex flex-col gap-6 animate-fade-in-delayed" @submit.prevent="activeStep === registrationSteps.length - 1 ? submitData() : nextStep()">
+          <!-- Step 0: Application Selection -->
+          <div v-if="activeStep === 0" class="step-content">
             <div class="flex flex-col space-y-2">
-              <label for="application" class="text-[#0D47A1] font-medium text-sm">Application</label>
+              <label for="application" class="text-[#0D47A1] font-medium text-sm">Select Application</label>
               <div class="relative w-full">
                 <Dropdown
                   v-model="admission"
                   :options="admissions"
                   optionLabel="name"
-                  placeholder="Select Application"
+                  placeholder="Choose your application type"
                   id="application"
                   class="w-full"
                   :class="{'p-invalid': admission === null && admissions.length > 0}"
@@ -274,11 +355,14 @@ onMounted(() => {
                 </Dropdown>
               </div>
             </div>
+          </div>
 
-            <!-- UTME Number Field (conditional) -->
+          <!-- Step 1: UTME/Mode of Entry (conditional) -->
+          <div v-else-if="activeStep === 1 && (admission?.applicationType?.autoLoadUtme || admission?.applicationType?.modeOfEntryEnabled)" class="step-content">
+            <!-- UTME Number Field -->
             <div
-              v-if="admission != null && admission.applicationType.autoLoadUtme === true"
-              class="flex flex-col space-y-2"
+              v-if="admission.applicationType.autoLoadUtme === true"
+              class="flex flex-col space-y-2 mb-6"
             >
               <label for="utme" class="text-[#0D47A1] font-medium text-sm">UTME No. or User ID</label>
               <div class="relative w-full">
@@ -295,9 +379,9 @@ onMounted(() => {
               </div>
             </div>
 
-            <!-- Mode of Entry (conditional) -->
+            <!-- Mode of Entry -->
             <div
-              v-if="admission != null && admission.applicationType.modeOfEntryEnabled === true"
+              v-if="admission.applicationType.modeOfEntryEnabled === true"
               class="flex flex-col space-y-2"
             >
               <label for="modeOfEntry" class="text-[#0D47A1] font-medium text-sm">Mode of Entry</label>
@@ -314,16 +398,18 @@ onMounted(() => {
                 />
               </div>
             </div>
+          </div>
 
-            <!-- Email -->
+          <!-- Step 2/1: Email -->
+          <div v-else-if="(activeStep === 2 && (admission?.applicationType?.autoLoadUtme || admission?.applicationType?.modeOfEntryEnabled)) || (activeStep === 1 && !(admission?.applicationType?.autoLoadUtme || admission?.applicationType?.modeOfEntryEnabled))" class="step-content">
             <div class="flex flex-col space-y-2">
-              <label for="email" class="text-[#0D47A1] font-medium text-sm">Email</label>
+              <label for="email" class="text-[#0D47A1] font-medium text-sm">Email Address</label>
               <div class="relative w-full">
                 <InputText
                   v-model="obj.emailAddress"
                   type="email"
                   id="email"
-                  placeholder="Enter your email"
+                  placeholder="Enter your email address"
                   class="w-full pl-12"
                   :class="{'p-invalid': obj.emailAddress && validateEmail(obj.emailAddress) !== true}"
                   @blur="validateEmail(obj.emailAddress)"
@@ -336,73 +422,87 @@ onMounted(() => {
                 {{ validateEmail(obj.emailAddress) }}
               </small>
             </div>
+          </div>
 
-            <!-- Password -->
-            <div class="flex flex-col space-y-2">
-              <label for="password" class="text-[#0D47A1] font-medium text-sm">Password</label>
-              <div class="relative w-full">
-                <Password
-                  v-model="obj.password"
-                  :feedback="false"
-                  toggleMask
-                  id="password"
-                  placeholder="Enter your password"
-                  class="w-full"
-                  :inputClass="{'p-invalid': obj.password && validatePassword(obj.password) !== true}"
-                  @blur="validatePassword(obj.password)"
-                />
+          <!-- Step 3/2: Password & Confirm Password -->
+          <div v-else-if="(activeStep === 3 && (admission?.applicationType?.autoLoadUtme || admission?.applicationType?.modeOfEntryEnabled)) || (activeStep === 2 && !(admission?.applicationType?.autoLoadUtme || admission?.applicationType?.modeOfEntryEnabled))" class="step-content">
+            <div class="flex flex-col space-y-6">
+              <!-- Password -->
+              <div class="flex flex-col space-y-2">
+                <label for="password" class="text-[#0D47A1] font-medium text-sm">Password</label>
+                <div class="relative w-full">
+                  <Password
+                    v-model="obj.password"
+                    :feedback="false"
+                    toggleMask
+                    id="password"
+                    placeholder="Enter your password"
+                    class="w-full"
+                    :inputClass="{'p-invalid': obj.password && validatePassword(obj.password) !== true}"
+                    @blur="validatePassword(obj.password)"
+                  />
+                </div>
+                <small v-if="obj.password && validatePassword(obj.password) !== true" class="p-error animate-fade-in">
+                  {{ validatePassword(obj.password) }}
+                </small>
               </div>
-              <small v-if="obj.password && validatePassword(obj.password) !== true" class="p-error animate-fade-in">
-                {{ validatePassword(obj.password) }}
-              </small>
-            </div>
 
-            <!-- Confirm Password -->
-            <div class="flex flex-col space-y-2">
-              <label for="confirmPassword" class="text-[#0D47A1] font-medium text-sm">Confirm Password</label>
-              <div class="relative w-full">
-                <Password
-                  v-model="obj.confirmPassword"
-                  :feedback="false"
-                  toggleMask
-                  id="confirmPassword"
-                  placeholder="Confirm your password"
-                  class="w-full"
-                  :inputClass="{'p-invalid': obj.confirmPassword && obj.password !== obj.confirmPassword}"
-                />
+              <!-- Confirm Password -->
+              <div class="flex flex-col space-y-2">
+                <label for="confirmPassword" class="text-[#0D47A1] font-medium text-sm">Confirm Password</label>
+                <div class="relative w-full">
+                  <Password
+                    v-model="obj.confirmPassword"
+                    :feedback="false"
+                    toggleMask
+                    id="confirmPassword"
+                    placeholder="Confirm your password"
+                    class="w-full"
+                    :inputClass="{'p-invalid': obj.confirmPassword && obj.password !== obj.confirmPassword}"
+                  />
+                </div>
+                <small v-if="obj.confirmPassword && obj.password !== obj.confirmPassword" class="p-error animate-fade-in">
+                  Passwords do not match
+                </small>
               </div>
-              <small v-if="obj.confirmPassword && obj.password !== obj.confirmPassword" class="p-error animate-fade-in">
-                Passwords do not match
-              </small>
             </div>
           </div>
 
-          <!-- Submit Button -->
-          <div class="flex flex-col gap-6">
-            <div class="flex flex-col space-y-4">
-              <Button
-                type="submit"
-                label="Proceed"
-                :loading="loading"
-                :disabled="!isFormValid || loading"
-                class="w-full hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300"
-              />
-            </div>
+          <!-- Navigation Buttons -->
+          <div class="flex justify-between items-center gap-4 mt-8">
+            <Button
+              v-if="activeStep > 0"
+              type="button"
+              label="Previous"
+              severity="secondary"
+              outlined
+              @click="previousStep"
+              class="transition-all duration-300"
+            />
+            <div v-else></div>
+            
+            <Button
+              type="submit"
+              :label="activeStep === registrationSteps.length - 1 ? 'Complete Registration' : 'Next'"
+              :loading="loading"
+              :disabled="!canProceedToNextStep() || loading"
+              class="hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300"
+            />
+          </div>
 
-            <!-- Switch to Login -->
-            <div class="flex flex-col text-center space-y-1">
-              <span class="text-gray-400">Already applied?</span>
-              <div class="flex self-center items-center gap-2">
-                <span
-                  @click="registering = false"
-                  class="text-blue-700 font-medium hover:text-blue-800 cursor-pointer transition-colors duration-300"
-                >
-                  Login here
-                </span>
-                <span class="flex transition-transform duration-300 hover:translate-x-1">
-                  <i class="pi pi-arrow-right"></i>
-                </span>
-              </div>
+          <!-- Switch to Login -->
+          <div class="flex flex-col text-center space-y-1 mt-6">
+            <span class="text-gray-400">Already applied?</span>
+            <div class="flex self-center items-center gap-2">
+              <span
+                @click="registering = false"
+                class="text-blue-700 font-medium hover:text-blue-800 cursor-pointer transition-colors duration-300"
+              >
+                Login here
+              </span>
+              <span class="flex transition-transform duration-300 hover:translate-x-1">
+                <i class="pi pi-arrow-right"></i>
+              </span>
             </div>
           </div>
         </form>
@@ -806,6 +906,75 @@ onMounted(() => {
 
 .p-error {
   color: #ef4444;
+}
+
+/* Steps Component Styling */
+:deep(.p-steps) {
+  padding: 0;
+}
+
+:deep(.p-steps .p-steps-list) {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+}
+
+:deep(.p-steps .p-steps-item) {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+:deep(.p-steps .p-steps-item .p-steps-number) {
+  background: #e5e7eb;
+  color: #6b7280;
+  border-radius: 50%;
+  width: 2.5rem;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+:deep(.p-steps .p-steps-item.p-highlight .p-steps-number) {
+  background: #0d47a1;
+  color: white;
+}
+
+:deep(.p-steps .p-steps-item .p-steps-title) {
+  color: #6b7280;
+  font-weight: 500;
+  font-size: 0.875rem;
+  transition: all 0.3s ease;
+}
+
+:deep(.p-steps .p-steps-item.p-highlight .p-steps-title) {
+  color: #0d47a1;
+  font-weight: 600;
+}
+
+/* Step Content Animation */
+.step-content {
+  animation: fadeSlideIn 0.5s ease-out;
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+@keyframes fadeSlideIn {
+  0% {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 /* Responsive Design */
